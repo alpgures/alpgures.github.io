@@ -34,54 +34,35 @@
 }
 .proj-scene .scn { width: 100%; height: auto; max-height: 380px; display: block; }
 
-/* ---------- PlaneFrame: the flight ---------- */
+/* ---------- PlaneFrame: e-ink display mockup ---------- */
 
-.sc-plane .scn-trail {
-  animation: scn-trail-flow 1.4s linear infinite, scn-fade-cycle 9s var(--ease-flow) infinite;
-}
-@keyframes scn-trail-flow {
-  to { stroke-dashoffset: -20; }
-}
+.sc-plane .scn-eink { animation: scn-float 7s ease-in-out infinite; }
 
-.sc-plane .scn-plane {
-  offset-path: path('M24 208 C 110 200, 150 150, 210 120 S 320 70, 352 82');
-  offset-rotate: auto;
-  animation: scn-fly 9s var(--ease-flow) infinite;
+.sc-plane .scn-fplane {
+  offset-path: path('M112 126 H288');
+  animation: scn-ffly 8s var(--ease-flow) infinite;
 }
-@keyframes scn-fly {
+@keyframes scn-ffly {
   0% { offset-distance: 0%; opacity: 1; }
-  32% { offset-distance: 100%; opacity: 1; }
-  38%, 100% { offset-distance: 100%; opacity: 0; }
+  76% { offset-distance: 100%; opacity: 1; }
+  86%, 100% { offset-distance: 100%; opacity: 0; }
 }
 
-.sc-plane .scn-display {
+.sc-plane .scn-progfill {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: scn-pfill 8s var(--ease-flow) infinite;
+}
+@keyframes scn-pfill {
+  0% { stroke-dashoffset: 100; opacity: 1; }
+  76% { stroke-dashoffset: 0; opacity: 1; }
+  86%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+.sc-plane .scn-livedot {
   transform-box: fill-box;
   transform-origin: center;
-  animation: scn-pop-in 9s var(--ease-flow) infinite;
-}
-@keyframes scn-pop-in {
-  0%, 30% { opacity: 0; transform: scale(0.9); }
-  40%, 82% { opacity: 1; transform: scale(1); }
-  92%, 100% { opacity: 0; transform: scale(0.96); }
-}
-
-.sc-plane .scn-dline {
-  animation: scn-line-in 9s var(--ease-flow) infinite;
-}
-.sc-plane .scn-dline:nth-of-type(2) { animation-delay: 0.35s; }
-.sc-plane .scn-dline:nth-of-type(3) { animation-delay: 0.7s; }
-.sc-plane .scn-dline:nth-of-type(4) { animation-delay: 1.05s; }
-@keyframes scn-line-in {
-  0%, 36% { opacity: 0; transform: translateY(6px); }
-  46%, 82% { opacity: 0.85; transform: translateY(0); }
-  92%, 100% { opacity: 0; }
-}
-.sc-plane .scn-dline { transform-box: fill-box; }
-
-@keyframes scn-fade-cycle {
-  0%, 6% { opacity: 0; }
-  14%, 82% { opacity: 1; }
-  92%, 100% { opacity: 0; }
+  animation: scn-pulse 2s ease-in-out infinite;
 }
 
 /* ---------- Kotoban: simplified app mockup ---------- */

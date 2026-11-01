@@ -5,15 +5,26 @@
 function scenePlane() {
   return (
     '<svg class="scn sc-plane" viewBox="0 0 400 250" aria-hidden="true">' +
-    '<path class="scn-trail" d="M24 208 C 110 200, 150 150, 210 120 S 320 70, 352 82" fill="none" stroke="#c8412b" stroke-width="2.5" stroke-dasharray="1 9" stroke-linecap="round"/>' +
-    '<g class="scn-plane"><path d="M0 0 L30 10 L0 20 L9 10 Z" fill="#c8412b"/></g>' +
-    '<g class="scn-display">' +
-    '<rect x="262" y="28" width="122" height="100" rx="12" fill="#fffdf8" stroke="#1b1815" stroke-width="2.5"/>' +
-    '<circle cx="282" cy="52" r="7" fill="#c8412b"/>' +
-    '<rect class="scn-dline" x="296" y="46" width="66" height="9" rx="4.5" fill="#1b1815" opacity="0.85"/>' +
-    '<rect class="scn-dline" x="276" y="68" width="92" height="7" rx="3.5" fill="#1b1815" opacity="0.35"/>' +
-    '<rect class="scn-dline" x="276" y="84" width="70" height="7" rx="3.5" fill="#1b1815" opacity="0.35"/>' +
-    '<rect class="scn-dline" x="276" y="100" width="80" height="7" rx="3.5" fill="#1b1815" opacity="0.35"/>' +
+    '<g class="scn-eink">' +
+    '<rect x="70" y="26" width="260" height="172" rx="12" fill="#1b1815"/>' +
+    '<rect x="82" y="38" width="236" height="148" rx="4" fill="#f4f1e8"/>' +
+    '<circle class="scn-livedot" cx="102" cy="60" r="4" fill="#c8412b"/>' +
+    '<text x="200" y="66" text-anchor="middle" font-size="15" font-weight="600" letter-spacing="3" font-family="Inter, sans-serif" fill="#1b1815">TK 1987</text>' +
+    '<text x="200" y="85" text-anchor="middle" font-size="11" letter-spacing="2" font-family="Inter, sans-serif" fill="#6f6a62">JFK &#8594; IST</text>' +
+    '<line x1="100" y1="97" x2="300" y2="97" stroke="#d8d0c2" stroke-width="1.5"/>' +
+    '<line x1="112" y1="126" x2="288" y2="126" stroke="#e2dccf" stroke-width="3" stroke-linecap="round"/>' +
+    '<line class="scn-progfill" x1="112" y1="126" x2="288" y2="126" stroke="#1b1815" stroke-width="3" stroke-linecap="round" pathLength="100"/>' +
+    '<circle cx="112" cy="126" r="5" fill="#1b1815"/>' +
+    '<circle cx="288" cy="126" r="5" fill="none" stroke="#1b1815" stroke-width="2.5"/>' +
+    '<g class="scn-fplane"><path d="M0 -8 L22 0 L0 8 L6 0 Z" fill="#c8412b"/></g>' +
+    '<text x="130" y="156" text-anchor="middle" font-size="9" letter-spacing="1.5" font-family="Inter, sans-serif" fill="#6f6a62">ALT</text>' +
+    '<text x="130" y="172" text-anchor="middle" font-size="14" font-weight="600" font-family="Inter, sans-serif" fill="#1b1815">38,000</text>' +
+    '<text x="200" y="156" text-anchor="middle" font-size="9" letter-spacing="1.5" font-family="Inter, sans-serif" fill="#6f6a62">SPD</text>' +
+    '<text x="200" y="172" text-anchor="middle" font-size="14" font-weight="600" font-family="Inter, sans-serif" fill="#1b1815">520 KT</text>' +
+    '<text x="270" y="156" text-anchor="middle" font-size="9" letter-spacing="1.5" font-family="Inter, sans-serif" fill="#6f6a62">HDG</text>' +
+    '<text x="270" y="172" text-anchor="middle" font-size="14" font-weight="600" font-family="Inter, sans-serif" fill="#1b1815">084&#176;</text>' +
+    '<rect x="186" y="198" width="28" height="16" fill="#1b1815"/>' +
+    '<rect x="150" y="212" width="100" height="9" rx="4.5" fill="#1b1815"/>' +
     "</g></svg>"
   );
 }
