@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alp D. Güreş – Brown '27</title>
+<meta name="description" content="Alp D. Güreş: Brown University senior (Sc.B. Biology '27) working across research, data, and operations. Recruiting for strategy and operations roles.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐦</text></svg>">
+</head>
+<body>
+
+<nav class="nav">
+  <a href="#top" class="nav-name" data-field="hero.name">Alp D. Güreş</a>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#experience">Experience</a>
+    <a href="#projects">Projects</a>
+    <a href="#contact">Contact</a>
+    <a href="resume.pdf" class="nav-resume" target="_blank" rel="noopener">Resume ↓</a>
+  </div>
+</nav>
+
+<main id="top">
+
+<header class="hero">
+  <p class="hero-kicker" data-field="hero.kicker"></p>
+  <h1 data-field="hero.name"></h1>
+  <p class="hero-sub" data-field="hero.sub"></p>
+  <p class="hero-meta" data-field="hero.meta"></p>
+  <div class="hero-actions">
+    <a class="btn" href="resume.pdf" target="_blank" rel="noopener">Download resume</a>
+    <a class="btn btn-ghost" data-field="contact.email" data-attr="href" data-prefix="mailto:">Get in touch</a>
+  </div>
+</header>
+
+<section id="about">
+  <h2>About</h2>
+  <div data-list="about" data-tag="p"></div>
+</section>
+
+<section id="experience">
+  <h2>Experience</h2>
+  <div id="experience-list"></div>
+</section>
+
+<section id="projects">
+  <h2>Projects</h2>
+  <div id="projects-list"></div>
+</section>
+
+<section id="skills">
+  <h2>Skills &amp; languages</h2>
+  <div class="skills-grid">
+    <div>
+      <h3>Tools &amp; data</h3>
+      <p data-field="skills.tools"></p>
+    </div>
+    <div>
+      <h3>Languages</h3>
+      <p data-field="skills.languages"></p>
+    </div>
+    <div>
+      <h3>Education</h3>
+      <p data-field="skills.education"></p>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <h2>Contact</h2>
+  <p data-field="contact.blurb"></p>
+  <div class="contact-links">
+    <a data-field="contact.email" data-attr="href" data-prefix="mailto:" data-label="contact.email"></a>
+    <a data-field="contact.linkedin" data-attr="href" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="resume.pdf" target="_blank" rel="noopener">Resume (PDF)</a>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>© 2026 <span data-field="hero.name"></span> – Providence, RI</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,68 @@
+# Decap CMS config for alpgures.me
+# ------------------------------------------------------------------
+# BEFORE DEPLOYING: replace REPO-NAME below with the actual GitHub
+# Pages repo name (e.g. alpgures/alpgures.github.io), and set base_url
+# to the deployed OAuth gateway worker URL (see oauth-worker.js).
+# ------------------------------------------------------------------
+
+backend:
+  name: github
+  repo: alpgures/alpgures.github.io
+  branch: main
+  base_url: https://alpgures-me-auth.guresalpdeniz.workers.dev
+  auth_endpoint: auth
+
+media_folder: "images"
+public_folder: "/images"
+
+collections:
+  - name: site
+    label: "Site content"
+    files:
+      - name: content
+        label: "All site content"
+        file: "data/site.json"
+        fields:
+          - label: "Hero"
+            name: hero
+            widget: object
+            fields:
+              - { label: "Name", name: name, widget: string }
+              - { label: "Kicker (small line above name)", name: kicker, widget: string }
+              - { label: "Intro sentence", name: sub, widget: text }
+              - { label: "Location line", name: meta, widget: string }
+          - label: "About paragraphs"
+            name: about
+            widget: list
+            field: { label: "Paragraph", name: paragraph, widget: text }
+          - label: "Experience entries"
+            name: experience
+            widget: list
+            fields:
+              - { label: "Title", name: title, widget: string }
+              - { label: "Organization / location", name: org, widget: string }
+              - { label: "Dates", name: date, widget: string }
+              - label: "Bullets"
+                name: bullets
+                widget: list
+                field: { label: "Bullet", name: bullet, widget: text }
+          - label: "Projects"
+            name: projects
+            widget: list
+            fields:
+              - { label: "Title", name: title, widget: string }
+              - { label: "Blurb", name: blurb, widget: text }
+          - label: "Skills"
+            name: skills
+            widget: object
+            fields:
+              - { label: "Tools & data", name: tools, widget: text }
+              - { label: "Languages", name: languages, widget: text }
+              - { label: "Education", name: education, widget: text }
+          - label: "Contact"
+            name: contact
+            widget: object
+            fields:
+              - { label: "Blurb", name: blurb, widget: text }
+              - { label: "Email", name: email, widget: string }
+              - { label: "LinkedIn URL", name: linkedin, widget: string }
