@@ -73,7 +73,7 @@
 .sc-koto .scn-wrow.wr2 rect { animation-delay: -3s; }
 .sc-koto .scn-wrow.wr3 rect { animation-delay: -6s; }
 @keyframes scn-row-cycle {
-  0%, 10% { fill: #c8412b; }
+  0%, 10% { fill: #5b6b84; }
   24%, 100% { fill: #f6f1e8; }
 }
 .sc-koto .scn-wrow text { animation: scn-row-text 9s var(--ease-flow) infinite; }
@@ -100,7 +100,7 @@
 .sc-rui .scn-pill.p3 rect { animation-delay: -6s; }
 .sc-rui .scn-pill.p4 rect { animation-delay: -8s; }
 @keyframes scn-pill-cycle {
-  0%, 10% { fill: #c8412b; }
+  0%, 10% { fill: #5b6b84; }
   20%, 100% { fill: #f1ece2; }
 }
 .sc-rui .scn-pill text { animation: scn-pill-text 10s var(--ease-flow) infinite; }
@@ -123,27 +123,9 @@
   50% { transform: scale(1.14); }
 }
 
-/* ---------- Hero: drifting language chips ---------- */
+/* ---------- Hero: drifting language chips (rendered by app.js) ---------- */
 
 .hero { position: relative; }
-.chips { position: absolute; inset: 0; pointer-events: none; }
-.chips span {
-  position: absolute;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--muted);
-  background: rgba(27, 29, 34, 0.85);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 4px 12px;
-  animation: scn-drift 7s ease-in-out infinite;
-  white-space: nowrap;
-}
-.chips span:nth-child(1) { top: 6%; left: 2%; animation-delay: 0s; }
-.chips span:nth-child(2) { top: 18%; right: 4%; animation-delay: -1.8s; animation-duration: 8s; }
-.chips span:nth-child(3) { bottom: 24%; left: 5%; animation-delay: -3.5s; animation-duration: 6.4s; }
-.chips span:nth-child(4) { top: 46%; right: 1%; animation-delay: -5s; animation-duration: 7.6s; }
-.chips span:nth-child(5) { bottom: 10%; right: 14%; animation-delay: -2.6s; }
 
 /* ---------- DCT Asistan: spindle + app overview ---------- */
 
@@ -194,7 +176,7 @@
 /* ---------- Reduced motion ---------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .scn *, .scn, .chips span {
+  .scn *, .scn, .chip-x, .chip-x .chip, .aurora, .stars circle.tw {
     animation: none !important;
   }
   .rv { opacity: 1; translate: none; transition: none; }
@@ -204,6 +186,6 @@
 }
 
 @media (max-width: 700px) {
-  .chips span:nth-child(4),
-  .chips span:nth-child(5) { display: none; }
+  .hero { min-height: 96vh; padding-bottom: 170px; }
+  .taurus { height: 36vh; }
 }

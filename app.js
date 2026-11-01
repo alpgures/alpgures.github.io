@@ -77,6 +77,38 @@
       var cards = document.getElementById("project-cards");
       if (cards) cards.innerHTML = renderProjectCards(data.projects || []);
 
+      // Hero: floating language chips drift the full hero width, very slowly.
+      // Words come from data.hero.floating_words (editable in /admin); extras
+      // simply spread out — traverse timing keeps some off-screen at any moment.
+      var chipsBox = document.querySelector(".hero .chips");
+      if (chipsBox) {
+        var words = (data.hero && data.hero.floating_words) || [
+          "言葉", "bạn", "merhaba", "こんにちは", "hello",
+        ];
+        chipsBox.innerHTML = "";
+        words.forEach(function (w) {
+          var ltr = Math.random() < 0.5;
+          var dur = 80 + Math.random() * 80; // 80-160s: barely moving
+          var from = ltr ? -18 - Math.random() * 8 : 108 + Math.random() * 8;
+          var to = ltr ? 108 + Math.random() * 8 : -18 - Math.random() * 8;
+          var outer = document.createElement("span");
+          outer.className = "chip-x";
+          outer.style.top = (4 + Math.random() * 20).toFixed(1) + "%"; // sky band, clear of the text
+          outer.style.setProperty("--fx", from.toFixed(1) + "vw");
+          outer.style.setProperty("--tx", to.toFixed(1) + "vw");
+          outer.style.animationDuration = dur.toFixed(1) + "s";
+          outer.style.animationDelay = (-Math.random() * dur).toFixed(1) + "s";
+          var inner = document.createElement("span");
+          inner.className = "chip";
+          inner.textContent = w;
+          inner.style.opacity = (0.45 + Math.random() * 0.3).toFixed(2);
+          inner.style.animationDuration = (8 + Math.random() * 6).toFixed(1) + "s";
+          inner.style.animationDelay = (-Math.random() * 10).toFixed(1) + "s";
+          outer.appendChild(inner);
+          chipsBox.appendChild(outer);
+        });
+      }
+
       var exp = document.getElementById("experience-list");
       if (exp) exp.innerHTML = renderExperience(data.experience || []);
 

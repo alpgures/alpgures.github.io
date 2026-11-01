@@ -28,6 +28,10 @@ collections:
             widget: object
             fields:
               - { label: "Name", name: name, widget: string }
+          - label: "Floating words (drift across the hero sky)"
+            name: floating_words
+            widget: list
+            field: { label: "Word", name: word, widget: string }
               - { label: "Kicker (small line above name)", name: kicker, widget: string }
               - { label: "Intro sentence", name: sub, widget: text }
               - { label: "Location line", name: meta, widget: string }

@@ -91,7 +91,52 @@ section h2 {
 
 /* Hero */
 
-.hero { padding: 84px 0 40px; }
+.hero {
+  position: relative;
+  overflow: hidden;
+  min-height: 92vh;
+  display: flex;
+  align-items: center;
+  padding: 84px 0 150px;
+}
+.hero-bg { position: absolute; inset: 0; pointer-events: none; }
+.hero-bg .aurora { position: absolute; border-radius: 50%; filter: blur(80px); z-index: 0; }
+.aurora-a {
+  width: 70vw; height: 52vh; left: -10vw; top: -16vh;
+  background: radial-gradient(ellipse at center, rgba(147,160,180,0.08), transparent 70%);
+  animation: aurora-drift 110s ease-in-out infinite alternate;
+}
+@keyframes aurora-drift {
+  from { transform: translate3d(-4vw, 0, 0) scale(1); }
+  to { transform: translate3d(4vw, 2vh, 0) scale(1.08); }
+}
+.stars { position: absolute; left: 0; top: 0; width: 100%; height: 58%; z-index: 0; }
+.stars circle.tw { animation: twinkle 7s ease-in-out infinite; }
+@keyframes twinkle { 0%, 100% { opacity: 0.14; } 50% { opacity: 0.55; } }
+.taurus { position: absolute; left: 0; right: 0; bottom: -2px; width: 100%; height: 44vh; z-index: 1; }
+.chips { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
+.chip-x { position: absolute; left: 0; animation: chip-trav linear infinite; will-change: transform; }
+@keyframes chip-trav {
+  from { transform: translateX(var(--fx, -15vw)); }
+  to { transform: translateX(var(--tx, 112vw)); }
+}
+.chip-x .chip {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+  background: rgba(27, 29, 34, 0.8);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 12px;
+  white-space: nowrap;
+  animation: chip-bob ease-in-out infinite;
+}
+@keyframes chip-bob {
+  0%, 100% { transform: translateY(-5px); }
+  50% { transform: translateY(5px); }
+}
+.hero-inner { position: relative; z-index: 3; width: 100%; max-width: 740px; margin: 0 auto; padding: 0 28px; }
 
 .hero-kicker {
   color: var(--accent);
