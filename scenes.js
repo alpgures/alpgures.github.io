@@ -14,15 +14,27 @@ function scenePlane() {
     '<path d="M90 98 Q170 104 250 98"/>' +
     '<path d="M90 124 Q170 118 250 124"/>' +
     "</g>" +
-    '<g class="scn-jet"><image href="/images/jet-747.png" x="90" y="60" width="220" height="53.5"/></g>' +
-    '<text x="94" y="142" font-size="12" font-weight="600" font-family="Inter, sans-serif" fill="#1b1815">Güreş Airways</text>' +
-    '<text x="208" y="142" font-size="10" font-family="Inter, sans-serif" fill="#6f6a62">AG2027</text>' +
-    '<text x="94" y="154" font-size="9" font-family="Inter, sans-serif" fill="#6f6a62">Boeing 747-1000</text>' +
-    '<text x="156" y="170" text-anchor="middle" font-size="15" font-weight="700" letter-spacing="1" font-family="Inter, sans-serif" fill="#1b1815">NRN</text>' +
-    '<text x="200" y="169" text-anchor="middle" font-size="9" font-family="Inter, sans-serif" fill="#6f6a62">to</text>' +
-    '<text x="244" y="170" text-anchor="middle" font-size="15" font-weight="700" letter-spacing="1" font-family="Inter, sans-serif" fill="#1b1815">GTH</text>' +
-    '<text x="156" y="180" text-anchor="middle" font-size="8" font-family="Inter, sans-serif" fill="#6f6a62">Narnia</text>' +
-    '<text x="244" y="180" text-anchor="middle" font-size="8" font-family="Inter, sans-serif" fill="#6f6a62">Gotham</text>' +
+    '<g transform="translate(107,68)"><g class="scn-jet"><g transform="scale(0.88)">' +
+    '<path d="M18 16 L32 -12 L46 -12 L54 16 Z" fill="#1b1815"/>' +
+    '<path d="M32 -12 L46 -12 L44 -6 L34 -6 Z" fill="#c8412b"/>' +
+    '<path d="M12 46 L36 46 L28 56 L18 56 Z" fill="#1b1815"/>' +
+    '<path d="M10 46 L128 46 Q166 46 182 38 Q196 32 194 24 Q192 16 180 16 L156 16 Q150 16 148 9 L116 9 Q104 9 100 16 L26 16 Q10 16 10 30 Z" fill="#1b1815"/>' +
+    '<path d="M168 19 L190 19 L186 25 L166 25 Z" fill="#f4f1e8"/>' +
+    '<rect x="34" y="26" width="106" height="2.6" rx="1.3" fill="#f4f1e8" opacity="0.85"/>' +
+    '<rect x="34" y="30.6" width="106" height="1.6" fill="#c8412b" opacity="0.9"/>' +
+    '<rect x="118" y="12.6" width="26" height="2.2" rx="1.1" fill="#f4f1e8" opacity="0.85"/>' +
+    '<path d="M105 46 L150 46 L85 84 L60 80 Z" fill="#1b1815"/>' +
+    '<ellipse cx="118" cy="58" rx="14" ry="5.5" fill="#1b1815" transform="rotate(-21 118 58)"/>' +
+    '<ellipse cx="96" cy="66" rx="14" ry="5.5" fill="#1b1815" transform="rotate(-21 96 66)"/>' +
+    "</g></g></g>" +
+    '<text x="94" y="148" font-size="12" font-weight="600" font-family="Inter, sans-serif" fill="#1b1815">Güreş Airways</text>' +
+    '<text x="208" y="148" font-size="10" font-family="Inter, sans-serif" fill="#6f6a62">AG2027</text>' +
+    '<text x="94" y="159" font-size="9" font-family="Inter, sans-serif" fill="#6f6a62">Boeing 747-1000</text>' +
+    '<text x="156" y="173" text-anchor="middle" font-size="15" font-weight="700" letter-spacing="1" font-family="Inter, sans-serif" fill="#1b1815">NRN</text>' +
+    '<text x="200" y="172" text-anchor="middle" font-size="9" font-family="Inter, sans-serif" fill="#6f6a62">to</text>' +
+    '<text x="244" y="173" text-anchor="middle" font-size="15" font-weight="700" letter-spacing="1" font-family="Inter, sans-serif" fill="#1b1815">GTH</text>' +
+    '<text x="156" y="183" text-anchor="middle" font-size="8" font-family="Inter, sans-serif" fill="#6f6a62">Narnia</text>' +
+    '<text x="244" y="183" text-anchor="middle" font-size="8" font-family="Inter, sans-serif" fill="#6f6a62">Gotham</text>' +
     '<rect x="186" y="198" width="28" height="16" fill="#1b1815"/>' +
     '<rect x="150" y="212" width="100" height="9" rx="4.5" fill="#1b1815"/>' +
     "</g></svg>"
@@ -68,38 +80,62 @@ function sceneFor(slug, image, title) {
   return sceneRecipeUI();
 }
 
-/* İğde: WhatsApp business assistant mockup, same simplified language. */
+/* İğde: cotton picker spindle + DCT Asistan app overview (Bugün/post tab). */
 function sceneDct() {
+  var teeth = "";
+  for (var i = 0; i < 12; i++) {
+    var a = (i / 12) * Math.PI * 2;
+    var tx = 35 + Math.cos(a) * 24, ty = 168 + Math.sin(a) * 24;
+    teeth += '<rect x="' + (tx - 3).toFixed(1) + '" y="' + (ty - 3).toFixed(1) + '" width="6" height="6" rx="1.5" fill="#7d838a" transform="rotate(' + (a * 180 / Math.PI).toFixed(1) + " " + tx.toFixed(1) + " " + ty.toFixed(1) + ')"/>';
+  }
+  var barbs = "";
+  for (var b = 0; b < 6; b++) {
+    var y = 138 - b * 20;
+    var xl = 23 + 8 * ((150 - y) / 136);
+    var xr = 47 - 8 * ((150 - y) / 136);
+    barbs += '<path d="M' + xl.toFixed(1) + " " + y + ' l -7 5" stroke="#8f959b" stroke-width="2" stroke-linecap="round"/>';
+    barbs += '<path d="M' + xr.toFixed(1) + " " + y + ' l 7 5" stroke="#8f959b" stroke-width="2" stroke-linecap="round"/>';
+  }
   return (
     '<svg class="scn sc-dct" viewBox="0 0 400 250" aria-hidden="true">' +
-    '<circle class="scn-dot" cx="64" cy="182" r="6" fill="#c8412b" opacity="0.25"/>' +
-    '<circle class="scn-dot d2" cx="340" cy="58" r="8" fill="#c8412b" opacity="0.18"/>' +
+    '<circle class="scn-dot" cx="120" cy="216" r="6" fill="#c8412b" opacity="0.22"/>' +
+    '<circle class="scn-dot d2" cx="382" cy="40" r="8" fill="#c8412b" opacity="0.16"/>' +
+    /* spindle */
+    '<g transform="translate(28,14)">' +
+    '<rect x="15" y="190" width="40" height="16" rx="8" fill="#116530"/>' +
+    '<g class="scn-gear">' + teeth +
+    '<circle cx="35" cy="168" r="20" fill="#9aa0a6"/>' +
+    '<circle cx="35" cy="168" r="11" fill="#767c83"/>' +
+    "</g>" +
+    '<path d="M23 152 L47 152 L39 14 Q35 4 31 14 Z" fill="#c3c9cf"/>' +
+    '<path d="M27 146 L32 22" stroke="#eef1f3" stroke-width="3" stroke-linecap="round"/>' +
+    barbs +
+    '<circle class="scn-eye" cx="31" cy="98" r="1.8" fill="#1b1815"/>' +
+    '<circle class="scn-eye" cx="39" cy="98" r="1.8" fill="#1b1815"/>' +
+    '<path d="M30 104 Q35 108 40 104" fill="none" stroke="#1b1815" stroke-width="1.4" stroke-linecap="round"/>' +
+    "</g>" +
+    /* app mockup: Bugün tab */
     '<g class="scn-phone">' +
-    '<rect x="140" y="12" width="120" height="226" rx="26" fill="#fffdf8" stroke="#1b1815" stroke-width="2.5"/>' +
-    '<rect x="178" y="22" width="44" height="10" rx="5" fill="#1b1815"/>' +
-    '<circle cx="163" cy="52" r="13" fill="#c8412b"/>' +
-    '<circle class="scn-eye" cx="158" cy="50" r="1.8" fill="#fffdf8"/>' +
-    '<circle class="scn-eye" cx="168" cy="50" r="1.8" fill="#fffdf8"/>' +
-    '<path d="M157 56 Q163 60 169 56" fill="none" stroke="#fffdf8" stroke-width="1.6" stroke-linecap="round"/>' +
-    '<rect x="157" y="64" width="12" height="5" rx="2.5" fill="#1b1815"/>' +
-    '<text x="184" y="50" font-size="13" font-weight="600" font-family="Inter, sans-serif" fill="#1b1815">İğde</text>' +
-    '<circle cx="186" cy="60" r="3" fill="#7fb069"/>' +
-    '<text x="193" y="63" font-size="9" font-family="Inter, sans-serif" fill="#6f6a62">çevrimiçi</text>' +
-    '<line x1="140" y1="76" x2="260" y2="76" stroke="#e6e0d6" stroke-width="1.5"/>' +
-    '<g class="scn-msg m1">' +
-    '<rect x="182" y="90" width="66" height="28" rx="10" fill="#e9f3e4"/>' +
-    '<text x="215" y="108" text-anchor="middle" font-size="10" font-family="Inter, sans-serif" fill="#1b1815">Onaylar?</text>' +
-    "</g>" +
-    '<g class="scn-typing">' +
-    '<circle class="td1" cx="164" cy="148" r="3" fill="#6f6a62"/>' +
-    '<circle class="td2" cx="172" cy="148" r="3" fill="#6f6a62"/>' +
-    '<circle class="td3" cx="180" cy="148" r="3" fill="#6f6a62"/>' +
-    "</g>" +
-    '<g class="scn-msg m2">' +
-    '<rect x="152" y="128" width="96" height="44" rx="10" fill="#fffdf8" stroke="#e6e0d6" stroke-width="1.5"/>' +
-    '<text x="162" y="146" font-size="10" font-family="Inter, sans-serif" fill="#1b1815">Not aldım,</text>' +
-    '<text x="162" y="160" font-size="10" font-family="Inter, sans-serif" fill="#1b1815">Deniz’e ilettim ✓</text>' +
-    "</g>" +
+    '<rect x="140" y="12" width="150" height="226" rx="24" fill="#fffdf8" stroke="#1b1815" stroke-width="2.5"/>' +
+    '<rect x="198" y="22" width="34" height="9" rx="4.5" fill="#1b1815"/>' +
+    '<text x="154" y="52" font-size="12" font-weight="700" font-family="Inter, sans-serif" fill="#1b1815">Bugünün Gönderisi</text>' +
+    '<rect x="196" y="40" width="82" height="16" rx="8" fill="#f7ecc9"/>' +
+    '<text x="237" y="51.5" text-anchor="middle" font-size="8" font-weight="600" font-family="Inter, sans-serif" fill="#8a6d1f">Onay Bekliyor</text>' +
+    '<rect x="152" y="64" width="126" height="60" rx="8" fill="#d9e6d2"/>' +
+    '<circle cx="252" cy="82" r="9" fill="#f2e9c9"/>' +
+    '<path d="M152 124 L196 96 L224 116 L252 100 L278 124 Z" fill="#b9cfb0"/>' +
+    '<rect x="152" y="132" width="104" height="6" rx="3" fill="#e6e0d6"/>' +
+    '<rect x="152" y="142" width="114" height="6" rx="3" fill="#e6e0d6"/>' +
+    '<rect x="152" y="152" width="72" height="6" rx="3" fill="#e6e0d6"/>' +
+    '<g class="scn-okbtn"><rect x="152" y="168" width="126" height="28" rx="14" fill="#116530"/>' +
+    '<text x="215" y="186" text-anchor="middle" font-size="10" font-weight="600" font-family="Inter, sans-serif" fill="#fffdf8">Onayla ve Yayınla</text></g>' +
+    '<line x1="140" y1="208" x2="290" y2="208" stroke="#e6e0d6" stroke-width="1.5"/>' +
+    '<circle cx="172" cy="216" r="3.5" fill="#116530"/>' +
+    '<text x="172" y="230" text-anchor="middle" font-size="8" font-weight="600" font-family="Inter, sans-serif" fill="#116530">Bugün</text>' +
+    '<circle cx="215" cy="216" r="3.5" fill="#cfc8b8"/>' +
+    '<text x="215" y="230" text-anchor="middle" font-size="8" font-family="Inter, sans-serif" fill="#a09a8c">Geçmiş</text>' +
+    '<circle cx="258" cy="216" r="3.5" fill="#cfc8b8"/>' +
+    '<text x="258" y="230" text-anchor="middle" font-size="8" font-family="Inter, sans-serif" fill="#a09a8c">Asistan</text>' +
     "</g></svg>"
   );
 }
