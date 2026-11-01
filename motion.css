@@ -2,7 +2,7 @@
 
 :root {
   --ease-flow: cubic-bezier(0.22, 1, 0.36, 1);
-  --scene-bg: #f6f1e8;
+  --scene-bg: #1b1d22;
 }
 
 @keyframes scn-float {
@@ -132,7 +132,7 @@
   font-size: 13px;
   font-weight: 500;
   color: var(--muted);
-  background: rgba(255, 253, 248, 0.8);
+  background: rgba(27, 29, 34, 0.85);
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 4px 12px;
@@ -148,6 +148,8 @@
 /* ---------- DCT Asistan: spindle + app overview ---------- */
 
 .sc-dct .scn-phone { animation: scn-float 7s ease-in-out infinite; }
+
+.sc-dct .scn-chat { animation: scn-float 7.5s ease-in-out infinite; animation-delay: -3s; }
 
 .sc-dct .scn-gear {
   transform-box: fill-box;

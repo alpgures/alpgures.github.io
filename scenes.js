@@ -1,5 +1,7 @@
 /* Shared SVG scene builders — one motion language everywhere.
-   Refined playful: soft flowy easing, gentle floats, vermilion + ink + paper.
+   Refined playful: soft flowy easing, gentle floats, slate + bone on dark.
+   Device mockups (phone, browser, e-ink) keep their own light screens;
+   only the floating chrome on the dark card takes the site accent.
    All scenes loop; all respect prefers-reduced-motion (see motion.css). */
 
 function scenePlane() {
@@ -15,17 +17,16 @@ function scenePlane() {
     '<path d="M90 124 Q170 118 250 124"/>' +
     "</g>" +
     '<g transform="translate(107,68)"><g class="scn-jet"><g transform="scale(0.88)">' +
-    '<path d="M18 16 L32 -12 L46 -12 L54 16 Z" fill="#1b1815"/>' +
-    '<path d="M32 -12 L46 -12 L44 -6 L34 -6 Z" fill="#c8412b"/>' +
-    '<path d="M12 46 L36 46 L28 56 L18 56 Z" fill="#1b1815"/>' +
-    '<path d="M10 46 L128 46 Q166 46 182 38 Q196 32 194 24 Q192 16 180 16 L156 16 Q150 16 148 9 L116 9 Q104 9 100 16 L26 16 Q10 16 10 30 Z" fill="#1b1815"/>' +
-    '<path d="M168 19 L190 19 L186 25 L166 25 Z" fill="#f4f1e8"/>' +
-    '<rect x="34" y="26" width="106" height="2.6" rx="1.3" fill="#f4f1e8" opacity="0.85"/>' +
-    '<rect x="34" y="30.6" width="106" height="1.6" fill="#c8412b" opacity="0.9"/>' +
-    '<rect x="118" y="12.6" width="26" height="2.2" rx="1.1" fill="#f4f1e8" opacity="0.85"/>' +
-    '<path d="M105 46 L150 46 L85 84 L60 80 Z" fill="#1b1815"/>' +
-    '<ellipse cx="118" cy="58" rx="14" ry="5.5" fill="#1b1815" transform="rotate(-21 118 58)"/>' +
-    '<ellipse cx="96" cy="66" rx="14" ry="5.5" fill="#1b1815" transform="rotate(-21 96 66)"/>' +
+    '<path d="M48 34 L34 4 L27 4 L18 34 Z" fill="#1b1815"/>' +
+    '<path d="M34 4 L27 4 L25 11 L32 11 Z" fill="#c8412b"/>' +
+    '<path d="M10 34 L96 34 Q104 34 110 27 Q118 20 132 20 L158 22 Q180 24 190 30 Q197 34 192 39 L182 43 L22 45 Q10 43 10 34 Z" fill="#1b1815"/>' +
+    '<path d="M170 25 L182 27 L180 30 L168 28 Z" fill="#f4f1e8"/>' +
+    '<rect x="24" y="36.5" width="140" height="2" fill="#f4f1e8" opacity="0.9"/>' +
+    '<rect x="24" y="40" width="140" height="1.8" fill="#c8412b" opacity="0.9"/>' +
+    '<path d="M108 44 L76 68 L83 70 L136 46 Z" fill="#1b1815"/>' +
+    '<ellipse cx="98" cy="59" rx="9" ry="4" fill="#1b1815" transform="rotate(-20 98 59)"/>' +
+    '<ellipse cx="118" cy="54" rx="9" ry="4" fill="#1b1815" transform="rotate(-20 118 54)"/>' +
+    '<path d="M26 40 L6 50 L10 52 L30 42 Z" fill="#1b1815"/>' +
     "</g></g></g>" +
     '<text x="94" y="148" font-size="12" font-weight="600" font-family="Inter, sans-serif" fill="#1b1815">Güreş Airways</text>' +
     '<text x="208" y="148" font-size="10" font-family="Inter, sans-serif" fill="#6f6a62">AG2027</text>' +
@@ -57,8 +58,8 @@ function sceneKotoban() {
     '<text x="85" y="90" text-anchor="middle" font-size="17" font-family="Newsreader, Georgia, serif" fill="#1b1815">言葉</text></g>' +
     '<g class="scn-chip c2"><rect x="278" y="150" width="66" height="36" rx="18" fill="#fffdf8" stroke="#e6e0d6" stroke-width="1.5"/>' +
     '<text x="311" y="174" text-anchor="middle" font-size="17" font-family="Newsreader, Georgia, serif" fill="#1b1815">bạn</text></g>' +
-    '<circle class="scn-dot" cx="66" cy="172" r="6" fill="#c8412b" opacity="0.25"/>' +
-    '<circle class="scn-dot d2" cx="338" cy="66" r="8" fill="#c8412b" opacity="0.18"/>' +
+    '<circle class="scn-dot" cx="66" cy="172" r="6" fill="#93a0b4" opacity="0.25"/>' +
+    '<circle class="scn-dot d2" cx="338" cy="66" r="8" fill="#93a0b4" opacity="0.18"/>' +
     '<g class="scn-phone">' +
     '<rect x="140" y="12" width="120" height="226" rx="26" fill="#fffdf8" stroke="#1b1815" stroke-width="2.5"/>' +
     '<rect x="178" y="22" width="44" height="10" rx="5" fill="#1b1815"/>' +
@@ -98,10 +99,10 @@ function sceneDct() {
   }
   return (
     '<svg class="scn sc-dct" viewBox="0 0 400 250" aria-hidden="true">' +
-    '<circle class="scn-dot" cx="120" cy="216" r="6" fill="#c8412b" opacity="0.22"/>' +
-    '<circle class="scn-dot d2" cx="382" cy="40" r="8" fill="#c8412b" opacity="0.16"/>' +
+    '<circle class="scn-dot" cx="62" cy="222" r="6" fill="#93a0b4" opacity="0.25"/>' +
+    '<circle class="scn-dot d2" cx="196" cy="18" r="7" fill="#93a0b4" opacity="0.18"/>' +
     /* spindle */
-    '<g transform="translate(28,14)">' +
+    '<g transform="translate(12,16)">' +
     '<rect x="15" y="190" width="40" height="16" rx="8" fill="#116530"/>' +
     '<g class="scn-gear">' + teeth +
     '<circle cx="35" cy="168" r="20" fill="#9aa0a6"/>' +
@@ -114,8 +115,8 @@ function sceneDct() {
     '<circle class="scn-eye" cx="39" cy="98" r="1.8" fill="#1b1815"/>' +
     '<path d="M30 104 Q35 108 40 104" fill="none" stroke="#1b1815" stroke-width="1.4" stroke-linecap="round"/>' +
     "</g>" +
-    /* app mockup: Bugün tab */
-    '<g class="scn-phone">' +
+    /* app mockup: Bugün tab (scaled to share the scene with the chat) */
+    '<g transform="translate(-39.2, 2.64) scale(0.78)"><g class="scn-phone">' +
     '<rect x="140" y="12" width="150" height="226" rx="24" fill="#fffdf8" stroke="#1b1815" stroke-width="2.5"/>' +
     '<rect x="198" y="22" width="34" height="9" rx="4.5" fill="#1b1815"/>' +
     '<text x="154" y="46" font-size="12" font-weight="700" font-family="Inter, sans-serif" fill="#1b1815">Bugünün Gönderisi</text>' +
@@ -136,6 +137,23 @@ function sceneDct() {
     '<text x="215" y="230" text-anchor="middle" font-size="8" font-family="Inter, sans-serif" fill="#a09a8c">Geçmiş</text>' +
     '<circle cx="258" cy="216" r="3.5" fill="#cfc8b8"/>' +
     '<text x="258" y="230" text-anchor="middle" font-size="8" font-family="Inter, sans-serif" fill="#a09a8c">Asistan</text>' +
+    "</g></g>" +
+    /* Asistan chat window */
+    '<g class="scn-chat">' +
+    '<rect x="200" y="28" width="185" height="175" rx="16" fill="#fffdf8" stroke="#1b1815" stroke-width="2"/>' +
+    '<circle cx="222" cy="48" r="9" fill="#116530"/>' +
+    '<text x="238" y="51" font-size="11" font-weight="700" font-family="Inter, sans-serif" fill="#1b1815">Asistan</text>' +
+    '<text x="238" y="63" font-size="7.5" font-family="Inter, sans-serif" fill="#6f6a62">çevrimiçi</text>' +
+    '<line x1="200" y1="74" x2="385" y2="74" stroke="#e6e0d6" stroke-width="1.5"/>' +
+    '<rect x="212" y="84" width="118" height="32" rx="10" fill="#d9e6d2"/>' +
+    '<text x="220" y="97" font-size="8" font-family="Inter, sans-serif" fill="#1b1815">Günaydın! Bugünün</text>' +
+    '<text x="220" y="107" font-size="8" font-family="Inter, sans-serif" fill="#1b1815">gönderisi hazır.</text>' +
+    '<rect x="257" y="124" width="116" height="22" rx="10" fill="#e4e7ec"/>' +
+    '<text x="365" y="138" text-anchor="end" font-size="8" font-family="Inter, sans-serif" fill="#1b1815">Harika, bakıyorum.</text>' +
+    '<rect x="212" y="154" width="128" height="22" rx="10" fill="#d9e6d2"/>' +
+    '<text x="220" y="168" font-size="8" font-family="Inter, sans-serif" fill="#1b1815">Onaylandı, yayınlandı.</text>' +
+    '<rect x="212" y="184" width="161" height="15" rx="7.5" fill="#f1ece2"/>' +
+    '<text x="220" y="195" font-size="7.5" font-family="Inter, sans-serif" fill="#a09a8c">Mesaj yaz…</text>' +
     "</g></svg>"
   );
 }
