@@ -176,7 +176,7 @@
 /* ---------- Reduced motion ---------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .scn *, .scn, .chip-x, .chip-x .chip, .aurora, .stars circle.tw {
+  .scn *, .scn, .chip-x, .chip-x .chip, .mesh .blob, .stars circle.tw {
     animation: none !important;
   }
   .rv { opacity: 1; translate: none; transition: none; }
@@ -186,6 +186,6 @@
 }
 
 @media (max-width: 700px) {
-  .hero { min-height: 96vh; padding-bottom: 170px; }
-  .taurus { height: 36vh; }
+  .hero { min-height: 96vh; padding-bottom: 34vh; }
+  .taurus { height: 48vh; }
 }

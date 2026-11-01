@@ -93,7 +93,7 @@
           var to = ltr ? 108 + Math.random() * 8 : -18 - Math.random() * 8;
           var outer = document.createElement("span");
           outer.className = "chip-x";
-          outer.style.top = (4 + Math.random() * 20).toFixed(1) + "%"; // sky band, clear of the text
+          outer.style.top = (4 + Math.random() * 32).toFixed(1) + "%"; // all over the sky
           outer.style.setProperty("--fx", from.toFixed(1) + "vw");
           outer.style.setProperty("--tx", to.toFixed(1) + "vw");
           outer.style.animationDuration = dur.toFixed(1) + "s";

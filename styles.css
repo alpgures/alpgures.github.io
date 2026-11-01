@@ -97,23 +97,46 @@ section h2 {
   min-height: 92vh;
   display: flex;
   align-items: center;
-  padding: 84px 0 150px;
+  padding: 60px 0 30vh;
 }
 .hero-bg { position: absolute; inset: 0; pointer-events: none; }
-.hero-bg .aurora { position: absolute; border-radius: 50%; filter: blur(80px); z-index: 0; }
-.aurora-a {
-  width: 70vw; height: 52vh; left: -10vw; top: -16vh;
-  background: radial-gradient(ellipse at center, rgba(147,160,180,0.08), transparent 70%);
-  animation: aurora-drift 110s ease-in-out infinite alternate;
+/* Mesh-gradient sky: Lovable-style color blending, kept to the cool
+   Slate & Bone palette (no warm/orange tones). */
+.mesh { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+.mesh .blob { position: absolute; border-radius: 50%; filter: blur(70px); mix-blend-mode: screen; }
+.blob.b1 {
+  width: 52vw; height: 52vh; left: -10vw; top: -16vh;
+  background: radial-gradient(ellipse at center, rgba(139,147,196,0.55), transparent 70%);
+  animation: blob-drift 95s ease-in-out infinite alternate;
 }
-@keyframes aurora-drift {
-  from { transform: translate3d(-4vw, 0, 0) scale(1); }
-  to { transform: translate3d(4vw, 2vh, 0) scale(1.08); }
+.blob.b2 {
+  width: 46vw; height: 48vh; right: -8vw; top: -10vh;
+  background: radial-gradient(ellipse at center, rgba(154,143,192,0.5), transparent 70%);
+  animation: blob-drift 120s ease-in-out infinite alternate-reverse;
+}
+.blob.b3 {
+  width: 60vw; height: 40vh; left: 18vw; top: -6vh;
+  background: radial-gradient(ellipse at center, rgba(125,143,192,0.42), transparent 70%);
+  animation: blob-drift 80s ease-in-out infinite alternate;
+}
+.blob.b4 {
+  width: 44vw; height: 30vh; left: 28vw; top: 30vh;
+  background: radial-gradient(ellipse at center, rgba(231,228,219,0.13), transparent 70%);
+  animation: blob-drift 105s ease-in-out infinite alternate-reverse;
+}
+.blob.b5 {
+  width: 40vw; height: 34vh; left: -6vw; top: 26vh;
+  background: radial-gradient(ellipse at center, rgba(91,107,132,0.55), transparent 70%);
+  animation: blob-drift 90s ease-in-out infinite alternate;
+}
+@keyframes blob-drift {
+  from { transform: translate3d(-3vw, -1vh, 0) scale(1); }
+  to { transform: translate3d(3vw, 2vh, 0) scale(1.1); }
 }
 .stars { position: absolute; left: 0; top: 0; width: 100%; height: 58%; z-index: 0; }
 .stars circle.tw { animation: twinkle 7s ease-in-out infinite; }
 @keyframes twinkle { 0%, 100% { opacity: 0.14; } 50% { opacity: 0.55; } }
-.taurus { position: absolute; left: 0; right: 0; bottom: -2px; width: 100%; height: 44vh; z-index: 1; }
+.taurus { position: absolute; left: 0; right: 0; bottom: -2px; width: 100%; height: 58vh; z-index: 1; }
 .chips { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
 .chip-x { position: absolute; left: 0; animation: chip-trav linear infinite; will-change: transform; }
 @keyframes chip-trav {
