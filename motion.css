@@ -44,6 +44,8 @@
   to { stroke-dashoffset: 28; }
 }
 
+.sc-plane .scn-eink { animation: scn-float 9s ease-in-out infinite; }
+
 .sc-plane .scn-jet { animation: scn-hover 6s ease-in-out infinite; }
 @keyframes scn-hover {
   0%, 100% { transform: translateY(0); }
