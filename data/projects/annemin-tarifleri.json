@@ -1,0 +1,46 @@
+{
+  "facts": [
+    {
+      "label": "Status",
+      "value": "Live at annemintarifleri.org"
+    },
+    {
+      "label": "Recipes",
+      "value": "8 family recipes"
+    },
+    {
+      "label": "Languages",
+      "value": "5 — Turkish, English, German, Japanese, Vietnamese"
+    },
+    {
+      "label": "Videos",
+      "value": "40 narrated step-by-step videos (8 recipes × 5 languages)"
+    },
+    {
+      "label": "Stack",
+      "value": "Static site on Cloudflare Pages"
+    },
+    {
+      "label": "Honors",
+      "value": "Halise Teyze's red-lentil soup, presented in her memory"
+    }
+  ],
+  "gallery": [
+    "../images/recipe-mercimek-corbasi.webp",
+    "../images/recipe-tavuklu-pilav.webp",
+    "../images/recipe-sambali-tatlisi.webp"
+  ],
+  "links": [
+    {
+      "label": "annemintarifleri.org",
+      "url": "https://annemintarifleri.org"
+    }
+  ],
+  "story": [
+    "My mom is an extraordinary cook, and her recipes lived where family recipes always live — in her head, in gestures, in “a handful of this.” Annemin Tarifleri (“My Mother's Recipes”) is my attempt to pin them down before they drift: the lentil soup, the orzo chicken soup, the stuffed peppers, each one documented the way she actually makes it.",
+    "Every recipe gets a full video walkthrough, narrated in five languages — forty videos total. The narration isn't a recipe card being read aloud; it's written to feel like standing in her kitchen. One page honors my late aunt Halise Teyze, whose red-lentil soup reached me through my mom.",
+    "It's a heritage project disguised as a recipe site — and a serious content-production pipeline: recipe development, filming, editing, and multilingual voiceover, all produced by me."
+  ],
+  "tagline": "A recipe site preserving my mother's cooking — 8 recipes, 40 narrated videos, 5 languages.",
+  "title": "Annemin Tarifleri"
+}

@@ -66,3 +66,81 @@ collections:
               - { label: "Blurb", name: blurb, widget: text }
               - { label: "Email", name: email, widget: string }
               - { label: "LinkedIn URL", name: linkedin, widget: string }
+      - name: project-kotoban
+        label: "Project: Kotoban"
+        file: "data/projects/kotoban.json"
+        fields:
+          - { label: "Title", name: title, widget: string }
+          - { label: "Tagline", name: tagline, widget: text }
+          - label: "Story paragraphs"
+            name: story
+            widget: list
+            field: { label: "Paragraph", name: paragraph, widget: text }
+          - label: "Facts"
+            name: facts
+            widget: list
+            fields:
+              - { label: "Label", name: label, widget: string }
+              - { label: "Value", name: value, widget: string }
+          - label: "Gallery images"
+            name: gallery
+            widget: list
+            field: { label: "Image", name: image, widget: image }
+          - label: "Links"
+            name: links
+            widget: list
+            fields:
+              - { label: "Label", name: label, widget: string }
+              - { label: "URL", name: url, widget: string }
+      - name: project-planeframe
+        label: "Project: PlaneFrame"
+        file: "data/projects/planeframe.json"
+        fields:
+          - { label: "Title", name: title, widget: string }
+          - { label: "Tagline", name: tagline, widget: text }
+          - label: "Story paragraphs"
+            name: story
+            widget: list
+            field: { label: "Paragraph", name: paragraph, widget: text }
+          - label: "Facts"
+            name: facts
+            widget: list
+            fields:
+              - { label: "Label", name: label, widget: string }
+              - { label: "Value", name: value, widget: string }
+          - label: "Gallery images"
+            name: gallery
+            widget: list
+            field: { label: "Image", name: image, widget: image }
+          - label: "Links"
+            name: links
+            widget: list
+            fields:
+              - { label: "Label", name: label, widget: string }
+              - { label: "URL", name: url, widget: string }
+      - name: project-recipes
+        label: "Project: Annemin Tarifleri"
+        file: "data/projects/annemin-tarifleri.json"
+        fields:
+          - { label: "Title", name: title, widget: string }
+          - { label: "Tagline", name: tagline, widget: text }
+          - label: "Story paragraphs"
+            name: story
+            widget: list
+            field: { label: "Paragraph", name: paragraph, widget: text }
+          - label: "Facts"
+            name: facts
+            widget: list
+            fields:
+              - { label: "Label", name: label, widget: string }
+              - { label: "Value", name: value, widget: string }
+          - label: "Gallery images"
+            name: gallery
+            widget: list
+            field: { label: "Image", name: image, widget: image }
+          - label: "Links"
+            name: links
+            widget: list
+            fields:
+              - { label: "Label", name: label, widget: string }
+              - { label: "URL", name: url, widget: string }

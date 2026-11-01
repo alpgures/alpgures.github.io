@@ -1,0 +1,38 @@
+{
+  "facts": [
+    {
+      "label": "What",
+      "value": "E-ink flight information display"
+    },
+    {
+      "label": "Built for",
+      "value": "John — my boyfriend, a serious avgeek"
+    },
+    {
+      "label": "Status",
+      "value": "Built, gifted, used daily"
+    },
+    {
+      "label": "Display",
+      "value": "E-ink panel, custom layout"
+    },
+    {
+      "label": "Architecture",
+      "value": "Display/frontend split from information-gathering/backend"
+    },
+    {
+      "label": "Mount",
+      "value": "Screw-free assembly — fir-tree pins, snap-in cable gate"
+    }
+  ],
+  "gallery": [],
+  "links": [],
+  "story": [
+    "John is an avgeek — the kind of person who can identify an aircraft by its engine hum. I wanted to build him the ideal flight display: an e-ink panel showing live flight information in a layout clean enough to glance at across the room.",
+    "Three things fought me. AI layout tools couldn't produce the precise arrangement I wanted. The e-ink firmware resisted everything I threw at it. And reliable flight information turned out to be genuinely hard to source. So I split the problem in half: the display and frontend on one side, the information-gathering backend on the other, and solved each on its own terms.",
+    "The mount got the same treatment — a screw-free assembly with fir-tree pins and a snap-in cable gate, iterated through printed versions until the pins seated at exactly 3.6mm.",
+    "It was a surprise gift. It worked. He uses it every day — which is the only metric that matters for this one."
+  ],
+  "tagline": "An e-ink flight display I built as a surprise gift for my boyfriend, the avgeek. He uses it daily.",
+  "title": "PlaneFrame"
+}

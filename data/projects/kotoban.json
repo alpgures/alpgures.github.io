@@ -1,0 +1,46 @@
+{
+  "facts": [
+    {
+      "label": "Status",
+      "value": "Live — invite-only closed beta since October 2026"
+    },
+    {
+      "label": "Platform",
+      "value": "Progressive web app (mobile-first)"
+    },
+    {
+      "label": "Stack",
+      "value": "FastAPI + SQLite, nginx, hosted on Oracle Cloud"
+    },
+    {
+      "label": "Design",
+      "value": "Ink & Lacquer — light and dark themes"
+    },
+    {
+      "label": "Content",
+      "value": "12 languages: Arabic, German, Spanish, French, Italian, Japanese, Korean, Portuguese, Russian, Turkish, Vietnamese, Chinese"
+    },
+    {
+      "label": "Auth",
+      "value": "Magic-link + password sign-in, invite requests, admin portal"
+    }
+  ],
+  "gallery": [
+    "../images/kotoban-title-lockup.png",
+    "../images/dash-ja.png",
+    "../images/dash-tr.png"
+  ],
+  "links": [
+    {
+      "label": "kotoban.app",
+      "url": "https://kotoban.app"
+    }
+  ],
+  "story": [
+    "The name is a portmanteau: 言葉 (kotoba, Japanese for “word”) + bạn (Vietnamese for “friend”), overlapping on the shared “ba” — carrying bạn's nặng tone mark. I was studying Japanese and Vietnamese at the same time and couldn't find one app that did spaced repetition, dictionary lookup, and reading practice the way I wanted. So I built it.",
+    "Kotoban is a multi-user progressive web app, currently in invite-only closed beta. It has a full design system — Ink & Lacquer, in light and dark — built mobile-first at 390px and scaled up. Under the hood it's FastAPI and SQLite on an Oracle Cloud box, with magic-link sign-in, invite requests, and an admin portal.",
+    "The content pipeline is the part I'm proudest of: vocabulary and reading material across twelve languages, generated and curated in batches, with audio throughout. It's the study tool I wished existed, and now it's the one I actually use."
+  ],
+  "tagline": "A language-learning app I designed and built — currently in invite-only closed beta.",
+  "title": "Kotoban"
+}
