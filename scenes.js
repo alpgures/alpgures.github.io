@@ -14,18 +14,7 @@ function scenePlane() {
     '<path d="M90 98 Q170 104 250 98"/>' +
     '<path d="M90 124 Q170 118 250 124"/>' +
     "</g>" +
-    '<g transform="translate(92,54)"><g class="scn-jet">' +
-    '<path d="M26 34 L56 34 L47 8 L33 8 Z" fill="#1b1815"/>' +
-    '<circle cx="41" cy="22" r="3.2" fill="#c8412b"/>' +
-    '<path d="M2 48 L30 48 L22 58 L8 58 Z" fill="#1b1815"/>' +
-    '<path d="M6 34 H118 Q140 34 146 22 H176 Q196 22 204 32 Q210 36 206 42 Q200 48 180 48 H6 Q-2 48 -2 41 Q-2 34 6 34 Z" fill="#1b1815"/>' +
-    '<rect x="183" y="27" width="7" height="4.5" rx="2" fill="#f4f1e8"/>' +
-    '<rect x="192" y="28" width="7" height="4.5" rx="2" fill="#f4f1e8"/>' +
-    '<path d="M118 48 L150 48 L116 76 L94 76 Z" fill="#1b1815"/>' +
-    '<ellipse cx="114" cy="68" rx="9" ry="4.5" fill="#1b1815"/>' +
-    '<ellipse cx="129" cy="63" rx="9" ry="4.5" fill="#1b1815"/>' +
-    '<circle class="scn-strobe" cx="94" cy="76" r="2.6" fill="#c8412b"/>' +
-    "</g></g>" +
+    '<g class="scn-jet"><image href="/images/jet-747.png" x="90" y="60" width="220" height="53.5"/></g>' +
     '<text x="94" y="142" font-size="12" font-weight="600" font-family="Inter, sans-serif" fill="#1b1815">Güreş Airways</text>' +
     '<text x="208" y="142" font-size="10" font-family="Inter, sans-serif" fill="#6f6a62">AG2027</text>' +
     '<text x="94" y="154" font-size="9" font-family="Inter, sans-serif" fill="#6f6a62">Boeing 747-1000</text>' +
