@@ -75,7 +75,44 @@ function sceneKotoban() {
 function sceneFor(slug, image, title) {
   if (slug === "kotoban") return sceneKotoban();
   if (slug === "planeframe") return scenePlane();
+  if (slug === "dct-asistan") return sceneDct();
   return sceneRecipeUI();
+}
+
+/* İğde: WhatsApp business assistant mockup, same simplified language. */
+function sceneDct() {
+  return (
+    '<svg class="scn sc-dct" viewBox="0 0 400 250" aria-hidden="true">' +
+    '<circle class="scn-dot" cx="64" cy="182" r="6" fill="#c8412b" opacity="0.25"/>' +
+    '<circle class="scn-dot d2" cx="340" cy="58" r="8" fill="#c8412b" opacity="0.18"/>' +
+    '<g class="scn-phone">' +
+    '<rect x="140" y="12" width="120" height="226" rx="26" fill="#fffdf8" stroke="#1b1815" stroke-width="2.5"/>' +
+    '<rect x="178" y="22" width="44" height="10" rx="5" fill="#1b1815"/>' +
+    '<circle cx="163" cy="52" r="13" fill="#c8412b"/>' +
+    '<circle class="scn-eye" cx="158" cy="50" r="1.8" fill="#fffdf8"/>' +
+    '<circle class="scn-eye" cx="168" cy="50" r="1.8" fill="#fffdf8"/>' +
+    '<path d="M157 56 Q163 60 169 56" fill="none" stroke="#fffdf8" stroke-width="1.6" stroke-linecap="round"/>' +
+    '<rect x="157" y="64" width="12" height="5" rx="2.5" fill="#1b1815"/>' +
+    '<text x="184" y="50" font-size="13" font-weight="600" font-family="Inter, sans-serif" fill="#1b1815">İğde</text>' +
+    '<circle cx="186" cy="60" r="3" fill="#7fb069"/>' +
+    '<text x="193" y="63" font-size="9" font-family="Inter, sans-serif" fill="#6f6a62">çevrimiçi</text>' +
+    '<line x1="140" y1="76" x2="260" y2="76" stroke="#e6e0d6" stroke-width="1.5"/>' +
+    '<g class="scn-msg m1">' +
+    '<rect x="182" y="90" width="66" height="28" rx="10" fill="#e9f3e4"/>' +
+    '<text x="215" y="108" text-anchor="middle" font-size="10" font-family="Inter, sans-serif" fill="#1b1815">Onaylar?</text>' +
+    "</g>" +
+    '<g class="scn-typing">' +
+    '<circle class="td1" cx="164" cy="148" r="3" fill="#6f6a62"/>' +
+    '<circle class="td2" cx="172" cy="148" r="3" fill="#6f6a62"/>' +
+    '<circle class="td3" cx="180" cy="148" r="3" fill="#6f6a62"/>' +
+    "</g>" +
+    '<g class="scn-msg m2">' +
+    '<rect x="152" y="128" width="96" height="44" rx="10" fill="#fffdf8" stroke="#e6e0d6" stroke-width="1.5"/>' +
+    '<text x="162" y="146" font-size="10" font-family="Inter, sans-serif" fill="#1b1815">Not aldım,</text>' +
+    '<text x="162" y="160" font-size="10" font-family="Inter, sans-serif" fill="#1b1815">Deniz’e ilettim ✓</text>' +
+    "</g>" +
+    "</g></svg>"
+  );
 }
 
 /* Annemin Tarifleri: extra-simplified mockup of the recipe site UI. */

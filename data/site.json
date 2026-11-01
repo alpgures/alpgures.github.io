@@ -1,1 +1,91 @@
-{"about":["I'm a senior at Brown studying biology – but the thread through everything I do is building. I build software (a language-learning app in closed beta), hardware (an e-ink flight display for my boyfriend), and content (a recipe site preserving my mother's cooking in five languages). The biology is real too: I run data pipelines over terabytes of brain-imaging data in the Chen Lab, TA immunology for 175 students a semester, and spent two years running multinational clinical studies.","I'm natively bilingual in English and Turkish, fluent in Japanese including business keigo, and advanced in German. I move to New York in June 2027 and I'm currently recruiting for strategy and operations roles starting summer 2027 – the kind of work where figuring out how systems run, then making them run better, is the whole job."],"contact":{"blurb":"The fastest way to reach me is email – whether it's about a role, a project, or just to say hi. I'm happy to share references, transcripts, or work samples on request.","email":"alp_gures@brown.edu","linkedin":"https://www.linkedin.com/in/alpgures"},"experience":[{"bullets":["Build R and Python (pandas) data pipelines over 4.5 TB of behavioral and imaging data for a neonatal brain injury study, converting recurring manual analyses into repeatable workflows.","Built monitoring dashboards tracking analysis progress and data quality for the PI and lab team, with automated alerts for stalled or failed runs."],"date":"May 2026 – Present","org":"Brown University / Women & Infants Hospital, Providence, RI","title":"Undergraduate Researcher, Chen Laboratory"},{"bullets":["Grade exams and assignments for 175 students per semester and hold office hours explaining complex immunology concepts to non-specialists."],"date":"Sep 2024 – Present","org":"Brown University, Providence, RI","title":"Teaching Assistant, BIOL0530 Principles of Immunology"},{"bullets":["Lead campus tours for groups of ~30 visitors (3–5 tours weekly, up to 15 at peak) at an office hosting ~2,000 visitors per week, and staff the “Ask a Brown Student” communications service."],"date":"Feb 2024 – Present","org":"Brown University, Providence, RI","title":"Senior Student Ambassador, Office of Admission"},{"bullets":["Coordinated clinical trial recruiting and collaborator operations for 3 multinational studies with partners at Mass Eye & Ear / Harvard, the University of Christchurch, and TU Dresden's Interdisciplinary Center for Smell & Taste.","Co-authored 4 manuscripts (in preparation) reporting outcomes from long-term study programs."],"date":"Nov 2021 – Feb 2024","org":"Istanbul, Turkey (remote during Brown semesters, in person over breaks)","title":"Research Operations Lead, Altundağ Otolaryngology Research Institute"},{"bullets":["Built and operate API automation pipelines in daily production use, with monitoring dashboards and error-handling playbooks for incident response."],"date":"Ongoing","org":"Personal projects","title":"Automation Systems Developer (Independent)"}],"hero":{"kicker":"Alp D. Güreş – Brown '27","meta":"Providence, RI – moving to New York, June 2027","name":"I build things.","sub":"A language-learning app in closed beta. An e-ink flight display I built as a surprise for my boyfriend. A recipe site preserving my mother's cooking in five languages. I'm a Brown biology senior, and building is the thread through all of it."},"projects":[{"blurb":"A language-learning app I designed and built – currently in invite-only closed beta.","image":"images/dash-ja.png","slug":"kotoban","title":"Kotoban"},{"blurb":"An e-ink flight display I built as a surprise gift for my boyfriend, the avgeek. He uses it daily.","image":"","slug":"planeframe","title":"PlaneFrame"},{"blurb":"A recipe site preserving my mother's cooking – 8 recipes, 40 narrated videos, 5 languages.","image":"images/recipe-mercimek-corbasi.webp","slug":"annemin-tarifleri","title":"Annemin Tarifleri"}],"skills":{"education":"Brown University – Sc.B. Biology (STEM-designated), GPA 3.7/4.0, expected May 2027. Relevant coursework: Biostatistics, CS Fundamentals, Healthcare in the United States.","languages":"English (native), Turkish (native), Japanese (fluent, incl. business keigo), German (advanced).","tools":"R, Python (pandas), SQL, biostatistics and statistical modeling, data visualization, data pipelines. Microsoft Excel and PowerPoint (advanced), Google Workspace."}}
+{
+  "about": [
+    "I'm a senior at Brown studying biology – but the thread through everything I do is building. I build software (a language-learning app in closed beta), hardware (an e-ink flight display for my boyfriend), and content (a recipe site preserving my mother's cooking in five languages). The biology is real too: I run data pipelines over terabytes of brain-imaging data in the Chen Lab, TA immunology for 175 students a semester, and spent two years running multinational clinical studies.",
+    "I'm natively bilingual in English and Turkish, fluent in Japanese including business keigo, and advanced in German. I move to New York in June 2027 and I'm currently recruiting for strategy and operations roles starting summer 2027 – the kind of work where figuring out how systems run, then making them run better, is the whole job."
+  ],
+  "contact": {
+    "blurb": "The fastest way to reach me is email – whether it's about a role, a project, or just to say hi. I'm happy to share references, transcripts, or work samples on request.",
+    "email": "alp_gures@brown.edu",
+    "linkedin": "https://www.linkedin.com/in/alpgures"
+  },
+  "experience": [
+    {
+      "bullets": [
+        "Build R and Python (pandas) data pipelines over 4.5 TB of behavioral and imaging data for a neonatal brain injury study, converting recurring manual analyses into repeatable workflows.",
+        "Built monitoring dashboards tracking analysis progress and data quality for the PI and lab team, with automated alerts for stalled or failed runs."
+      ],
+      "date": "May 2026 – Present",
+      "org": "Brown University / Women & Infants Hospital, Providence, RI",
+      "title": "Undergraduate Researcher, Chen Laboratory"
+    },
+    {
+      "bullets": [
+        "Grade exams and assignments for 175 students per semester and hold office hours explaining complex immunology concepts to non-specialists."
+      ],
+      "date": "Sep 2024 – Present",
+      "org": "Brown University, Providence, RI",
+      "title": "Teaching Assistant, BIOL0530 Principles of Immunology"
+    },
+    {
+      "bullets": [
+        "Lead campus tours for groups of ~30 visitors (3–5 tours weekly, up to 15 at peak) at an office hosting ~2,000 visitors per week, and staff the “Ask a Brown Student” communications service."
+      ],
+      "date": "Feb 2024 – Present",
+      "org": "Brown University, Providence, RI",
+      "title": "Senior Student Ambassador, Office of Admission"
+    },
+    {
+      "bullets": [
+        "Coordinated clinical trial recruiting and collaborator operations for 3 multinational studies with partners at Mass Eye & Ear / Harvard, the University of Christchurch, and TU Dresden's Interdisciplinary Center for Smell & Taste.",
+        "Co-authored 4 manuscripts (in preparation) reporting outcomes from long-term study programs."
+      ],
+      "date": "Nov 2021 – Feb 2024",
+      "org": "Istanbul, Turkey (remote during Brown semesters, in person over breaks)",
+      "title": "Research Operations Lead, Altundağ Otolaryngology Research Institute"
+    },
+    {
+      "bullets": [
+        "Built and operate API automation pipelines in daily production use, with monitoring dashboards and error-handling playbooks for incident response."
+      ],
+      "date": "Ongoing",
+      "org": "Personal projects",
+      "title": "Automation Systems Developer (Independent)"
+    }
+  ],
+  "hero": {
+    "kicker": "Alp D. Güreş – Brown '27",
+    "meta": "Providence, RI – moving to New York, June 2027",
+    "name": "I build things.",
+    "sub": "A language-learning app in closed beta. An e-ink flight display I built as a surprise for my boyfriend. A recipe site preserving my mother's cooking in five languages. I'm a Brown biology senior, and building is the thread through all of it."
+  },
+  "projects": [
+    {
+      "blurb": "A language-learning app I designed and built – currently in invite-only closed beta.",
+      "image": "images/dash-ja.png",
+      "slug": "kotoban",
+      "title": "Kotoban"
+    },
+    {
+      "blurb": "An e-ink flight display I built as a surprise gift for my boyfriend, the avgeek. He uses it daily.",
+      "image": "",
+      "slug": "planeframe",
+      "title": "PlaneFrame"
+    },
+    {
+      "blurb": "A recipe site preserving my mother's cooking – 8 recipes, 40 narrated videos, 5 languages.",
+      "image": "images/recipe-mercimek-corbasi.webp",
+      "slug": "annemin-tarifleri",
+      "title": "Annemin Tarifleri"
+    },
+    {
+      "slug": "dct-asistan",
+      "title": "İğde",
+      "blurb": "A WhatsApp business assistant fronted by an animated avatar who answers in plain Turkish and relays the rest to a human."
+    }
+  ],
+  "skills": {
+    "education": "Brown University – Sc.B. Biology (STEM-designated), GPA 3.7/4.0, expected May 2027. Relevant coursework: Biostatistics, CS Fundamentals, Healthcare in the United States.",
+    "languages": "English (native), Turkish (native), Japanese (fluent, incl. business keigo), German (advanced).",
+    "tools": "R, Python (pandas), SQL, biostatistics and statistical modeling, data visualization, data pipelines. Microsoft Excel and PowerPoint (advanced), Google Workspace."
+  }
+}
