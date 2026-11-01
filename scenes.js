@@ -17,16 +17,16 @@ function scenePlane() {
     '<path d="M90 124 Q170 118 250 124"/>' +
     "</g>" +
     '<g transform="translate(107,68)"><g class="scn-jet"><g transform="scale(0.88)">' +
-    '<path d="M48 34 L34 4 L27 4 L18 34 Z" fill="#1b1815"/>' +
-    '<path d="M34 4 L27 4 L25 11 L32 11 Z" fill="#c8412b"/>' +
-    '<path d="M10 34 L96 34 Q104 34 110 27 Q118 20 132 20 L158 22 Q180 24 190 30 Q197 34 192 39 L182 43 L22 45 Q10 43 10 34 Z" fill="#1b1815"/>' +
-    '<path d="M170 25 L182 27 L180 30 L168 28 Z" fill="#f4f1e8"/>' +
-    '<rect x="24" y="36.5" width="140" height="2" fill="#f4f1e8" opacity="0.9"/>' +
-    '<rect x="24" y="40" width="140" height="1.8" fill="#c8412b" opacity="0.9"/>' +
-    '<path d="M108 44 L76 68 L83 70 L136 46 Z" fill="#1b1815"/>' +
-    '<ellipse cx="98" cy="59" rx="9" ry="4" fill="#1b1815" transform="rotate(-20 98 59)"/>' +
-    '<ellipse cx="118" cy="54" rx="9" ry="4" fill="#1b1815" transform="rotate(-20 118 54)"/>' +
-    '<path d="M26 40 L6 50 L10 52 L30 42 Z" fill="#1b1815"/>' +
+    '<path d="M54 33 L38 3 L30 3 L22 33 Z" fill="#1b1815"/>' +
+    '<path d="M38 3 L30 3 L28 10 L36 10 Z" fill="#c8412b"/>' +
+    '<path d="M16 33 L88 31 Q104 30 112 25 L142 21 Q156 20 162 24 L178 28 Q190 31 192 36 Q193 41 185 43 L30 46 Q16 44 16 33 Z" fill="#1b1815"/>' +
+    '<path d="M166 25 L180 27 L178 30 L164 28 Z" fill="#f4f1e8"/>' +
+    '<rect x="30" y="35.5" width="112" height="2" fill="#f4f1e8" opacity="0.9"/>' +
+    '<rect x="30" y="39" width="112" height="1.8" fill="#c8412b" opacity="0.9"/>' +
+    '<path d="M124 44 L88 66 L94 68 L142 46 Z" fill="#1b1815"/>' +
+    '<ellipse cx="104" cy="67" rx="8" ry="3.8" fill="#1b1815" transform="rotate(-24 104 67)"/>' +
+    '<ellipse cx="126" cy="58" rx="8" ry="3.8" fill="#1b1815" transform="rotate(-24 126 58)"/>' +
+    '<path d="M32 40 L10 51 L15 53 L36 42 Z" fill="#1b1815"/>' +
     "</g></g></g>" +
     '<text x="94" y="148" font-size="12" font-weight="600" font-family="Inter, sans-serif" fill="#1b1815">Güreş Airways</text>' +
     '<text x="208" y="148" font-size="10" font-family="Inter, sans-serif" fill="#6f6a62">AG2027</text>' +
