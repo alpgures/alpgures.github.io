@@ -34,35 +34,18 @@
 }
 .proj-scene .scn { width: 100%; height: auto; max-height: 380px; display: block; }
 
-/* ---------- PlaneFrame: e-ink display mockup ---------- */
+/* ---------- PlaneFrame: e-ink display mockup (mirrors the real Nook UI) ---------- */
 
-.sc-plane .scn-eink { animation: scn-float 7s ease-in-out infinite; }
-
-.sc-plane .scn-fplane {
-  offset-path: path('M112 126 H288');
-  animation: scn-ffly 8s var(--ease-flow) infinite;
-}
-@keyframes scn-ffly {
-  0% { offset-distance: 0%; opacity: 1; }
-  76% { offset-distance: 100%; opacity: 1; }
-  86%, 100% { offset-distance: 100%; opacity: 0; }
+.sc-plane .scn-jet { animation: scn-hover 6s ease-in-out infinite; }
+@keyframes scn-hover {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
 }
 
-.sc-plane .scn-progfill {
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-  animation: scn-pfill 8s var(--ease-flow) infinite;
-}
-@keyframes scn-pfill {
-  0% { stroke-dashoffset: 100; opacity: 1; }
-  76% { stroke-dashoffset: 0; opacity: 1; }
-  86%, 100% { stroke-dashoffset: 0; opacity: 0; }
-}
-
-.sc-plane .scn-livedot {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: scn-pulse 2s ease-in-out infinite;
+.sc-plane .scn-strobe { animation: scn-strobe 1.6s ease-in-out infinite; }
+@keyframes scn-strobe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.1; }
 }
 
 /* ---------- Kotoban: simplified app mockup ---------- */

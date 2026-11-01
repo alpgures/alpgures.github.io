@@ -8,21 +8,24 @@ function scenePlane() {
     '<g class="scn-eink">' +
     '<rect x="70" y="26" width="260" height="172" rx="12" fill="#1b1815"/>' +
     '<rect x="82" y="38" width="236" height="148" rx="4" fill="#f4f1e8"/>' +
-    '<circle class="scn-livedot" cx="102" cy="60" r="4" fill="#c8412b"/>' +
-    '<text x="200" y="66" text-anchor="middle" font-size="15" font-weight="600" letter-spacing="3" font-family="Inter, sans-serif" fill="#1b1815">TK 1987</text>' +
-    '<text x="200" y="85" text-anchor="middle" font-size="11" letter-spacing="2" font-family="Inter, sans-serif" fill="#6f6a62">JFK &#8594; IST</text>' +
-    '<line x1="100" y1="97" x2="300" y2="97" stroke="#d8d0c2" stroke-width="1.5"/>' +
-    '<line x1="112" y1="126" x2="288" y2="126" stroke="#e2dccf" stroke-width="3" stroke-linecap="round"/>' +
-    '<line class="scn-progfill" x1="112" y1="126" x2="288" y2="126" stroke="#1b1815" stroke-width="3" stroke-linecap="round" pathLength="100"/>' +
-    '<circle cx="112" cy="126" r="5" fill="#1b1815"/>' +
-    '<circle cx="288" cy="126" r="5" fill="none" stroke="#1b1815" stroke-width="2.5"/>' +
-    '<g class="scn-fplane"><path d="M0 -8 L22 0 L0 8 L6 0 Z" fill="#c8412b"/></g>' +
-    '<text x="130" y="156" text-anchor="middle" font-size="9" letter-spacing="1.5" font-family="Inter, sans-serif" fill="#6f6a62">ALT</text>' +
-    '<text x="130" y="172" text-anchor="middle" font-size="14" font-weight="600" font-family="Inter, sans-serif" fill="#1b1815">38,000</text>' +
-    '<text x="200" y="156" text-anchor="middle" font-size="9" letter-spacing="1.5" font-family="Inter, sans-serif" fill="#6f6a62">SPD</text>' +
-    '<text x="200" y="172" text-anchor="middle" font-size="14" font-weight="600" font-family="Inter, sans-serif" fill="#1b1815">520 KT</text>' +
-    '<text x="270" y="156" text-anchor="middle" font-size="9" letter-spacing="1.5" font-family="Inter, sans-serif" fill="#6f6a62">HDG</text>' +
-    '<text x="270" y="172" text-anchor="middle" font-size="14" font-weight="600" font-family="Inter, sans-serif" fill="#1b1815">084&#176;</text>' +
+    '<text x="200" y="54" text-anchor="middle" font-size="11" letter-spacing="2.5" font-family="Inter, sans-serif" fill="#1b1815">right above you!</text>' +
+    '<g transform="translate(98,58)"><g class="scn-jet">' +
+    '<path d="M14 24 L40 24 L28 4 Z" fill="#1b1815"/>' +
+    '<circle cx="29" cy="17" r="3" fill="#c8412b"/>' +
+    '<path d="M8 24 H168 Q194 24 198 33 Q194 42 168 42 H8 Q0 42 0 33 Q0 24 8 24 Z" fill="#1b1815"/>' +
+    '<rect x="180" y="28" width="10" height="5" rx="2.5" fill="#f4f1e8"/>' +
+    '<path d="M104 42 H136 L112 68 H96 Z" fill="#1b1815"/>' +
+    '<ellipse cx="112" cy="62" rx="11" ry="5.5" fill="#1b1815"/>' +
+    '<path d="M6 42 H26 L18 52 H8 Z" fill="#1b1815"/>' +
+    '<circle class="scn-strobe" cx="96" cy="68" r="2.6" fill="#c8412b"/>' +
+    "</g></g>" +
+    '<text x="94" y="140" font-size="12" font-weight="600" font-family="Inter, sans-serif" fill="#1b1815">Turkish Airlines</text>' +
+    '<text x="212" y="140" font-size="10" font-family="Inter, sans-serif" fill="#6f6a62">TK1987</text>' +
+    '<text x="94" y="152" font-size="9" font-family="Inter, sans-serif" fill="#6f6a62">Boeing 777-300ER</text>' +
+    '<text x="158" y="168" text-anchor="middle" font-size="15" font-weight="700" letter-spacing="1" font-family="Inter, sans-serif" fill="#1b1815">JFK</text>' +
+    '<text x="200" y="167" text-anchor="middle" font-size="9" font-family="Inter, sans-serif" fill="#6f6a62">to</text>' +
+    '<text x="242" y="168" text-anchor="middle" font-size="15" font-weight="700" letter-spacing="1" font-family="Inter, sans-serif" fill="#1b1815">IST</text>' +
+    '<text x="200" y="181" text-anchor="middle" font-size="7.5" font-family="Inter, sans-serif" fill="#6f6a62">Altitude: 38,000 ft   Speed: 520 kt</text>' +
     '<rect x="186" y="198" width="28" height="16" fill="#1b1815"/>' +
     '<rect x="150" y="212" width="100" height="9" rx="4.5" fill="#1b1815"/>' +
     "</g></svg>"
