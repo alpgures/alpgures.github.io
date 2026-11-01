@@ -58,6 +58,20 @@
       var label = { kotoban: "Kotoban", planeframe: "PlaneFrame", "annemin-tarifleri": "Annemin Tarifleri" }[next];
       document.getElementById("proj-next").innerHTML =
         '<a href="project.html?p=' + next + '">Next: ' + esc(label) + " →</a>";
+
+      var sceneBox = document.getElementById("proj-scene");
+      var firstImg = (d.gallery && d.gallery[0]) || "";
+      sceneBox.innerHTML = sceneFor(slug, firstImg, d.title);
+
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      document.querySelectorAll(".rv").forEach(function (el) { io.observe(el); });
     })
     .catch(function (err) {
       console.error("Could not load project:", err);

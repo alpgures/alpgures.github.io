@@ -17,13 +17,12 @@
 
   function renderProjectCards(items) {
     return items
-      .map(function (p) {
-        var img = p.image
-          ? '<div class="card-img"><img src="' + esc(p.image) + '" alt="' + esc(p.title) + '" loading="lazy"></div>'
-          : '<div class="card-img card-img-empty"><span>' + esc(p.title.charAt(0)) + "</span></div>";
+      .map(function (p, i) {
+        var scene = sceneFor(p.slug, p.image, p.title);
+        var delay = i === 1 ? " rv-d1" : i === 2 ? " rv-d2" : "";
         return (
-          '<a class="card" href="projects/project.html?p=' + esc(p.slug) + '">' +
-          img +
+          '<a class="card rv' + delay + '" href="projects/project.html?p=' + esc(p.slug) + '">' +
+          '<div class="card-scene">' + scene + "</div>" +
           '<div class="card-body"><h3>' + esc(p.title) + "</h3>" +
           "<p>" + esc(p.blurb) + "</p>" +
           '<span class="card-cta">Read the story →</span></div></a>'
@@ -81,7 +80,18 @@
       var exp = document.getElementById("experience-list");
       if (exp) exp.innerHTML = renderExperience(data.experience || []);
 
-      document.title = (data.hero && data.hero.name ? data.hero.name : "Alp D. Güreş") + " – Brown '27";
+      document.title = "Alp D. Güreş – Brown '27";
+
+      // Scroll reveal
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            e.target.classList.add("in");
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      document.querySelectorAll(".rv").forEach(function (el) { io.observe(el); });
     })
     .catch(function (err) {
       console.error("Could not load site content:", err);

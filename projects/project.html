@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="../motion.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐦</text></svg>">
 </head>
 <body>
@@ -32,11 +33,13 @@
     <div class="proj-links" id="proj-links"></div>
   </header>
 
+  <div class="proj-scene rv" id="proj-scene"></div>
+
   <div class="proj-gallery" id="proj-gallery"></div>
 
-  <section class="proj-story" id="proj-story"></section>
+  <section class="proj-story rv" id="proj-story"></section>
 
-  <section>
+  <section class="rv">
     <h2>Details</h2>
     <dl class="fact-grid" id="proj-facts"></dl>
   </section>
@@ -48,6 +51,7 @@
   <p>© 2026 Alp D. Güreş – Providence, RI</p>
 </footer>
 
+<script src="../scenes.js"></script>
 <script src="project.js"></script>
 </body>
 </html>

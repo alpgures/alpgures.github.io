@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="motion.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐦</text></svg>">
 </head>
 <body>
@@ -27,6 +28,7 @@
 <main>
 
 <header class="hero">
+  <div class="chips" aria-hidden="true"><span>言葉</span><span>bạn</span><span>merhaba</span><span>こんにちは</span><span>hello</span></div>
   <p class="hero-kicker" data-field="hero.kicker"></p>
   <h1 data-field="hero.name"></h1>
   <p class="hero-sub" data-field="hero.sub"></p>
@@ -37,17 +39,17 @@
   </div>
 </header>
 
-<section id="work">
+<section id="work" class="rv">
   <h2>Selected work</h2>
   <div id="project-cards" class="cards"></div>
 </section>
 
-<section id="about">
+<section id="about" class="rv">
   <h2>About</h2>
   <div data-list="about" data-tag="p"></div>
 </section>
 
-<section id="experience">
+<section id="experience" class="rv">
   <h2>Experience</h2>
   <div id="experience-list"></div>
 </section>
@@ -70,7 +72,7 @@
   </div>
 </section>
 
-<section id="contact">
+<section id="contact" class="rv">
   <h2>Contact</h2>
   <p data-field="contact.blurb"></p>
   <div class="contact-links">
@@ -86,6 +88,7 @@
   <p>© 2026 Alp D. Güreş – Providence, RI</p>
 </footer>
 
+<script src="scenes.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
