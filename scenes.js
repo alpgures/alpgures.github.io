@@ -118,17 +118,17 @@ function sceneDct() {
     '<g class="scn-phone">' +
     '<rect x="140" y="12" width="150" height="226" rx="24" fill="#fffdf8" stroke="#1b1815" stroke-width="2.5"/>' +
     '<rect x="198" y="22" width="34" height="9" rx="4.5" fill="#1b1815"/>' +
-    '<text x="154" y="52" font-size="12" font-weight="700" font-family="Inter, sans-serif" fill="#1b1815">Bugünün Gönderisi</text>' +
-    '<rect x="196" y="40" width="82" height="16" rx="8" fill="#f7ecc9"/>' +
-    '<text x="237" y="51.5" text-anchor="middle" font-size="8" font-weight="600" font-family="Inter, sans-serif" fill="#8a6d1f">Onay Bekliyor</text>' +
-    '<rect x="152" y="64" width="126" height="60" rx="8" fill="#d9e6d2"/>' +
-    '<circle cx="252" cy="82" r="9" fill="#f2e9c9"/>' +
-    '<path d="M152 124 L196 96 L224 116 L252 100 L278 124 Z" fill="#b9cfb0"/>' +
-    '<rect x="152" y="132" width="104" height="6" rx="3" fill="#e6e0d6"/>' +
-    '<rect x="152" y="142" width="114" height="6" rx="3" fill="#e6e0d6"/>' +
-    '<rect x="152" y="152" width="72" height="6" rx="3" fill="#e6e0d6"/>' +
-    '<g class="scn-okbtn"><rect x="152" y="168" width="126" height="28" rx="14" fill="#116530"/>' +
-    '<text x="215" y="186" text-anchor="middle" font-size="10" font-weight="600" font-family="Inter, sans-serif" fill="#fffdf8">Onayla ve Yayınla</text></g>' +
+    '<text x="154" y="46" font-size="12" font-weight="700" font-family="Inter, sans-serif" fill="#1b1815">Bugünün Gönderisi</text>' +
+    '<rect x="154" y="54" width="86" height="15" rx="7.5" fill="#f7ecc9"/>' +
+    '<text x="197" y="65" text-anchor="middle" font-size="8" font-weight="600" font-family="Inter, sans-serif" fill="#8a6d1f">Onay Bekliyor</text>' +
+    '<rect x="152" y="76" width="126" height="58" rx="8" fill="#d9e6d2"/>' +
+    '<circle cx="252" cy="92" r="9" fill="#f2e9c9"/>' +
+    '<path d="M152 134 L196 106 L224 126 L252 110 L278 134 Z" fill="#b9cfb0"/>' +
+    '<rect x="152" y="142" width="104" height="6" rx="3" fill="#e6e0d6"/>' +
+    '<rect x="152" y="151" width="114" height="6" rx="3" fill="#e6e0d6"/>' +
+    '<rect x="152" y="160" width="72" height="6" rx="3" fill="#e6e0d6"/>' +
+    '<g class="scn-okbtn"><rect x="152" y="170" width="126" height="28" rx="14" fill="#116530"/>' +
+    '<text x="215" y="188" text-anchor="middle" font-size="10" font-weight="600" font-family="Inter, sans-serif" fill="#fffdf8">Onayla ve Yayınla</text></g>' +
     '<line x1="140" y1="208" x2="290" y2="208" stroke="#e6e0d6" stroke-width="1.5"/>' +
     '<circle cx="172" cy="216" r="3.5" fill="#116530"/>' +
     '<text x="172" y="230" text-anchor="middle" font-size="8" font-weight="600" font-family="Inter, sans-serif" fill="#116530">Bugün</text>' +

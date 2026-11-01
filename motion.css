@@ -145,36 +145,14 @@
 .chips span:nth-child(4) { top: 46%; right: 1%; animation-delay: -5s; animation-duration: 7.6s; }
 .chips span:nth-child(5) { bottom: 10%; right: 14%; animation-delay: -2.6s; }
 
-/* ---------- İğde: WhatsApp assistant mockup ---------- */
+/* ---------- DCT Asistan: spindle + app overview ---------- */
 
 .sc-dct .scn-phone { animation: scn-float 7s ease-in-out infinite; }
 
-.sc-dct .scn-msg { opacity: 0; }
-.sc-dct .scn-msg.m1 { animation: scn-dct-m1 10s var(--ease-flow) infinite; }
-.sc-dct .scn-msg.m2 { animation: scn-dct-m2 10s var(--ease-flow) infinite; }
-@keyframes scn-dct-m1 {
-  0%, 3% { opacity: 0; transform: translateY(8px); }
-  9%, 80% { opacity: 1; transform: translateY(0); }
-  88%, 100% { opacity: 0; transform: translateY(-4px); }
-}
-@keyframes scn-dct-m2 {
-  0%, 33% { opacity: 0; transform: translateY(8px); }
-  39%, 80% { opacity: 1; transform: translateY(0); }
-  88%, 100% { opacity: 0; transform: translateY(-4px); }
-}
-
-.sc-dct .scn-typing { opacity: 0; animation: scn-dct-typing 10s ease-in-out infinite; }
-@keyframes scn-dct-typing {
-  0%, 13% { opacity: 0; }
-  17%, 29% { opacity: 1; }
-  33%, 100% { opacity: 0; }
-}
-.sc-dct .scn-typing circle { animation: scn-tbounce 0.9s ease-in-out infinite; }
-.sc-dct .scn-typing .td2 { animation-delay: 0.15s; }
-.sc-dct .scn-typing .td3 { animation-delay: 0.3s; }
-@keyframes scn-tbounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+.sc-dct .scn-gear {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: scn-spin 12s linear infinite;
 }
 
 .sc-dct .scn-eye {
@@ -185,6 +163,16 @@
 @keyframes scn-blink {
   0%, 92%, 100% { transform: scaleY(1); }
   95% { transform: scaleY(0.12); }
+}
+
+.sc-dct .scn-okbtn {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: scn-btn-pulse 2.8s ease-in-out infinite;
+}
+@keyframes scn-btn-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.045); }
 }
 
 .sc-dct .scn-dot { animation: scn-float 5.2s ease-in-out infinite; }
