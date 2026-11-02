@@ -86,24 +86,27 @@
           "言葉", "bạn", "merhaba", "こんにちは", "hello",
         ];
         chipsBox.innerHTML = "";
-        words.forEach(function (w) {
-          var ltr = Math.random() < 0.5;
-          var dur = 80 + Math.random() * 80; // 80-160s: barely moving
-          var from = ltr ? -18 - Math.random() * 8 : 108 + Math.random() * 8;
-          var to = ltr ? 108 + Math.random() * 8 : -18 - Math.random() * 8;
+        var n = words.length;
+        words.forEach(function (w, i) {
+          // Evenly distributed: no clumps, no empty gaps. Lanes spread 4-40%,
+          // phases staggered so chips are spread across the sky at any moment.
+          var ltr = i % 2 === 0;
+          var dur = 120 + ((i * 37) % 30) - 15; // 105-135s, near-equal keeps spacing even
+          var from = ltr ? -22 : 112;
+          var to = ltr ? 112 : -22;
           var outer = document.createElement("span");
           outer.className = "chip-x";
-          outer.style.top = (4 + Math.random() * 32).toFixed(1) + "%"; // all over the sky
+          outer.style.top = (4 + ((i + 0.5) / n) * 36).toFixed(1) + "%";
           outer.style.setProperty("--fx", from.toFixed(1) + "vw");
           outer.style.setProperty("--tx", to.toFixed(1) + "vw");
           outer.style.animationDuration = dur.toFixed(1) + "s";
-          outer.style.animationDelay = (-Math.random() * dur).toFixed(1) + "s";
+          outer.style.animationDelay = (-(i / n) * dur).toFixed(1) + "s";
           var inner = document.createElement("span");
           inner.className = "chip";
           inner.textContent = w;
-          inner.style.opacity = (0.45 + Math.random() * 0.3).toFixed(2);
-          inner.style.animationDuration = (8 + Math.random() * 6).toFixed(1) + "s";
-          inner.style.animationDelay = (-Math.random() * 10).toFixed(1) + "s";
+          inner.style.opacity = (0.45 + ((i * 53) % 30) / 100).toFixed(2);
+          inner.style.animationDuration = (8 + ((i * 29) % 60) / 10).toFixed(1) + "s";
+          inner.style.animationDelay = (-((i * 17) % 100) / 10).toFixed(1) + "s";
           outer.appendChild(inner);
           chipsBox.appendChild(outer);
         });
