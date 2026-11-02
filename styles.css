@@ -239,7 +239,7 @@ section h2 {
   margin-top: 14px;
 }
 
-.hero-actions { display: flex; gap: 14px; margin-top: 28px; flex-wrap: wrap; }
+.hero-actions { display: flex; gap: 8px; margin-top: 28px; flex-wrap: wrap; }
 
 .btn {
   display: inline-block;
