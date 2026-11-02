@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=8">
-<link rel="stylesheet" href="motion.css?v=8">
+<link rel="stylesheet" href="styles.css?v=10">
+<link rel="stylesheet" href="motion.css?v=10">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐦</text></svg>">
 </head>
 <body>
@@ -33,6 +33,20 @@
 
   <section class="rv">
     <div id="xp-list"></div>
+  </section>
+
+  <section class="rv">
+    <h2>Skills &amp; languages</h2>
+    <div class="skills-grid">
+      <div>
+        <h3>Tools &amp; data</h3>
+        <p id="skills-tools"></p>
+      </div>
+      <div>
+        <h3>Languages</h3>
+        <p id="skills-languages"></p>
+      </div>
+    </div>
   </section>
 
   <section class="rv edu">
@@ -80,6 +94,11 @@
           );
         }).join("");
       }
+      var sk = data.skills || {};
+      var skt = document.getElementById("skills-tools");
+      if (skt && sk.tools) skt.textContent = sk.tools;
+      var skl = document.getElementById("skills-languages");
+      if (skl && sk.languages) skl.textContent = sk.languages;
       var edu = document.getElementById("edu-block");
       if (edu && data.education) {
         var ed = data.education;

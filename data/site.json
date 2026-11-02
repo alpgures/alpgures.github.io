@@ -119,8 +119,6 @@
       "નમસ્તે",
       "salam"
     ],
-    "greeting_interval": 3,
-    "love_interval": 2.5,
     "love_words": [
       "building things",
       "languages",
@@ -132,7 +130,8 @@
       "e-ink",
       "flight tracking",
       "Tokyo"
-    ]
+    ],
+    "rotation_interval": 3
   },
   "projects": [
     {
@@ -160,7 +159,6 @@
     }
   ],
   "skills": {
-    "education": "Brown University – Sc.B. Biology (STEM-designated), GPA 3.7/4.0, expected May 2027. Relevant coursework: Biostatistics, CS Fundamentals, Healthcare in the United States.",
     "languages": "English (native), Turkish (native), Japanese (fluent, incl. business keigo), German (advanced).",
     "tools": "R, Python (pandas), SQL, biostatistics and statistical modeling, data visualization, data pipelines. Microsoft Excel and PowerPoint (advanced), Google Workspace."
   },

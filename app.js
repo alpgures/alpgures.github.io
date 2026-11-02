@@ -83,6 +83,46 @@
           [0.03, 0.18, 0.38, 0.50],
           [0.80, 0.97, 0.38, 0.55]
         ];
+        // Mountain-aware ceiling: sample the RENDERED ridge paths (so slice
+        // cropping, responsive sizes etc. are all accounted for) and forbid
+        // chips below the silhouette, at any viewport.
+        var RIDGE = null, RIDGE_N = 96;
+        function buildRidge() {
+          try {
+            var svg = document.querySelector(".hero .taurus");
+            if (!svg || !chipsBox) return;
+            var box = chipsBox.getBoundingClientRect();
+            if (!box.width || !box.height) return;
+            var cols = [];
+            for (var z = 0; z < RIDGE_N; z++) cols.push(Infinity);
+            var paths = svg.querySelectorAll("path");
+            for (var pi = 0; pi < paths.length; pi++) {
+              var f = paths[pi].getAttribute("fill") || "";
+              if (f !== "#2c3145" && f.indexOf("mmbase") === -1 && f.indexOf("mbase") === -1) continue;
+              var ctm = paths[pi].getScreenCTM();
+              if (!ctm) continue;
+              var len = paths[pi].getTotalLength();
+              for (var dd = 0; dd <= len; dd += 6) {
+                var pt = paths[pi].getPointAtLength(dd);
+                var sx = ctm.a * pt.x + ctm.c * pt.y + ctm.e;
+                var sy = ctm.b * pt.x + ctm.d * pt.y + ctm.f;
+                var bin = Math.floor((sx - box.left) / box.width * RIDGE_N);
+                if (bin < 0 || bin >= RIDGE_N) continue;
+                if (sy < cols[bin]) cols[bin] = sy;
+              }
+            }
+            var last = Infinity, i, j;
+            for (i = 0; i < RIDGE_N; i++) { if (cols[i] === Infinity) cols[i] = last; else last = cols[i]; }
+            last = Infinity;
+            for (j = RIDGE_N - 1; j >= 0; j--) { if (cols[j] === Infinity) cols[j] = last; else last = cols[j]; }
+            RIDGE = cols.map(function (sy) { return (sy - box.top) / box.height - 0.05; });
+          } catch (e) { RIDGE = null; }
+        }
+        function skyLimit(xf) {
+          if (!RIDGE) return 0.40;
+          var i = Math.max(0, Math.min(RIDGE_N - 1, Math.floor(xf * RIDGE_N)));
+          return RIDGE[i];
+        }
 
         function place(c) {
           var w = CW(), h = CH(), sx, sy;
@@ -95,6 +135,10 @@
                   c.ax * 0.6 * Math.sin(c.t * c.sp * 7 + c.ph2)) * w;
             sy = (c.by + c.ay * Math.cos(c.t * c.sp * 2.4 + c.ph2) +
                   c.ay * 0.6 * Math.cos(c.t * c.sp * 5.2 + c.ph1)) * h;
+          }
+          if (c.mode === "wander" && !c.dragging) {
+            var lim = skyLimit(sx / w) * h;
+            if (sy > lim) sy = lim;
           }
           var f = c.free * c.free;
           var x = sx * (1 - f) + c.px * f;
@@ -124,15 +168,17 @@
             c.mode = "wander";
             c.bx = pk[0] + Math.random() * (pk[1] - pk[0]);
             c.by = pk[2] + Math.random() * (pk[3] - pk[2]);
+            c.ay = 0.015 + Math.random() * 0.012;
+            c.by = Math.max(0.03, Math.min(c.by, skyLimit(c.bx) - c.ay - 0.015));
             c.t = Math.random() * 100; c.sp = 0.10 + Math.random() * 0.12;
             c.ph1 = Math.random() * 6.28; c.ph2 = Math.random() * 6.28;
-            c.ax = 0.018 + Math.random() * 0.012; c.ay = 0.015 + Math.random() * 0.012;
+            c.ax = 0.018 + Math.random() * 0.012;
           } else {
             var ltr = Math.random() < 0.5;
             c.mode = "traverse";
             c.fx = ltr ? -0.22 : 1.12; c.tx = ltr ? 1.12 : -0.22;
             c.lane = 0.04 + ((i + Math.random()) / n) * 0.34;
-            c.dy = Math.random() * 0.08 - 0.04;
+            c.dy = Math.random() * 0.07 - 0.035;
             c.t = Math.random(); c.sp = 1 / (100 + Math.random() * 40);
           }
           outer.className = c.mode === "wander" ? "chip-w" : "chip-x";
@@ -188,16 +234,22 @@
         });
 
         chips.forEach(place);
+        buildRidge();
+        var rT = null;
+        window.addEventListener("resize", function () {
+          if (rT) clearTimeout(rT);
+          rT = setTimeout(buildRidge, 200);
+        });
         var last = performance.now();
         var frameNo = 0;
         function nudge(c, ddx, ddy, w, h) {
           if (c.free > 0.3) { c.px += ddx * 0.6; c.py += ddy * 0.6; }
           else if (c.mode === "traverse") {
-            c.lane = Math.max(0.02, Math.min(0.42, c.lane + (ddy / h) * 0.6));
+            c.lane = Math.max(0.02, Math.min(0.38, c.lane + (ddy / h) * 0.6));
             c.t += (ddx / w) / (c.tx - c.fx) * 0.6;
           } else {
             c.bx = Math.max(0.01, Math.min(0.95, c.bx + (ddx / w) * 0.6));
-            c.by = Math.max(0.03, Math.min(0.55, c.by + (ddy / h) * 0.6));
+            c.by = Math.max(0.03, Math.min(skyLimit(c.bx) - 0.015, c.by + (ddy / h) * 0.6));
           }
         }
         function collide() {
@@ -275,8 +327,10 @@
         })(last);
       }
 
-      // Hero: rotating greeting + "I love" word box.
+      // Hero: rotating greeting + "I love" word box. Both swap on ONE
+      // shared interval so the page never has two competing motions.
       (function () {
+        var greetBox = document.getElementById("greetBox");
         var greetEl = document.getElementById("greetWord");
         var loveEl = document.getElementById("loveWord");
         if (!greetEl && !loveEl) return;
@@ -325,9 +379,9 @@
           }
           loveEl.textContent = cur;
         }
-        function swap(el, text) {
-          if (!el) return;
-          if (reduced) { el.textContent = text; return; }
+        function slideSwap(el, text, after) {
+          if (!el) { if (after) after(); return; }
+          if (reduced) { el.textContent = text; if (after) after(); return; }
           el.classList.remove("word-in");
           el.classList.add("word-out");
           setTimeout(function () {
@@ -335,22 +389,47 @@
             el.classList.remove("word-out");
             void el.offsetWidth;
             el.classList.add("word-in");
-            if (el === loveEl) fitLove();
-          }, 380);
+            if (after) after();
+          }, 360);
         }
-        if (greetEl) {
-          greetEl.textContent = nextGreeting();
-          setInterval(function () { swap(greetEl, nextGreeting()); },
-            (hero.greeting_interval || 3) * 1000);
+        // Greeting box: fluid width. New word is set hidden, measured, then
+        // the box eases to the new width while the word slides in — the
+        // "! My name is Alp" tail rides the box edge instead of jumping.
+        function sizeGreetBox() {
+          if (!greetBox || !greetEl || reduced) return;
+          greetBox.style.width = greetEl.offsetWidth + "px";
         }
+        function swapGreeting() {
+          var next = nextGreeting();
+          if (reduced || !greetBox) { slideSwap(greetEl, next); return; }
+          greetEl.classList.remove("word-in");
+          greetEl.classList.add("word-out");
+          setTimeout(function () {
+            greetEl.textContent = next;
+            greetEl.style.visibility = "hidden";
+            greetBox.style.width = greetEl.offsetWidth + "px";
+            void greetBox.offsetWidth;
+            greetEl.style.visibility = "";
+            greetEl.classList.remove("word-out");
+            void greetEl.offsetWidth;
+            greetEl.classList.add("word-in");
+          }, 360);
+        }
+        function tick() {
+          swapGreeting();
+          slideSwap(loveEl, nextLove(), fitLove);
+        }
+        if (greetEl) greetEl.textContent = nextGreeting();
         if (loveEl) {
           loveEl.textContent = nextLove();
-          setInterval(function () { swap(loveEl, nextLove()); },
-            (hero.love_interval || 2.5) * 1000);
           fitLove();
-          if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitLove);
-          window.addEventListener("resize", fitLove);
+          if (document.fonts && document.fonts.ready)
+            document.fonts.ready.then(function () { fitLove(); sizeGreetBox(); });
+          window.addEventListener("resize", function () { fitLove(); sizeGreetBox(); });
         }
+        sizeGreetBox();
+        var ROT = (hero.rotation_interval || 3) * 1000;
+        if (!reduced) setInterval(tick, ROT);
       })();
 
       document.title = "Alp D. Güreş – Brown '27";

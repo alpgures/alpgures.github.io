@@ -168,7 +168,19 @@ section h2 {
   margin: 0 0 18px;
   color: var(--ink);
 }
-.greet-word { color: var(--accent); }
+.greet-box {
+  display: inline-flex;
+  align-items: center;
+  overflow: hidden;
+  vertical-align: -0.12em;
+  background: var(--accent-soft);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.04em 0.3em;
+  transition: width 0.55s cubic-bezier(0.22,1,0.36,1);
+}
+.greet-word { color: var(--accent); white-space: nowrap; }
+.greet-rest { white-space: nowrap; }
 .hero-love {
   font-size: clamp(26px, 6.5vw, 56px);
   font-weight: 600;
@@ -178,13 +190,15 @@ section h2 {
   margin: 0 0 22px;
 }
 .love-box {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   background: var(--accent-soft);
   border: 1px solid var(--line);
   border-radius: 14px;
-  padding: 0.02em 0.3em 0.08em;
+  padding: 0.04em 0.3em;
   color: var(--ink);
 }
+.love-dot { white-space: nowrap; }
 .rot-word { display: inline-block; }
 .rot-word.word-out { animation: word-out 0.38s cubic-bezier(0.22,1,0.36,1) forwards; }
 .rot-word.word-in { animation: word-in 0.45s cubic-bezier(0.22,1,0.36,1); }
