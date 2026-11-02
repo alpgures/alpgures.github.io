@@ -71,7 +71,7 @@ function sceneDct() {
     '<circle class="scn-dot d2" cx="196" cy="18" r="7" fill="#93a0b4" opacity="0.18"/>' +
     /* spindle */
     '<g transform="translate(12,16)">' +
-    '<rect x="15" y="190" width="40" height="16" rx="8" fill="#116530"/>' +
+    '<rect x="15" y="190" width="40" height="16" rx="8" fill="#5b6b84"/>' +
     '<g class="scn-gear">' + teeth +
     '<circle cx="35" cy="168" r="20" fill="#9aa0a6"/>' +
     '<circle cx="35" cy="168" r="11" fill="#767c83"/>' +
@@ -88,19 +88,19 @@ function sceneDct() {
     '<rect x="140" y="12" width="150" height="226" rx="24" fill="#fffdf8" stroke="#1b1815" stroke-width="2.5"/>' +
     '<rect x="198" y="22" width="34" height="9" rx="4.5" fill="#1b1815"/>' +
     '<text x="154" y="46" font-size="12" font-weight="700" font-family="Inter, sans-serif" fill="#1b1815">Bugünün Gönderisi</text>' +
-    '<rect x="154" y="54" width="86" height="15" rx="7.5" fill="#f7ecc9"/>' +
-    '<text x="197" y="65" text-anchor="middle" font-size="8" font-weight="600" font-family="Inter, sans-serif" fill="#8a6d1f">Onay Bekliyor</text>' +
-    '<rect x="152" y="76" width="126" height="58" rx="8" fill="#d9e6d2"/>' +
-    '<circle cx="252" cy="92" r="9" fill="#f2e9c9"/>' +
-    '<path d="M152 134 L196 106 L224 126 L252 110 L278 134 Z" fill="#b9cfb0"/>' +
+    '<rect x="154" y="54" width="86" height="15" rx="7.5" fill="#e9e6dc"/>' +
+    '<text x="197" y="65" text-anchor="middle" font-size="8" font-weight="600" font-family="Inter, sans-serif" fill="#6f6a62">Onay Bekliyor</text>' +
+    '<rect x="152" y="76" width="126" height="58" rx="8" fill="#dde3ee"/>' +
+    '<circle cx="252" cy="92" r="9" fill="#e9e6dc"/>' +
+    '<path d="M152 134 L196 106 L224 126 L252 110 L278 134 Z" fill="#a8b4c8"/>' +
     '<rect x="152" y="142" width="104" height="6" rx="3" fill="#e6e0d6"/>' +
     '<rect x="152" y="151" width="114" height="6" rx="3" fill="#e6e0d6"/>' +
     '<rect x="152" y="160" width="72" height="6" rx="3" fill="#e6e0d6"/>' +
-    '<g class="scn-okbtn"><rect x="152" y="170" width="126" height="28" rx="14" fill="#116530"/>' +
+    '<g class="scn-okbtn"><rect x="152" y="170" width="126" height="28" rx="14" fill="#5b6b84"/>' +
     '<text x="215" y="188" text-anchor="middle" font-size="10" font-weight="600" font-family="Inter, sans-serif" fill="#fffdf8">Onayla ve Yayınla</text></g>' +
     '<line x1="140" y1="208" x2="290" y2="208" stroke="#e6e0d6" stroke-width="1.5"/>' +
-    '<circle cx="172" cy="216" r="3.5" fill="#116530"/>' +
-    '<text x="172" y="230" text-anchor="middle" font-size="8" font-weight="600" font-family="Inter, sans-serif" fill="#116530">Bugün</text>' +
+    '<circle cx="172" cy="216" r="3.5" fill="#5b6b84"/>' +
+    '<text x="172" y="230" text-anchor="middle" font-size="8" font-weight="600" font-family="Inter, sans-serif" fill="#5b6b84">Bugün</text>' +
     '<circle cx="215" cy="216" r="3.5" fill="#cfc8b8"/>' +
     '<text x="215" y="230" text-anchor="middle" font-size="8" font-family="Inter, sans-serif" fill="#a09a8c">Geçmiş</text>' +
     '<circle cx="258" cy="216" r="3.5" fill="#cfc8b8"/>' +
@@ -109,16 +109,16 @@ function sceneDct() {
     /* Asistan chat window */
     '<g class="scn-chat">' +
     '<rect x="200" y="28" width="185" height="175" rx="16" fill="#fffdf8" stroke="#1b1815" stroke-width="2"/>' +
-    '<circle cx="222" cy="48" r="9" fill="#116530"/>' +
+    '<circle cx="222" cy="48" r="9" fill="#5b6b84"/>' +
     '<text x="238" y="51" font-size="11" font-weight="700" font-family="Inter, sans-serif" fill="#1b1815">Asistan</text>' +
     '<text x="238" y="63" font-size="7.5" font-family="Inter, sans-serif" fill="#6f6a62">çevrimiçi</text>' +
     '<line x1="200" y1="74" x2="385" y2="74" stroke="#e6e0d6" stroke-width="1.5"/>' +
-    '<rect x="212" y="84" width="118" height="32" rx="10" fill="#d9e6d2"/>' +
+    '<rect x="212" y="84" width="118" height="32" rx="10" fill="#dde3ee"/>' +
     '<text x="220" y="97" font-size="8" font-family="Inter, sans-serif" fill="#1b1815">Günaydın! Bugünün</text>' +
     '<text x="220" y="107" font-size="8" font-family="Inter, sans-serif" fill="#1b1815">gönderisi hazır.</text>' +
     '<rect x="257" y="124" width="116" height="22" rx="10" fill="#e4e7ec"/>' +
     '<text x="365" y="138" text-anchor="end" font-size="8" font-family="Inter, sans-serif" fill="#1b1815">Harika, bakıyorum.</text>' +
-    '<rect x="212" y="154" width="128" height="22" rx="10" fill="#d9e6d2"/>' +
+    '<rect x="212" y="154" width="128" height="22" rx="10" fill="#dde3ee"/>' +
     '<text x="220" y="168" font-size="8" font-family="Inter, sans-serif" fill="#1b1815">Onaylandı, yayınlandı.</text>' +
     '<rect x="212" y="184" width="161" height="15" rx="7.5" fill="#f1ece2"/>' +
     '<text x="220" y="195" font-size="7.5" font-family="Inter, sans-serif" fill="#a09a8c">Mesaj yaz…</text>' +
@@ -143,8 +143,8 @@ function sceneRecipeUI() {
   function rcard(x, play) {
     var s =
       '<defs><clipPath id="rui-c' + x + '"><rect x="' + x + '" y="134" width="98" height="78" rx="10"/></clipPath></defs>' +
-      '<g clip-path="url(#rui-c' + x + ')"><rect x="' + x + '" y="134" width="98" height="40" fill="#f3ddd6"/>' +
-      '<circle cx="' + (x + 49) + '" cy="154" r="12" fill="#e8b4a6" opacity="0.7"/></g>' +
+      '<g clip-path="url(#rui-c' + x + ')"><rect x="' + x + '" y="134" width="98" height="40" fill="#e4e8f0"/>' +
+      '<circle cx="' + (x + 49) + '" cy="154" r="12" fill="#a8b4c8" opacity="0.7"/></g>' +
       '<rect x="' + x + '" y="134" width="98" height="78" rx="10" fill="none" stroke="#e6e0d6" stroke-width="1.5"/>' +
       '<rect x="' + (x + 10) + '" y="182" width="58" height="7" rx="3.5" fill="#d8d0c2"/>' +
       '<rect x="' + (x + 10) + '" y="194" width="40" height="7" rx="3.5" fill="#e6e0d6"/>';
@@ -160,7 +160,7 @@ function sceneRecipeUI() {
     '<svg class="scn sc-rui" viewBox="0 0 400 250" aria-hidden="true">' +
     '<g class="scn-browser">' +
     '<rect x="30" y="18" width="340" height="214" rx="14" fill="#fffdf8" stroke="#e6e0d6" stroke-width="2"/>' +
-    '<circle cx="50" cy="36" r="5" fill="#e06c5b"/><circle cx="65" cy="36" r="5" fill="#e8b64c"/><circle cx="80" cy="36" r="5" fill="#7fb069"/>' +
+    '<circle cx="50" cy="36" r="5" fill="#7d8aa0"/><circle cx="65" cy="36" r="5" fill="#9aa5bb"/><circle cx="80" cy="36" r="5" fill="#5b6b84"/>' +
     '<rect x="98" y="28.5" width="152" height="15" rx="7.5" fill="#f1ece2"/>' +
     '<text x="174" y="40" text-anchor="middle" font-size="10" font-family="Inter, sans-serif" fill="#6f6a62">annemintarifleri.org</text>' +
     '<line x1="30" y1="52" x2="370" y2="52" stroke="#e6e0d6" stroke-width="1.5"/>' +
