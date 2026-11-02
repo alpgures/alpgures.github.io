@@ -116,12 +116,39 @@
             last = Infinity;
             for (j = RIDGE_N - 1; j >= 0; j--) { if (cols[j] === Infinity) cols[j] = last; else last = cols[j]; }
             RIDGE = cols.map(function (sy) { return (sy - box.top) / box.height - 0.035; });
+            replanChips();
           } catch (e) { RIDGE = null; }
         }
         function skyLimit(xf) {
           if (!RIDGE) return 0.40;
           var i = Math.max(0, Math.min(RIDGE_N - 1, Math.floor(xf * RIDGE_N)));
           return RIDGE[i];
+        }
+        // Planned trajectories: a chip's whole motion is budgeted against the
+        // ridge UP FRONT, so the per-frame clamp never has to fight anything.
+        function maxWanderY(bx, ay) {
+          var swing = ay * 1.6 + 0.025; // full vertical extent + margin
+          var x0 = Math.max(0, bx - 0.03), x1 = Math.min(1, bx + 0.03);
+          var lim = Math.min(skyLimit(x0), skyLimit(bx), skyLimit(x1));
+          return lim - swing;
+        }
+        function replanChips() {
+          for (var k = 0; k < chips.length; k++) {
+            var c = chips[k];
+            if (c.dragging) continue;
+            if (c.mode === "wander") {
+              c.by = Math.max(0.03, Math.min(c.by, maxWanderY(c.bx, c.ay)));
+            } else {
+              // traverser: lane + max drift must clear the highest peak
+              var minR = 0.40;
+              if (RIDGE) {
+                minR = Infinity;
+                for (var i = 0; i < RIDGE_N; i++) minR = Math.min(minR, RIDGE[i]);
+              }
+              var maxLane = Math.max(0.04, minR - 0.045);
+              if (c.lane > maxLane) c.lane = maxLane;
+            }
+          }
         }
 
         function place(c) {
@@ -175,7 +202,7 @@
             c.bx = pk[0] + Math.random() * (pk[1] - pk[0]);
             c.by = pk[2] + Math.random() * (pk[3] - pk[2]);
             c.ay = 0.015 + Math.random() * 0.012;
-            c.by = Math.max(0.03, Math.min(c.by, skyLimit(c.bx) - c.ay - 0.015));
+            c.by = Math.max(0.03, Math.min(c.by, maxWanderY(c.bx, c.ay)));
             c.t = Math.random() * 100; c.sp = 0.10 + Math.random() * 0.12;
             c.ph1 = Math.random() * 6.28; c.ph2 = Math.random() * 6.28;
             c.ax = 0.018 + Math.random() * 0.012;
@@ -239,7 +266,7 @@
               cc.lane = Math.max(0.02, Math.min(0.38, dy - cc.dy * p0));
             } else {
               cc.bx = Math.max(0.01, Math.min(0.95, dx));
-              cc.by = Math.max(0.03, Math.min(skyLimit(cc.bx) - cc.ay - 0.015, dy));
+              cc.by = Math.max(0.03, Math.min(maxWanderY(cc.bx, cc.ay), dy));
             }
             cc.px = cc._x; cc.py = cc._y; // fling from the drop point
             cc.free = 1;
@@ -271,7 +298,7 @@
             c.t += (ddx / w) / (c.tx - c.fx) * 0.6;
           } else {
             c.bx = Math.max(0.01, Math.min(0.95, c.bx + (ddx / w) * 0.6));
-            c.by = Math.max(0.03, Math.min(skyLimit(c.bx) - 0.015, c.by + (ddy / h) * 0.6));
+            c.by = Math.max(0.03, Math.min(maxWanderY(c.bx, c.ay), c.by + (ddy / h) * 0.6));
           }
         }
         function collide() {
