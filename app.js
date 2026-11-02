@@ -389,6 +389,7 @@
         void 0;
         var loveEl = document.getElementById("loveWord");
         var loveBox = document.getElementById("loveBox");
+        var dotEl = document.getElementById("loveDot");
         if (!greetEl && !loveEl) return;
         var hero = data.hero || {};
         var words = hero.floating_words || [];
@@ -468,6 +469,8 @@
           if (reduced) { el.textContent = text; if (after) after(); return; }
           el.classList.remove("word-in");
           el.classList.add("word-out");
+          var punct = (el === loveEl) ? dotEl : null;
+          if (punct) { punct.classList.remove("word-in"); punct.classList.add("word-out"); }
           // Pre-size the love box during word-out so expansion leads the
           // incoming word (no clipping) and contraction glides smoothly.
           if (el === loveEl && loveBox) {
@@ -478,6 +481,11 @@
             el.classList.remove("word-out");
             void el.offsetWidth;
             el.classList.add("word-in");
+            if (punct) {
+              punct.classList.remove("word-out");
+              void punct.offsetWidth;
+              punct.classList.add("word-in");
+            }
             if (after) after();
           }, 360);
         }
@@ -509,6 +517,7 @@
           if (reduced || !greetBox) { slideSwap(greetEl, next); return; }
           greetEl.classList.remove("word-in");
           greetEl.classList.add("word-out");
+          if (bangEl) { bangEl.classList.remove("word-in"); bangEl.classList.add("word-out"); }
           setTimeout(function () {
             greetEl.textContent = next;
             glideGreetWidth();
@@ -516,6 +525,11 @@
             greetEl.classList.remove("word-out");
             void greetEl.offsetWidth;
             greetEl.classList.add("word-in");
+            if (bangEl) {
+              bangEl.classList.remove("word-out");
+              void bangEl.offsetWidth;
+              bangEl.classList.add("word-in");
+            }
           }, 360);
         }
         function tick() {
