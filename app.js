@@ -46,12 +46,7 @@
           var prefix = el.getAttribute("data-prefix") || "";
           el.setAttribute(attr, prefix + val);
         }
-        var htmlMode = el.getAttribute("data-html");
-        if (htmlMode && typeof val === "string") {
-          el.innerHTML = val.replace(/\n/g, "<br>");
-        } else {
-          el.textContent = label ? get(data, label) : val;
-        }
+        el.textContent = label ? get(data, label) : val;
       });
 
       document.querySelectorAll("[data-list]").forEach(function (el) {

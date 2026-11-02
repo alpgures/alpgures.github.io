@@ -233,15 +233,9 @@ section h2 {
   line-height: 1.5;
   color: var(--soft);
   max-width: 34em;
-  text-align: center;
 }
-.hero-actions-inline {
-  display: inline-flex;
-  gap: 8px;
-  margin-left: 14px;
-  vertical-align: middle;
-}
-.hero-actions-inline .btn { white-space: nowrap; }
+
+.hero-actions { display: flex; gap: 8px; margin-top: 28px; flex-wrap: wrap; }
 
 .hero-meta {
   color: var(--muted);
