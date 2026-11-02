@@ -331,6 +331,8 @@ section h2 {
 
 /* Contact */
 
+.contact-link { display: inline-flex; align-items: center; gap: 8px; }
+.contact-link svg { flex-shrink: 0; }
 .contact-links {
   display: flex;
   gap: 24px;
