@@ -182,7 +182,7 @@ section h2 {
 }
 .greet-word { color: var(--accent); white-space: nowrap; flex-shrink: 0; }
 .greet-bang { color: var(--accent); white-space: nowrap; flex-shrink: 0; }
-.greet-rest { white-space: nowrap; }
+.greet-rest { white-space: nowrap; position: relative; top: 0.05em; }
 .love-box > span { flex-shrink: 0; line-height: 1; }
 .hero-love {
   font-size: clamp(24px, 5vw, 44px);
@@ -197,7 +197,7 @@ section h2 {
   display: inline-flex;
   align-items: center;
   box-sizing: border-box;
-  padding: 0.04em 0.32em;
+  padding: 0.16em 0.32em 0.06em;
   overflow: hidden;
   vertical-align: baseline;
   line-height: 1;
