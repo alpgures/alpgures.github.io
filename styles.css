@@ -197,10 +197,10 @@ section h2 {
   display: inline-flex;
   align-items: center;
   box-sizing: border-box;
-  height: 1.28em;
+  height: 1.12em;
   padding: 0 0.32em;
   overflow: hidden;
-  vertical-align: 0.22em;
+  vertical-align: -0.06em;
   transition: width 0.55s cubic-bezier(0.22,1,0.36,1);
   background: var(--accent-soft);
   border: 1px solid var(--line);
