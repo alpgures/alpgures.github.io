@@ -41,7 +41,8 @@
   animation: scn-breeze-flow 1.1s linear infinite;
 }
 @keyframes scn-breeze-flow {
-  to { stroke-dashoffset: 28; }
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -28; }
 }
 
 .sc-plane .scn-eink { animation: scn-float 9s ease-in-out infinite; }
