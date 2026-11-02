@@ -115,7 +115,7 @@
             for (i = 0; i < RIDGE_N; i++) { if (cols[i] === Infinity) cols[i] = last; else last = cols[i]; }
             last = Infinity;
             for (j = RIDGE_N - 1; j >= 0; j--) { if (cols[j] === Infinity) cols[j] = last; else last = cols[j]; }
-            RIDGE = cols.map(function (sy) { return (sy - box.top) / box.height - 0.05; });
+            RIDGE = cols.map(function (sy) { return (sy - box.top) / box.height - 0.035; });
           } catch (e) { RIDGE = null; }
         }
         function skyLimit(xf) {
@@ -137,8 +137,14 @@
                   c.ay * 0.6 * Math.cos(c.t * c.sp * 5.2 + c.ph1)) * h;
           }
           if (c.mode === "wander" && !c.dragging) {
+            // soft ceiling: curve away before touching, hard guarantee at the limit
             var lim = skyLimit(sx / w) * h;
-            if (sy > lim) sy = lim;
+            var zone = 0.07 * h;
+            if (sy > lim) { sy = lim; }
+            else if (sy > lim - zone) {
+              var kk = 1 - (lim - sy) / zone;
+              sy = sy - kk * kk * zone * 0.45;
+            }
           }
           var f = c.free * c.free;
           var x = sx * (1 - f) + c.px * f;
@@ -219,6 +225,22 @@
             inner.style.cursor = "";
             var sp = Math.sqrt(cc.vx * cc.vx + cc.vy * cc.vy);
             if (sp > 1400) { cc.vx *= 1400 / sp; cc.vy *= 1400 / sp; }
+            // permanently rebase the trajectory through the drop point,
+            // so the chip keeps its new path instead of snapping back
+            var rr = chipsBox.getBoundingClientRect();
+            var ww = rr.width || 1, hh = rr.height || 1;
+            var dx = cc._x / ww, dy = cc._y / hh;
+            dy = Math.min(dy, skyLimit(Math.max(0, Math.min(1, dx))) - 0.02);
+            dy = Math.max(0.02, dy);
+            if (cc.mode === "traverse") {
+              var p0 = ((cc.t % 1) + 1) % 1;
+              var shift = dx - (cc.fx + (cc.tx - cc.fx) * p0);
+              cc.fx += shift; cc.tx += shift;
+              cc.lane = Math.max(0.02, Math.min(0.38, dy - cc.dy * p0));
+            } else {
+              cc.bx = Math.max(0.01, Math.min(0.95, dx));
+              cc.by = Math.max(0.03, Math.min(skyLimit(cc.bx) - cc.ay - 0.015, dy));
+            }
             cc.px = cc._x; cc.py = cc._y; // fling from the drop point
             cc.free = 1;
           }
@@ -332,6 +354,8 @@
       (function () {
         var greetBox = document.getElementById("greetBox");
         var greetEl = document.getElementById("greetWord");
+        var bangEl = document.getElementById("greetBang");
+        void 0;
         var loveEl = document.getElementById("loveWord");
         if (!greetEl && !loveEl) return;
         var hero = data.hero || {};
@@ -358,6 +382,12 @@
             gSeq = [gRest.pop()];
           }
           return gSeq.shift();
+        }
+        function greetDisplay(w) {
+          // Latin-alphabet greetings get a capital in the headline box;
+          // the floating bubbles keep their own casing.
+          if (/^[a-z]/.test(w)) return w.charAt(0).toUpperCase() + w.slice(1);
+          return w;
         }
         var loveWords = hero.love_words || ["building things"];
         var lPool = [];
@@ -395,21 +425,31 @@
         // Greeting box: fluid width. New word is set hidden, measured, then
         // the box eases to the new width while the word slides in — the
         // "! My name is Alp" tail rides the box edge instead of jumping.
+        function greetContentWidth() {
+          // measure the real box at its natural width: synchronous, no paint
+          // in between, so the width transition still glides old -> new
+          var oldW = greetBox.style.width;
+          var oldV = greetBox.style.visibility;
+          greetBox.style.visibility = "hidden";
+          greetBox.style.width = "max-content";
+          var w = greetBox.offsetWidth;
+          greetBox.style.width = oldW;
+          greetBox.style.visibility = oldV;
+          return w;
+        }
         function sizeGreetBox() {
           if (!greetBox || !greetEl || reduced) return;
-          greetBox.style.width = greetEl.offsetWidth + "px";
+          greetBox.style.width = greetContentWidth() + "px";
         }
         function swapGreeting() {
-          var next = nextGreeting();
+          var next = greetDisplay(nextGreeting());
           if (reduced || !greetBox) { slideSwap(greetEl, next); return; }
           greetEl.classList.remove("word-in");
           greetEl.classList.add("word-out");
           setTimeout(function () {
             greetEl.textContent = next;
-            greetEl.style.visibility = "hidden";
-            greetBox.style.width = greetEl.offsetWidth + "px";
+            greetBox.style.width = greetContentWidth() + "px";
             void greetBox.offsetWidth;
-            greetEl.style.visibility = "";
             greetEl.classList.remove("word-out");
             void greetEl.offsetWidth;
             greetEl.classList.add("word-in");
@@ -419,7 +459,7 @@
           swapGreeting();
           slideSwap(loveEl, nextLove(), fitLove);
         }
-        if (greetEl) greetEl.textContent = nextGreeting();
+        if (greetEl) greetEl.textContent = greetDisplay(nextGreeting());
         if (loveEl) {
           loveEl.textContent = nextLove();
           fitLove();
@@ -428,6 +468,8 @@
           window.addEventListener("resize", function () { fitLove(); sizeGreetBox(); });
         }
         sizeGreetBox();
+        if (document.fonts && document.fonts.ready)
+          document.fonts.ready.then(sizeGreetBox);
         var ROT = (hero.rotation_interval || 3) * 1000;
         if (!reduced) setInterval(tick, ROT);
       })();

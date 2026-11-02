@@ -171,6 +171,7 @@ section h2 {
 .greet-box {
   display: inline-flex;
   align-items: center;
+  box-sizing: border-box;
   overflow: hidden;
   vertical-align: -0.12em;
   background: var(--accent-soft);
@@ -179,8 +180,10 @@ section h2 {
   padding: 0.04em 0.3em;
   transition: width 0.55s cubic-bezier(0.22,1,0.36,1);
 }
-.greet-word { color: var(--accent); white-space: nowrap; }
+.greet-word { color: var(--accent); white-space: nowrap; flex-shrink: 0; }
+.greet-bang { color: var(--accent); white-space: nowrap; flex-shrink: 0; }
 .greet-rest { white-space: nowrap; }
+.love-box > span { flex-shrink: 0; }
 .hero-love {
   font-size: clamp(26px, 6.5vw, 56px);
   font-weight: 600;
@@ -407,12 +410,6 @@ footer {
 .proj-gallery img { width: 100%; display: block; }
 
 .proj-story p { margin-bottom: 1.1em; font-size: 18px; }
-.proj-story p:first-child::first-letter {
-  font-family: "Newsreader", Georgia, serif;
-  font-size: 1.35em;
-  font-weight: 600;
-  color: var(--accent);
-}
 
 .fact-grid { display: grid; gap: 0; border-top: 1px solid var(--line); }
 .fact-grid > div {
