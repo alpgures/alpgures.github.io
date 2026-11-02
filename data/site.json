@@ -73,8 +73,8 @@
     }
   ],
   "hero": {
-    "meta": "based in Providence, RI – moving to New York, June 2027",
-    "sub": "A language-learning app in closed beta. An e-ink flight display I built as a surprise for my boyfriend. A recipe site preserving my mother's cooking in five languages. I'm a Brown biology senior, and building is the thread through all of it.",
+    "meta": "Providence, RI – moving to New York, June 2027",
+    "sub": "I study biology at Brown and build in a dozen languages. I care about making things that get used.",
     "floating_words": [
       "你好",
       "xin chào",
@@ -96,29 +96,42 @@
       "გამარჯობა",
       "բարև",
       "שלום",
+      "ሰላም",
       "নমস্কার",
+      "வணக்கம்",
+      "ආයුබෝවන්",
       "မင်္ဂလာပါ",
+      "សួស្តី",
       "ສະບາຍດີ",
       "བཀྲ་ཤིས་བདེ་ལེགས",
+      "ᐊᐃ",
       "ᎣᏏᏲ",
       "നമസ്കാരം",
+      "నమస్కారం",
+      "ਸਤ ਸ੍ਰੀ ਅਕਾਲ",
       "ନମସ୍କାର",
       "ސަލާމް",
       "ܫܠܡܐ",
+      "ⴰⵣⵓⵍ",
+      "ꦱꦸꦒꦼꦁꦲꦺꦚ꧀ꦗꦶꦁ",
+      "ᜃᜓᜋᜓᜐ᜔ᜆ",
       "ನಮಸ್ಕಾರ",
+      "નમસ્તે",
       "salam"
     ],
     "love_words": [
       "building things",
-      "learning languages",
-      "trains",
+      "languages",
+      "aviation",
       "good design",
       "side projects",
-      "full-stack development",
-      "my mom's cooking",
-      "exploring new hobbies"
+      "biology",
+      "mom's cooking",
+      "e-ink",
+      "flight tracking",
+      "Tokyo"
     ],
-    "rotation_interval": 5
+    "rotation_interval": 3
   },
   "projects": [
     {
