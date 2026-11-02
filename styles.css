@@ -97,7 +97,7 @@ section h2 {
   min-height: 92vh;
   display: flex;
   align-items: center;
-  padding: 60px 0 30vh;
+  padding: 32px 0 32vh;
 }
 .hero-bg { position: absolute; inset: 0; pointer-events: none; }
 /* Mesh-gradient sky: Lovable-style color blending, kept to the cool
@@ -165,7 +165,7 @@ section h2 {
   font-size: clamp(20px, 2.8vw, 30px);
   font-weight: 700;
   letter-spacing: 0.01em;
-  margin: 0 0 18px;
+  margin: 0 0 10px;
   color: var(--ink);
 }
 .greet-box {
@@ -191,7 +191,7 @@ section h2 {
   line-height: 1.15;
   white-space: nowrap;
   text-align: left;
-  margin: 0 0 18px;
+  margin: 0 0 10px;
 }
 .love-box {
   display: inline-flex;
@@ -231,17 +231,18 @@ section h2 {
 .hero-sub {
   font-family: "Newsreader", Georgia, serif;
   font-size: 22px;
-  line-height: 1.5;
+  line-height: 1.45;
+  margin: 0 0 8px;
   color: var(--soft);
   max-width: 34em;
 }
 
-.hero-actions { display: flex; gap: 8px; margin-top: 28px; flex-wrap: wrap; }
+.hero-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
 
 .hero-meta {
   color: var(--muted);
   font-size: 15px;
-  margin-top: 14px;
+  margin: 0 0 8px;
 }
 
 .btn {
