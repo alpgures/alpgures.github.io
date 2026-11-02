@@ -335,6 +335,7 @@ section h2 {
 .contact-link svg { flex-shrink: 0; }
 .contact-links {
   display: flex;
+  justify-content: center;
   gap: 24px;
   margin-top: 18px;
   flex-wrap: wrap;

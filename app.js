@@ -46,7 +46,9 @@
           var prefix = el.getAttribute("data-prefix") || "";
           el.setAttribute(attr, prefix + val);
         }
-        el.textContent = label ? get(data, label) : val;
+        if (el.children.length === 0) {
+          el.textContent = label ? get(data, label) : val;
+        }
       });
 
       document.querySelectorAll("[data-list]").forEach(function (el) {
