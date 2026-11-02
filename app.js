@@ -145,7 +145,7 @@
                 minR = Infinity;
                 for (var i = 0; i < RIDGE_N; i++) minR = Math.min(minR, RIDGE[i]);
               }
-              var maxLane = Math.max(0.04, minR - 0.045);
+              var maxLane = Math.max(0.08, minR - 0.045);
               if (c.lane > maxLane) c.lane = maxLane;
             }
           }
@@ -210,7 +210,7 @@
             var ltr = Math.random() < 0.5;
             c.mode = "traverse";
             c.fx = ltr ? -0.22 : 1.12; c.tx = ltr ? 1.12 : -0.22;
-            c.lane = 0.04 + ((i + Math.random()) / n) * 0.34;
+            c.lane = 0.08 + ((i + Math.random()) / n) * 0.30;
             c.dy = Math.random() * 0.07 - 0.035;
             c.t = Math.random(); c.sp = 1 / (100 + Math.random() * 40);
           }
@@ -263,7 +263,7 @@
               var p0 = ((cc.t % 1) + 1) % 1;
               var shift = dx - (cc.fx + (cc.tx - cc.fx) * p0);
               cc.fx += shift; cc.tx += shift;
-              cc.lane = Math.max(0.02, Math.min(0.38, dy - cc.dy * p0));
+              cc.lane = Math.max(0.08, Math.min(0.38, dy - cc.dy * p0));
             } else {
               cc.bx = Math.max(0.01, Math.min(0.95, dx));
               cc.by = Math.max(0.03, Math.min(maxWanderY(cc.bx, cc.ay), dy));
@@ -294,7 +294,7 @@
         function nudge(c, ddx, ddy, w, h) {
           if (c.free > 0.3) { c.px += ddx * 0.6; c.py += ddy * 0.6; }
           else if (c.mode === "traverse") {
-            c.lane = Math.max(0.02, Math.min(0.38, c.lane + (ddy / h) * 0.6));
+            c.lane = Math.max(0.08, Math.min(0.38, c.lane + (ddy / h) * 0.6));
             c.t += (ddx / w) / (c.tx - c.fx) * 0.6;
           } else {
             c.bx = Math.max(0.01, Math.min(0.95, c.bx + (ddx / w) * 0.6));
