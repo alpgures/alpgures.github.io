@@ -185,21 +185,22 @@ section h2 {
 .greet-rest { white-space: nowrap; }
 .love-box > span { flex-shrink: 0; }
 .hero-love {
-  font-size: clamp(26px, 6.5vw, 56px);
+  font-size: clamp(24px, 5vw, 44px);
   font-weight: 600;
   letter-spacing: -0.01em;
+  line-height: 1.15;
   white-space: nowrap;
   text-align: left;
-  margin: 0 0 22px;
+  margin: 0 0 18px;
 }
 .love-box {
   display: inline-flex;
   align-items: center;
   box-sizing: border-box;
-  height: 1.42em;
+  height: 1.28em;
   padding: 0 0.32em;
   overflow: hidden;
-  vertical-align: 0.34em;
+  vertical-align: 0.22em;
   transition: width 0.55s cubic-bezier(0.22,1,0.36,1);
   background: var(--accent-soft);
   border: 1px solid var(--line);
