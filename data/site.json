@@ -120,19 +120,19 @@
   },
   "projects": [
     {
-      "blurb": "A language-learning app I designed and built – currently in invite-only closed beta.",
+      "blurb": "Learn vocabulary in 12 languages with the power of spaced repetition.",
       "image": "images/dash-ja.png",
       "slug": "kotoban",
       "title": "kotobạn"
     },
     {
-      "blurb": "An e-ink flight display I built as a surprise gift for my boyfriend, the avgeek. He uses it daily.",
+      "blurb": "An e-ink frame that displays the flight above you!",
       "image": "",
       "slug": "planeframe",
       "title": "PlaneFrame"
     },
     {
-      "blurb": "A recipe site preserving my mother's cooking – 8 recipes, 40 narrated videos, 5 languages.",
+      "blurb": "A recipe site preserving my mother's cooking in 5 languages.",
       "image": "images/recipe-mercimek-corbasi.webp",
       "slug": "annemin-tarifleri",
       "title": "Annemin Tarifleri"
@@ -140,7 +140,7 @@
     {
       "slug": "dct-asistan",
       "title": "DCT Asistan",
-      "blurb": "Approval workflows for daily social posts: one-tap publish, per-account queues, and a relay-first Turkish assistant."
+      "blurb": "Social media management app for my father's company a built-in custom AI assistant. "
     }
   ],
   "skills": {
