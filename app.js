@@ -388,6 +388,7 @@
         var bangEl = document.getElementById("greetBang");
         void 0;
         var loveEl = document.getElementById("loveWord");
+        var loveBox = document.getElementById("loveBox");
         if (!greetEl && !loveEl) return;
         var hero = data.hero || {};
         var words = hero.floating_words || [];
@@ -440,11 +441,34 @@
           }
           loveEl.textContent = cur;
         }
+        function loveContentWidth(text) {
+          if (!loveBox || !loveEl) return 0;
+          var oldT = loveEl.textContent;
+          var oldW = loveBox.style.width;
+          var oldV = loveBox.style.visibility;
+          loveEl.textContent = text;
+          loveBox.style.visibility = "hidden";
+          loveBox.style.width = "max-content";
+          var w = loveBox.offsetWidth;
+          loveEl.textContent = oldT;
+          loveBox.style.width = oldW;
+          loveBox.style.visibility = oldV;
+          return w;
+        }
+        function sizeLoveBox() {
+          if (!loveBox || !loveEl || reduced) return;
+          loveBox.style.width = loveContentWidth(loveEl.textContent) + "px";
+        }
         function slideSwap(el, text, after) {
           if (!el) { if (after) after(); return; }
           if (reduced) { el.textContent = text; if (after) after(); return; }
           el.classList.remove("word-in");
           el.classList.add("word-out");
+          // Pre-size the love box during word-out so expansion leads the
+          // incoming word (no clipping) and contraction glides smoothly.
+          if (el === loveEl && loveBox) {
+            loveBox.style.width = loveContentWidth(text) + "px";
+          }
           setTimeout(function () {
             el.textContent = text;
             el.classList.remove("word-out");
@@ -494,6 +518,7 @@
         if (loveEl) {
           loveEl.textContent = nextLove();
           fitLove();
+          sizeLoveBox();
           if (document.fonts && document.fonts.ready)
             document.fonts.ready.then(function () { fitLove(); sizeGreetBox(); });
           window.addEventListener("resize", function () { fitLove(); sizeGreetBox(); });

@@ -195,10 +195,12 @@ section h2 {
 .love-box {
   display: inline-flex;
   align-items: center;
+  box-sizing: border-box;
   height: 1.42em;
   padding: 0 0.32em;
   overflow: hidden;
   vertical-align: 0.34em;
+  transition: width 0.55s cubic-bezier(0.22,1,0.36,1);
   background: var(--accent-soft);
   border: 1px solid var(--line);
   border-radius: 14px;
