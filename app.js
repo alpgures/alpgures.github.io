@@ -512,7 +512,7 @@
         }
         function tick() {
           swapGreeting();
-          slideSwap(loveEl, nextLove(), fitLove);
+          slideSwap(loveEl, nextLove(), function () { fitLove(); sizeLoveBox(); });
         }
         if (greetEl) greetEl.textContent = greetDisplay(nextGreeting());
         if (loveEl) {
@@ -520,8 +520,8 @@
           fitLove();
           sizeLoveBox();
           if (document.fonts && document.fonts.ready)
-            document.fonts.ready.then(function () { fitLove(); sizeGreetBox(); });
-          window.addEventListener("resize", function () { fitLove(); sizeGreetBox(); });
+            document.fonts.ready.then(function () { fitLove(); sizeLoveBox(); sizeGreetBox(); });
+          window.addEventListener("resize", function () { fitLove(); sizeLoveBox(); sizeGreetBox(); });
         }
         sizeGreetBox();
         if (document.fonts && document.fonts.ready)
