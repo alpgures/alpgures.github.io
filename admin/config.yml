@@ -43,13 +43,26 @@ collections:
             name: experience
             widget: list
             fields:
+              - { label: "Organization", name: org, widget: string }
               - { label: "Title", name: title, widget: string }
-              - { label: "Organization / location", name: org, widget: string }
               - { label: "Dates", name: date, widget: string }
+              - { label: "Location", name: place, widget: string, required: false }
+              - { label: "Summary", name: summary, widget: text, required: false }
+              - { label: "Website URL", name: link, widget: string, required: false }
+              - { label: "Website label", name: link_label, widget: string, required: false }
               - label: "Bullets"
                 name: bullets
                 widget: list
                 field: { label: "Bullet", name: bullet, widget: text }
+          - label: "Education"
+            name: education
+            widget: object
+            fields:
+              - { label: "School", name: school, widget: string }
+              - { label: "Detail (location etc.)", name: detail, widget: string, required: false }
+              - { label: "Degree", name: degree, widget: string }
+              - { label: "Graduation", name: graduation, widget: string }
+              - { label: "Note", name: note, widget: text, required: false }
           - label: "Projects"
             name: projects
             widget: list

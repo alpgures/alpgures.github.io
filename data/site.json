@@ -10,46 +10,66 @@
   },
   "experience": [
     {
+      "org": "Chen Laboratory",
+      "place": "Brown University · Providence, RI",
+      "title": "Undergraduate Researcher",
+      "date": "May 2026 – Present",
+      "summary": "Behavioral neuroscience research in a neuroprotection lab, turning recurring manual analyses into repeatable data workflows.",
+      "link": "https://www.brown.edu",
+      "link_label": "brown.edu",
       "bullets": [
         "Build R and Python (pandas) data pipelines over 4.5 TB of behavioral and imaging data for a neonatal brain injury study, converting recurring manual analyses into repeatable workflows.",
         "Built monitoring dashboards tracking analysis progress and data quality for the PI and lab team, with automated alerts for stalled or failed runs."
-      ],
-      "date": "May 2026 – Present",
-      "org": "Brown University / Women & Infants Hospital, Providence, RI",
-      "title": "Undergraduate Researcher, Chen Laboratory"
+      ]
     },
     {
+      "org": "Brown University",
+      "place": "Providence, RI",
+      "title": "Teaching Assistant, BIOL0530 Principles of Immunology",
+      "date": "Sep 2024 – Present",
+      "summary": "Teaching support for the immunology course: grading and office hours for 175 students a semester.",
+      "link": "https://www.brown.edu",
+      "link_label": "brown.edu",
       "bullets": [
         "Grade exams and assignments for 175 students per semester and hold office hours explaining complex immunology concepts to non-specialists."
-      ],
-      "date": "Sep 2024 – Present",
-      "org": "Brown University, Providence, RI",
-      "title": "Teaching Assistant, BIOL0530 Principles of Immunology"
+      ]
     },
     {
+      "org": "Office of Admission, Brown University",
+      "place": "Providence, RI",
+      "title": "Senior Student Ambassador",
+      "date": "Feb 2024 – Present",
+      "summary": "Campus tours and visitor experience for an admission office hosting about 2,000 visitors a week.",
+      "link": "https://www.brown.edu",
+      "link_label": "brown.edu",
       "bullets": [
         "Lead campus tours for groups of ~30 visitors (3–5 tours weekly, up to 15 at peak) at an office hosting ~2,000 visitors per week, and staff the “Ask a Brown Student” communications service."
-      ],
-      "date": "Feb 2024 – Present",
-      "org": "Brown University, Providence, RI",
-      "title": "Senior Student Ambassador, Office of Admission"
+      ]
     },
     {
-      "bullets": [
-        "Coordinated clinical trial recruiting and collaborator operations for 3 multinational studies with partners at Mass Eye & Ear / Harvard, the University of Christchurch, and TU Dresden's Interdisciplinary Center for Smell & Taste.",
-        "Co-authored 4 manuscripts (in preparation) reporting outcomes from long-term study programs."
-      ],
+      "org": "Altundağ Otolaryngology Research Institute",
+      "place": "Istanbul, Turkey · remote during Brown semesters",
+      "title": "Research Operations Lead",
       "date": "Nov 2021 – Feb 2024",
-      "org": "Istanbul, Turkey (remote during Brown semesters, in person over breaks)",
-      "title": "Research Operations Lead, Altundağ Otolaryngology Research Institute"
+      "summary": "Clinical research operations across three multinational ENT studies; co-authored four manuscripts (in preparation).",
+      "link": "",
+      "link_label": "",
+      "bullets": [
+        "Coordinated clinical trial recruiting and collaborator operations for 3 multinational studies with partners at Mass Eye & Ear / Harvard, the University of Christchurch, and TU Dresden’s Interdisciplinary Center for Smell & Taste.",
+        "Co-authored 4 manuscripts (in preparation) reporting outcomes from long-term study programs."
+      ]
     },
     {
+      "org": "Independent",
+      "place": "Remote",
+      "title": "Automation Systems Developer",
+      "date": "Ongoing",
+      "summary": "API automation pipelines in daily production use, with monitoring and incident-response playbooks.",
+      "link": "",
+      "link_label": "",
       "bullets": [
         "Built and operate API automation pipelines in daily production use, with monitoring dashboards and error-handling playbooks for incident response."
-      ],
-      "date": "Ongoing",
-      "org": "Personal projects",
-      "title": "Automation Systems Developer (Independent)"
+      ]
     }
   ],
   "hero": {
@@ -98,7 +118,8 @@
       "ꦱꦸꦒꦼꦁꦲꦺꦚ꧀ꦗꦶꦁ",
       "ᜃᜓᜋᜓᜐ᜔ᜆ",
       "ನಮಸ್ಕಾರ",
-      "નમસ્તે"
+      "નમસ્તે",
+      "salam"
     ]
   },
   "projects": [
@@ -130,5 +151,12 @@
     "education": "Brown University – Sc.B. Biology (STEM-designated), GPA 3.7/4.0, expected May 2027. Relevant coursework: Biostatistics, CS Fundamentals, Healthcare in the United States.",
     "languages": "English (native), Turkish (native), Japanese (fluent, incl. business keigo), German (advanced).",
     "tools": "R, Python (pandas), SQL, biostatistics and statistical modeling, data visualization, data pipelines. Microsoft Excel and PowerPoint (advanced), Google Workspace."
+  },
+  "education": {
+    "school": "Brown University",
+    "detail": "Providence, RI",
+    "degree": "Sc.B. Biology (STEM-designated), GPA 3.7/4.0",
+    "graduation": "Expected May 2027",
+    "note": "Relevant coursework: Biostatistics, CS Fundamentals, Healthcare in the United States."
   }
 }

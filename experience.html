@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Experience – Alp D. Güreş</title>
+<meta name="description" content="Experience and education of Alp D. Güreş: research, teaching, admission work, and independent automation projects.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="motion.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐦</text></svg>">
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html" class="nav-name">Alp D. Güreş</a>
+  <div class="nav-links">
+    <a href="index.html#work">Work</a>
+    <a href="index.html#about">About</a>
+    <a href="experience.html" class="active">Experience</a>
+    <a href="index.html#contact">Contact</a>
+    <a href="resume.pdf" class="nav-resume" target="_blank" rel="noopener">Resume ↓</a>
+  </div>
+</nav>
+
+<main class="page">
+  <header class="page-head rv">
+    <h1>Experience</h1>
+    <p class="page-sub">Research, teaching, and building — in Providence, Istanbul, and on my own servers.</p>
+  </header>
+
+  <section class="rv">
+    <div id="xp-list"></div>
+  </section>
+
+  <section class="rv edu">
+    <h2>Education</h2>
+    <div id="edu-block"></div>
+  </section>
+</main>
+
+<footer>
+  <p>© 2026 Alp D. Güreş – Providence, RI</p>
+</footer>
+
+<script>
+(function () {
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+  fetch("data/site.json", { cache: "no-store" })
+    .then(function (r) {
+      if (!r.ok) throw new Error("site.json " + r.status);
+      return r.json();
+    })
+    .then(function (data) {
+      var list = document.getElementById("xp-list");
+      if (list) {
+        list.innerHTML = (data.experience || []).map(function (e) {
+          var bullets = (e.bullets || [])
+            .map(function (b) { return "<li>" + esc(b) + "</li>"; })
+            .join("");
+          var link = e.link
+            ? '<a class="xp-link" href="' + esc(e.link) + '" target="_blank" rel="noopener">' +
+              esc(e.link_label || "Visit website") + " ↗</a>"
+            : "";
+          return (
+            '<article class="xp">' +
+            '<div class="xp-top"><h3>' + esc(e.org) + "</h3>" +
+            '<span class="xp-date">' + esc(e.date) + "</span></div>" +
+            '<p class="xp-role">' + esc(e.title) +
+            (e.place ? ' <span class="xp-place">· ' + esc(e.place) + "</span>" : "") + "</p>" +
+            (e.summary ? '<p class="xp-sum">' + esc(e.summary) + "</p>" : "") +
+            "<ul>" + bullets + "</ul>" + link +
+            "</article>"
+          );
+        }).join("");
+      }
+      var edu = document.getElementById("edu-block");
+      if (edu && data.education) {
+        var ed = data.education;
+        edu.innerHTML =
+          '<div class="xp-top"><h3>' + esc(ed.school) + "</h3>" +
+          '<span class="xp-date">' + esc(ed.graduation) + "</span></div>" +
+          '<p class="xp-role">' + esc(ed.degree) +
+          (ed.detail ? ' <span class="xp-place">· ' + esc(ed.detail) + "</span>" : "") + "</p>" +
+          (ed.note ? '<p class="xp-sum">' + esc(ed.note) + "</p>" : "");
+      }
+      document.title = "Experience – Alp D. Güreş";
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); }
+        });
+      }, { threshold: 0.1 });
+      document.querySelectorAll(".rv").forEach(function (el) { io.observe(el); });
+    })
+    .catch(function (err) { console.error("Could not load site content:", err); });
+})();
+</script>
+</body>
+</html>
