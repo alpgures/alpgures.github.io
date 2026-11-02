@@ -73,9 +73,7 @@
     }
   ],
   "hero": {
-    "kicker": "Alp D. Güreş – Brown '27",
     "meta": "Providence, RI – moving to New York, June 2027",
-    "name": "I build things.",
     "sub": "A language-learning app in closed beta. An e-ink flight display I built as a surprise for my boyfriend. A recipe site preserving my mother's cooking in five languages. I'm a Brown biology senior, and building is the thread through all of it.",
     "floating_words": [
       "你好",
@@ -120,6 +118,20 @@
       "ನಮಸ್ಕಾರ",
       "નમસ્તે",
       "salam"
+    ],
+    "greeting_interval": 3,
+    "love_interval": 2.5,
+    "love_words": [
+      "building things",
+      "languages",
+      "aviation",
+      "good design",
+      "side projects",
+      "biology",
+      "mom's cooking",
+      "e-ink",
+      "flight tracking",
+      "Tokyo"
     ]
   },
   "projects": [

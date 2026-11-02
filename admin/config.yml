@@ -27,12 +27,16 @@ collections:
             name: hero
             widget: object
             fields:
-              - { label: "Name", name: name, widget: string }
+              - { label: "Greeting rotation interval (seconds)", name: greeting_interval, widget: number, value_type: float, min: 1, max: 10 }
+              - label: "\"I love\" words (rotate in the headline box)"
+                name: love_words
+                widget: list
+                field: { label: "Word", name: word, widget: string }
+              - { label: "\"I love\" rotation interval (seconds)", name: love_interval, widget: number, value_type: float, min: 1, max: 10 }
               - label: "Floating words (drift across the hero sky)"
                 name: floating_words
                 widget: list
                 field: { label: "Word", name: word, widget: string }
-              - { label: "Kicker (small line above name)", name: kicker, widget: string }
               - { label: "Intro sentence", name: sub, widget: text }
               - { label: "Location line", name: meta, widget: string }
           - label: "About paragraphs"

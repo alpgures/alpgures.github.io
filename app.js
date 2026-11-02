@@ -275,6 +275,84 @@
         })(last);
       }
 
+      // Hero: rotating greeting + "I love" word box.
+      (function () {
+        var greetEl = document.getElementById("greetWord");
+        var loveEl = document.getElementById("loveWord");
+        if (!greetEl && !loveEl) return;
+        var hero = data.hero || {};
+        var words = hero.floating_words || [];
+        var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        function shuffled(a) {
+          a = a.slice();
+          for (var i = a.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var t = a[i]; a[i] = a[j]; a[j] = t;
+          }
+          return a;
+        }
+        // Greetings: first the big five (TR/EN/JA/VI/DE) in random order,
+        // then the rest of the list, reshuffled every cycle, no repeats.
+        var first5 = ["merhaba", "hello", "こんにちは", "xin chào", "hallo"];
+        var gSeq = shuffled(first5), gRest = [];
+        function nextGreeting() {
+          if (!gSeq.length) {
+            if (!gRest.length) {
+              gRest = shuffled(words.filter(function (w) { return first5.indexOf(w) === -1; }));
+            }
+            gSeq = [gRest.pop()];
+          }
+          return gSeq.shift();
+        }
+        var loveWords = hero.love_words || ["building things"];
+        var lPool = [];
+        function nextLove() {
+          if (!lPool.length) lPool = shuffled(loveWords.slice());
+          return lPool.pop();
+        }
+        // Keep "I love" on one line: shrink the headline to fit the longest word.
+        function fitLove() {
+          var h1 = document.querySelector(".hero-love");
+          if (!h1 || !loveEl) return;
+          var cur = loveEl.textContent;
+          var longest = loveWords.reduce(function (a, b) { return a.length >= b.length ? a : b; });
+          loveEl.textContent = longest;
+          h1.style.fontSize = "";
+          if (h1.scrollWidth > h1.clientWidth) {
+            var fs = parseFloat(getComputedStyle(h1).fontSize);
+            h1.style.fontSize = (fs * h1.clientWidth / h1.scrollWidth).toFixed(1) + "px";
+          }
+          loveEl.textContent = cur;
+        }
+        function swap(el, text) {
+          if (!el) return;
+          if (reduced) { el.textContent = text; return; }
+          el.classList.remove("word-in");
+          el.classList.add("word-out");
+          setTimeout(function () {
+            el.textContent = text;
+            el.classList.remove("word-out");
+            void el.offsetWidth;
+            el.classList.add("word-in");
+            if (el === loveEl) fitLove();
+          }, 380);
+        }
+        if (greetEl) {
+          greetEl.textContent = nextGreeting();
+          setInterval(function () { swap(greetEl, nextGreeting()); },
+            (hero.greeting_interval || 3) * 1000);
+        }
+        if (loveEl) {
+          loveEl.textContent = nextLove();
+          setInterval(function () { swap(loveEl, nextLove()); },
+            (hero.love_interval || 2.5) * 1000);
+          fitLove();
+          if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitLove);
+          window.addEventListener("resize", fitLove);
+        }
+      })();
+
       document.title = "Alp D. Güreş – Brown '27";
 
       // Scroll reveal
