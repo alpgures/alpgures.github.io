@@ -361,6 +361,7 @@ footer {
   .hero { padding: 56px 0 28px; }
   .hero-inner { max-width: 400px; padding: 0 20px; }
   .hero-love { font-size: min(8vw, 31px) !important; }
+  .taurus { height: 68vh; }
   section { padding: 40px 0 6px; }
 }
 

@@ -104,19 +104,19 @@ function sceneDct() {
     '<circle cx="215" cy="216" r="3.5" fill="#cfc8b8"/>' +
     '<text x="215" y="230" text-anchor="middle" font-size="8" font-family="Inter, sans-serif" fill="#a09a8c">Geçmiş</text>' +
     '<circle cx="258" cy="216" r="3.5" fill="#cfc8b8"/>' +
-    '<text x="258" y="230" text-anchor="middle" font-size="8" font-family="Inter, sans-serif" fill="#a09a8c">Asistan</text>' +
+    '<text x="258" y="230" text-anchor="middle" font-size="8" font-family="Inter, sans-serif" fill="#a09a8c">İğde</text>' +
     "</g></g>" +
     /* Asistan chat window */
     '<g class="scn-chat">' +
     '<rect x="200" y="28" width="185" height="175" rx="16" fill="#fffdf8" stroke="#1b1815" stroke-width="2"/>' +
     '<circle cx="222" cy="48" r="9" fill="#5b6b84"/>' +
-    '<text x="238" y="51" font-size="11" font-weight="700" font-family="Inter, sans-serif" fill="#1b1815">Asistan</text>' +
+    '<text x="238" y="51" font-size="11" font-weight="700" font-family="Inter, sans-serif" fill="#1b1815">İğde</text>' +
     '<text x="238" y="63" font-size="7.5" font-family="Inter, sans-serif" fill="#6f6a62">çevrimiçi</text>' +
     '<line x1="200" y1="74" x2="385" y2="74" stroke="#e6e0d6" stroke-width="1.5"/>' +
     '<rect x="212" y="84" width="118" height="32" rx="10" fill="#dde3ee"/>' +
     '<text x="220" y="97" font-size="8" font-family="Inter, sans-serif" fill="#1b1815">Günaydın! Bugünün</text>' +
     '<text x="220" y="107" font-size="8" font-family="Inter, sans-serif" fill="#1b1815">gönderisi hazır.</text>' +
-    '<rect x="257" y="124" width="116" height="22" rx="10" fill="#e4e7ec"/>' +
+    '<rect x="289" y="124" width="84" height="22" rx="10" fill="#e4e7ec"/>' +
     '<text x="365" y="138" text-anchor="end" font-size="8" font-family="Inter, sans-serif" fill="#1b1815">Harika, bakıyorum.</text>' +
     '<rect x="212" y="154" width="128" height="22" rx="10" fill="#dde3ee"/>' +
     '<text x="220" y="168" font-size="8" font-family="Inter, sans-serif" fill="#1b1815">Onaylandı, yayınlandı.</text>' +
