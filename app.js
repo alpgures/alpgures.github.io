@@ -116,7 +116,8 @@
 
           var c = {
             el: outer, dragging: false,
-            free: 0, px: 0, py: 0, vx: 0, vy: 0
+            free: 0, px: 0, py: 0, vx: 0, vy: 0,
+            baseOp: parseFloat(inner.style.opacity) || 0.6, op: 1, _lastOp: 1
           };
           if (i % 4 === 3) {
             var pk = pockets[Math.floor(i / 4) % pockets.length];
@@ -227,7 +228,22 @@
           }
         }
         measure();
-        if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+        var heroEl = document.querySelector(".hero .hero-inner");
+        var heroBox = null;
+        function measureHero() {
+          if (!heroEl) return;
+          var r = chipsBox.getBoundingClientRect();
+          var h = heroEl.getBoundingClientRect();
+          var padX = 46, padY = 26;
+          heroBox = {
+            x0: h.left - r.left - padX, x1: h.right - r.left + padX,
+            y0: h.top - r.top - padY, y1: h.bottom - r.top + padY
+          };
+        }
+        measureHero();
+        window.addEventListener("resize", function () { measureHero(); measure(); });
+        if (document.fonts && document.fonts.ready)
+          document.fonts.ready.then(function () { measureHero(); measure(); });
         (function frame(now) {
           var dt = Math.min(0.1, (now - last) / 1000); last = now;
           if (!reduced) {
@@ -242,6 +258,16 @@
                 c.free = Math.max(0, c.free - dt / 4.5);
               }
               place(c);
+              if (heroBox) {
+                var behind = c._x > heroBox.x0 && c._x < heroBox.x1 &&
+                             c._y > heroBox.y0 && c._y < heroBox.y1;
+                var tgt = behind ? 0.14 : 1;
+                c.op += (tgt - c.op) * Math.min(1, dt * 5);
+                if (Math.abs(c.op - c._lastOp) > 0.02) {
+                  c.el.firstChild.style.opacity = (c.baseOp * c.op).toFixed(3);
+                  c._lastOp = c.op;
+                }
+              }
             }
             if (++frameNo % 3 === 0) collide();
           }
