@@ -77,36 +77,48 @@
       var cards = document.getElementById("project-cards");
       if (cards) cards.innerHTML = renderProjectCards(data.projects || []);
 
-      // Hero: floating language chips drift the full hero width, very slowly.
-      // Words come from data.hero.floating_words (editable in /admin); extras
-      // simply spread out — traverse timing keeps some off-screen at any moment.
+      // Hero: floating language chips. Stratified random lanes (even vertical
+      // coverage, no empty bands) with genuine randomness everywhere else.
+      // Most traverse the full width with a slight diagonal drift; the rest
+      // wander freely inside the open middle airspace (never over the mountains).
       var chipsBox = document.querySelector(".hero .chips");
       if (chipsBox) {
         var words = (data.hero && data.hero.floating_words) || [
-          "言葉", "bạn", "merhaba", "こんにちは", "hello",
+          "你好", "xin ch\u00e0o", "merhaba", "\u3053\u3093\u306b\u3061\u306f", "hello",
         ];
         chipsBox.innerHTML = "";
         var n = words.length;
         words.forEach(function (w, i) {
-          // Evenly distributed: no clumps, no empty gaps. Lanes spread 4-40%,
-          // phases staggered so chips are spread across the sky at any moment.
-          var ltr = i % 2 === 0;
-          var dur = 120 + ((i * 37) % 30) - 15; // 105-135s, near-equal keeps spacing even
-          var from = ltr ? -22 : 112;
-          var to = ltr ? 112 : -22;
           var outer = document.createElement("span");
-          outer.className = "chip-x";
-          outer.style.top = (4 + ((i + 0.5) / n) * 36).toFixed(1) + "%";
-          outer.style.setProperty("--fx", from.toFixed(1) + "vw");
-          outer.style.setProperty("--tx", to.toFixed(1) + "vw");
-          outer.style.animationDuration = dur.toFixed(1) + "s";
-          outer.style.animationDelay = (-(i / n) * dur).toFixed(1) + "s";
           var inner = document.createElement("span");
           inner.className = "chip";
           inner.textContent = w;
-          inner.style.opacity = (0.45 + ((i * 53) % 30) / 100).toFixed(2);
-          inner.style.animationDuration = (8 + ((i * 29) % 60) / 10).toFixed(1) + "s";
-          inner.style.animationDelay = (-((i * 17) % 100) / 10).toFixed(1) + "s";
+          inner.style.opacity = (0.45 + Math.random() * 0.3).toFixed(2);
+          inner.style.animationDuration = (8 + Math.random() * 6).toFixed(1) + "s";
+          inner.style.animationDelay = (-Math.random() * 10).toFixed(1) + "s";
+          if (i % 4 === 3) {
+            // wanderer: open corner pockets above the peaks and clear of the
+            // text — left (x 2-20%) or right (x 80-96%), y 8-30%
+            var leftSide = (i % 8) === 3;
+            outer.className = "chip-w";
+            outer.style.left = (leftSide ? 2 + Math.random() * 18 : 80 + Math.random() * 16).toFixed(1) + "%";
+            outer.style.top = (8 + Math.random() * 22).toFixed(1) + "%";
+            var wdur = 26 + Math.random() * 20;
+            outer.style.animationDuration = wdur.toFixed(1) + "s";
+            outer.style.animationDelay = (-Math.random() * wdur).toFixed(1) + "s";
+          } else {
+            // traverser: stratified lane, random direction + diagonal drift
+            var ltr = Math.random() < 0.5;
+            var dur = 100 + Math.random() * 40;
+            outer.className = "chip-x";
+            outer.style.top = (4 + ((i + Math.random()) / n) * 34).toFixed(1) + "%";
+            outer.style.setProperty("--fx", (ltr ? -22 : 112).toFixed(1) + "vw");
+            outer.style.setProperty("--tx", (ltr ? 112 : -22).toFixed(1) + "vw");
+            outer.style.setProperty("--fy", "0vh");
+            outer.style.setProperty("--ty", (Math.random() * 8 - 4).toFixed(1) + "vh");
+            outer.style.animationDuration = dur.toFixed(1) + "s";
+            outer.style.animationDelay = (-Math.random() * dur).toFixed(1) + "s";
+          }
           outer.appendChild(inner);
           chipsBox.appendChild(outer);
         });

@@ -178,7 +178,7 @@
 /* ---------- Reduced motion ---------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .scn *, .scn, .chip-x, .chip-x .chip, .mesh .blob, .stars circle.tw {
+  .scn *, .scn, .chip-x, .chip-w, .chip-x .chip, .chip-w .chip, .mesh .blob, .stars circle.tw {
     animation: none !important;
   }
   .rv { opacity: 1; translate: none; transition: none; }
