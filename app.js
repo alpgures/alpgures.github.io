@@ -430,6 +430,7 @@
         }
         // Keep "I love" on one line: shrink the headline to fit the longest word.
         function fitLove() {
+          return; // fixed size; never exceed sub width
           var h1 = document.querySelector(".hero-love");
           if (!h1 || !loveEl) return;
           var cur = loveEl.textContent;
