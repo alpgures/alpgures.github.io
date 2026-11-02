@@ -359,6 +359,8 @@ footer {
 @media (max-width: 600px) {
   .nav-links a:not(.nav-resume) { display: none; }
   .hero { padding: 56px 0 28px; }
+  .hero-inner { max-width: 400px; padding: 0 20px; }
+  .hero-love { font-size: min(8vw, 31px) !important; }
   section { padding: 40px 0 6px; }
 }
 
