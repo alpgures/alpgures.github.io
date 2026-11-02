@@ -441,23 +441,27 @@
           }
           loveEl.textContent = cur;
         }
-        function loveContentWidth(text) {
+        function loveNaturalWidth(text) {
           if (!loveBox || !loveEl) return 0;
           var oldT = loveEl.textContent;
-          var oldW = loveBox.style.width;
-          var oldV = loveBox.style.visibility;
           loveEl.textContent = text;
-          loveBox.style.visibility = "hidden";
-          loveBox.style.width = "max-content";
+          loveBox.style.width = "auto";
           var w = loveBox.offsetWidth;
           loveEl.textContent = oldT;
-          loveBox.style.width = oldW;
-          loveBox.style.visibility = oldV;
           return w;
+        }
+        function glideLoveWidth(text) {
+          if (!loveBox || !loveEl || reduced) return;
+          var from = loveBox.offsetWidth;
+          var to = loveNaturalWidth(text);
+          if (from === to) { loveBox.style.width = to + "px"; return; }
+          loveBox.style.width = from + "px";
+          void loveBox.offsetWidth;
+          loveBox.style.width = to + "px";
         }
         function sizeLoveBox() {
           if (!loveBox || !loveEl || reduced) return;
-          loveBox.style.width = loveContentWidth(loveEl.textContent) + "px";
+          loveBox.style.width = loveNaturalWidth(loveEl.textContent) + "px";
         }
         function slideSwap(el, text, after) {
           if (!el) { if (after) after(); return; }
@@ -467,7 +471,7 @@
           // Pre-size the love box during word-out so expansion leads the
           // incoming word (no clipping) and contraction glides smoothly.
           if (el === loveEl && loveBox) {
-            loveBox.style.width = loveContentWidth(text) + "px";
+            glideLoveWidth(text);
           }
           setTimeout(function () {
             el.textContent = text;
@@ -480,21 +484,25 @@
         // Greeting box: fluid width. New word is set hidden, measured, then
         // the box eases to the new width while the word slides in — the
         // "! My name is Alp" tail rides the box edge instead of jumping.
-        function greetContentWidth() {
-          // measure the real box at its natural width: synchronous, no paint
-          // in between, so the width transition still glides old -> new
-          var oldW = greetBox.style.width;
-          var oldV = greetBox.style.visibility;
-          greetBox.style.visibility = "hidden";
-          greetBox.style.width = "max-content";
+        function greetNaturalWidth() {
+          var oldT = greetEl.textContent;
+          // measure with current text; caller sets new text first if needed
+          greetBox.style.width = "auto";
           var w = greetBox.offsetWidth;
-          greetBox.style.width = oldW;
-          greetBox.style.visibility = oldV;
           return w;
+        }
+        function glideGreetWidth() {
+          if (!greetBox || !greetEl || reduced) return;
+          var from = greetBox.offsetWidth;
+          var to = greetNaturalWidth();
+          if (from === to) { greetBox.style.width = to + "px"; return; }
+          greetBox.style.width = from + "px";
+          void greetBox.offsetWidth;
+          greetBox.style.width = to + "px";
         }
         function sizeGreetBox() {
           if (!greetBox || !greetEl || reduced) return;
-          greetBox.style.width = greetContentWidth() + "px";
+          greetBox.style.width = greetNaturalWidth() + "px";
         }
         function swapGreeting() {
           var next = greetDisplay(nextGreeting());
@@ -503,7 +511,7 @@
           greetEl.classList.add("word-out");
           setTimeout(function () {
             greetEl.textContent = next;
-            greetBox.style.width = greetContentWidth() + "px";
+            glideGreetWidth();
             void greetBox.offsetWidth;
             greetEl.classList.remove("word-out");
             void greetEl.offsetWidth;
