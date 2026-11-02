@@ -41,6 +41,6 @@
     "kotobạn is a multi-user progressive web app, currently in invite-only closed beta. It has a full design system — Ink & Lacquer, in light and dark — built mobile-first at 390px and scaled up. Under the hood it's FastAPI and SQLite on an Oracle Cloud box, with magic-link sign-in, invite requests, and an admin portal.",
     "The content pipeline is the part I'm proudest of: vocabulary and reading material across twelve languages, generated and curated in batches, with audio throughout. It's the study tool I wished existed, and now it's the one I actually use."
   ],
-  "tagline": "A language-learning app I designed and built — currently in invite-only closed beta.",
+  "tagline": "Learn vocabulary in 12 languages with the power of spaced repetition.",
   "title": "kotobạn"
 }
