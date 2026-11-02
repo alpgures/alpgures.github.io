@@ -143,7 +143,7 @@ section h2 {
 
 .chip-w { position: absolute; left: 0; top: 0; will-change: transform; }
 
-.chip-x .chip {
+.chips .chip {
   display: inline-block;
   font-size: 14.5px;
   font-weight: 500;

@@ -61,9 +61,10 @@
       if (cards) cards.innerHTML = renderProjectCards(data.projects || []);
 
       // Hero: floating language chips, fully interactive (JS-driven rAF).
-      // Drag any bubble to reposition it; mouse-wheel over a bubble scrubs
-      // its progression along its path. Stratified random lanes keep vertical
-      // coverage even; everything else is genuinely random each visit.
+      // Drag a bubble to fling it: on release it keeps flying in the drag
+      // direction with momentum, then eases back into its drift. Mouse-wheel
+      // over a bubble scrubs its progression. Stratified random lanes keep
+      // coverage even; everything else is random each visit.
       var chipsBox = document.querySelector(".hero .chips");
       if (chipsBox) {
         var words = (data.hero && data.hero.floating_words) || [
@@ -75,19 +76,29 @@
         var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         var CW = function () { return chipsBox.clientWidth; };
         var CH = function () { return chipsBox.clientHeight; };
+        // wanderer pockets: open airspace, never over mountains or text
+        var pockets = [
+          [0.02, 0.20, 0.08, 0.30],
+          [0.80, 0.96, 0.08, 0.30],
+          [0.03, 0.18, 0.38, 0.50],
+          [0.80, 0.97, 0.38, 0.55]
+        ];
 
         function place(c) {
-          var w = CW(), h = CH(), x, y;
+          var w = CW(), h = CH(), sx, sy;
           if (c.mode === "traverse") {
             var p = ((c.t % 1) + 1) % 1;
-            x = (c.fx + (c.tx - c.fx) * p) * w;
-            y = (c.lane + c.dy * p) * h;
+            sx = (c.fx + (c.tx - c.fx) * p) * w;
+            sy = (c.lane + c.dy * p) * h;
           } else {
-            x = (c.bx + c.ax * Math.sin(c.t * c.sp * 3 + c.ph1) +
-                 c.ax * 0.6 * Math.sin(c.t * c.sp * 7 + c.ph2)) * w;
-            y = (c.by + c.ay * Math.cos(c.t * c.sp * 2.4 + c.ph2) +
-                 c.ay * 0.6 * Math.cos(c.t * c.sp * 5.2 + c.ph1)) * h;
+            sx = (c.bx + c.ax * Math.sin(c.t * c.sp * 3 + c.ph1) +
+                  c.ax * 0.6 * Math.sin(c.t * c.sp * 7 + c.ph2)) * w;
+            sy = (c.by + c.ay * Math.cos(c.t * c.sp * 2.4 + c.ph2) +
+                  c.ay * 0.6 * Math.cos(c.t * c.sp * 5.2 + c.ph1)) * h;
           }
+          var f = c.free * c.free;
+          var x = sx * (1 - f) + c.px * f;
+          var y = sy * (1 - f) + c.py * f;
           c.el.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px)";
           c._x = x; c._y = y;
         }
@@ -103,28 +114,25 @@
           outer.appendChild(inner);
           chipsBox.appendChild(outer);
 
-          var c;
+          var c = {
+            el: outer, dragging: false,
+            free: 0, px: 0, py: 0, vx: 0, vy: 0
+          };
           if (i % 4 === 3) {
-            var leftSide = (i % 8) === 3; // wanderers: open corner pockets
-            c = {
-              el: outer, mode: "wander",
-              bx: leftSide ? 0.02 + Math.random() * 0.18 : 0.80 + Math.random() * 0.16,
-              by: 0.08 + Math.random() * 0.22,
-              t: Math.random() * 100, sp: 0.10 + Math.random() * 0.12,
-              ph1: Math.random() * 6.28, ph2: Math.random() * 6.28,
-              ax: 0.018 + Math.random() * 0.012, ay: 0.015 + Math.random() * 0.012,
-              dragging: false
-            };
+            var pk = pockets[Math.floor(i / 4) % pockets.length];
+            c.mode = "wander";
+            c.bx = pk[0] + Math.random() * (pk[1] - pk[0]);
+            c.by = pk[2] + Math.random() * (pk[3] - pk[2]);
+            c.t = Math.random() * 100; c.sp = 0.10 + Math.random() * 0.12;
+            c.ph1 = Math.random() * 6.28; c.ph2 = Math.random() * 6.28;
+            c.ax = 0.018 + Math.random() * 0.012; c.ay = 0.015 + Math.random() * 0.012;
           } else {
-            var ltr = Math.random() < 0.5; // traversers: full width, diagonal drift
-            c = {
-              el: outer, mode: "traverse",
-              fx: ltr ? -0.22 : 1.12, tx: ltr ? 1.12 : -0.22,
-              lane: 0.04 + ((i + Math.random()) / n) * 0.34,
-              dy: Math.random() * 0.08 - 0.04,
-              t: Math.random(), sp: 1 / (100 + Math.random() * 40),
-              dragging: false
-            };
+            var ltr = Math.random() < 0.5;
+            c.mode = "traverse";
+            c.fx = ltr ? -0.22 : 1.12; c.tx = ltr ? 1.12 : -0.22;
+            c.lane = 0.04 + ((i + Math.random()) / n) * 0.34;
+            c.dy = Math.random() * 0.08 - 0.04;
+            c.t = Math.random(); c.sp = 1 / (100 + Math.random() * 40);
           }
           outer.className = c.mode === "wander" ? "chip-w" : "chip-x";
           outer._chip = c;
@@ -133,7 +141,8 @@
           inner.addEventListener("pointerdown", function (ev) {
             ev.preventDefault();
             var cc = outer._chip;
-            cc.dragging = true;
+            cc.dragging = true; cc.free = 0;
+            cc.vx = 0; cc.vy = 0; cc._mx = undefined;
             try { inner.setPointerCapture(ev.pointerId); } catch (e) {}
             var r = chipsBox.getBoundingClientRect();
             cc.grabDX = ev.clientX - r.left - cc._x;
@@ -146,41 +155,50 @@
             var r = chipsBox.getBoundingClientRect();
             var x = ev.clientX - r.left - cc.grabDX;
             var y = ev.clientY - r.top - cc.grabDY;
+            var nowT = ev.timeStamp / 1000;
+            if (cc._mx !== undefined) {
+              var dtm = Math.max(0.008, nowT - cc._mt);
+              cc.vx = cc.vx * 0.7 + ((x - cc._mx) / dtm) * 0.3;
+              cc.vy = cc.vy * 0.7 + ((y - cc._my) / dtm) * 0.3;
+            }
+            cc._mx = x; cc._my = y; cc._mt = nowT;
             cc.el.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px)";
             cc._x = x; cc._y = y;
           });
-          function drop(ev) {
+          function drop() {
             var cc = outer._chip;
             if (!cc.dragging) return;
             cc.dragging = false;
             inner.style.cursor = "";
-            var w = CW(), h = CH();
-            if (cc.mode === "traverse") {
-              var p = (cc._x / w - cc.fx) / (cc.tx - cc.fx);
-              p = Math.max(0, Math.min(0.999, p));
-              cc.t = p;
-              cc.lane = cc._y / h - cc.dy * p;
-            } else {
-              cc.bx = cc._x / w; cc.by = cc._y / h;
-            }
-            place(cc);
+            var sp = Math.sqrt(cc.vx * cc.vx + cc.vy * cc.vy);
+            if (sp > 1400) { cc.vx *= 1400 / sp; cc.vy *= 1400 / sp; }
+            cc.px = cc._x; cc.py = cc._y; // fling from the drop point
+            cc.free = 1;
           }
           inner.addEventListener("pointerup", drop);
           inner.addEventListener("pointercancel", drop);
           inner.addEventListener("wheel", function (ev) {
-            ev.preventDefault(); // scrub this bubble's progression
+            ev.preventDefault();
             var cc = outer._chip;
             if (cc.mode === "traverse") cc.t += ev.deltaY * 0.0004;
             else cc.t += ev.deltaY * 0.03;
-            place(cc);
+            if (!cc.dragging) place(cc);
           }, { passive: false });
         });
 
         chips.forEach(place);
         var last = performance.now();
         var frameNo = 0;
-        // Gentle collision: when two bubbles overlap, nudge their
-        // trajectories apart a touch so they stop sitting on each other.
+        function nudge(c, ddx, ddy, w, h) {
+          if (c.free > 0.3) { c.px += ddx * 0.6; c.py += ddy * 0.6; }
+          else if (c.mode === "traverse") {
+            c.lane = Math.max(0.02, Math.min(0.42, c.lane + (ddy / h) * 0.6));
+            c.t += (ddx / w) / (c.tx - c.fx) * 0.6;
+          } else {
+            c.bx = Math.max(0.01, Math.min(0.95, c.bx + (ddx / w) * 0.6));
+            c.by = Math.max(0.03, Math.min(0.55, c.by + (ddy / h) * 0.6));
+          }
+        }
         function collide() {
           var w = CW(), h = CH();
           for (var a = 0; a < chips.length; a++) {
@@ -202,16 +220,6 @@
             }
           }
         }
-        function nudge(c, ddx, ddy, w, h) {
-          if (c.mode === "traverse") {
-            c.lane = Math.max(0.02, Math.min(0.42, c.lane + (ddy / h) * 0.6));
-            c.t += (ddx / w) / (c.tx - c.fx) * 0.6;
-          } else {
-            c.bx = Math.max(0.01, Math.min(0.95, c.bx + (ddx / w) * 0.6));
-            c.by = Math.max(0.03, Math.min(0.55, c.by + (ddy / h) * 0.6));
-          }
-          place(c);
-        }
         function measure() {
           for (var k = 0; k < chips.length; k++) {
             var el = chips[k].el.firstChild;
@@ -226,7 +234,13 @@
             for (var k = 0; k < chips.length; k++) {
               var c = chips[k];
               if (c.dragging) continue;
-              c.t += (c.mode === "traverse" ? c.sp : 1) * dt;
+              if (c.mode === "traverse") c.t += c.sp * dt; else c.t += dt;
+              if (c.free > 0) {
+                c.px += c.vx * dt; c.py += c.vy * dt;
+                var damp = Math.exp(-1.4 * dt);
+                c.vx *= damp; c.vy *= damp;
+                c.free = Math.max(0, c.free - dt / 4.5);
+              }
               place(c);
             }
             if (++frameNo % 3 === 0) collide();
