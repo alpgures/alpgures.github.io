@@ -232,17 +232,18 @@ section h2 {
   font-family: "Newsreader", Georgia, serif;
   font-size: 22px;
   line-height: 1.45;
-  margin: 0 0 8px;
+  margin: 0 0 4px;
   color: var(--soft);
   max-width: 34em;
+  text-align-last: right;
 }
 
-.hero-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+.hero-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 
 .hero-meta {
   color: var(--muted);
   font-size: 15px;
-  margin: 0 0 8px;
+  margin: 0 0 4px;
 }
 
 .btn {
