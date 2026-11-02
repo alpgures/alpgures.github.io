@@ -1,1 +1,33 @@
-{"facts":[{"label":"Role","value":"Design + build, solo"},{"label":"App","value":"Post-approval PWA — Bugün / Geçmiş / Asistan"},{"label":"Access","value":"Per-account token links"},{"label":"Assistant","value":"Relay-first, Turkish-first, no live LLM"},{"label":"Avatar","value":"İğde, a cotton picker spindle character"}],"gallery":[],"links":[],"story":["DCT Asistan runs the daily social post workflow for an agriculture business. I draft the day's post, it lands in the app waiting for approval, and one tap publishes it. Nothing ever goes out without a sign-off. That rule is load-bearing, not decorative.","The app opens on today's post: the media, the caption, the music, and two buttons — approve and publish, or request changes. The Bugün tab holds the day, Geçmiş holds the history, and the Asistan tab is a plain-Turkish chat. Access runs on per-account token links, so everyone only ever sees their own queue.","The assistant is relay-first by design. Routine questions get instant prepared answers, requests and ideas get an honest feasibility reply and are relayed to a human. No live language model, and it never publishes on its own. It is fronted by İğde, a cotton picker spindle character: only her tip and gear base turn, and her face speaks purely through expression."],"tagline":"Approval workflows for daily social posts: one-tap publish, per-account queues, and a relay-first Turkish assistant.","title":"DCT Asistan"}
+{
+  "facts": [
+    {
+      "label": "Role",
+      "value": "Design + build, solo"
+    },
+    {
+      "label": "App",
+      "value": "Post-approval PWA — Bugün / Geçmiş / Asistan"
+    },
+    {
+      "label": "Access",
+      "value": "Per-account token links"
+    },
+    {
+      "label": "Assistant",
+      "value": "Relay-first, Turkish-first, no live LLM"
+    },
+    {
+      "label": "Avatar",
+      "value": "İğde, a cotton picker spindle character"
+    }
+  ],
+  "gallery": [],
+  "links": [],
+  "story": [
+    "DCT Asistan runs the daily social post workflow for an agriculture business. I draft the day's post, it lands in the app waiting for approval, and one tap publishes it. Nothing ever goes out without a sign-off. That rule is load-bearing, not decorative.",
+    "The app opens on today's post: the media, the caption, the music, and two buttons — approve and publish, or request changes. The Bugün tab holds the day, Geçmiş holds the history, and the Asistan tab is a plain-Turkish chat. Access runs on per-account token links, so everyone only ever sees their own queue.",
+    "The assistant is relay-first by design. Routine questions get instant prepared answers, requests and ideas get an honest feasibility reply and are relayed to a human. No live language model, and it never publishes on its own. It is fronted by İğde, a cotton picker spindle character: only her tip and gear base turn, and her face speaks purely through expression."
+  ],
+  "tagline": "Custom social media management assistant for my father's company.",
+  "title": "DCT Asistan"
+}
