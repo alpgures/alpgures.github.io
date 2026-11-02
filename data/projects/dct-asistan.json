@@ -28,6 +28,6 @@
     "The app opens on today's post: the media, the caption, the music, and two buttons — approve and publish, or request changes. The Bugün tab holds the day, Geçmiş holds the history, and the Asistan tab is a plain-Turkish chat. Access runs on per-account token links, so everyone only ever sees their own queue.",
     "The assistant is relay-first by design. Routine questions get instant prepared answers, requests and ideas get an honest feasibility reply and are relayed to a human. No live language model, and it never publishes on its own. It is fronted by İğde, a cotton picker spindle character: only her tip and gear base turn, and her face speaks purely through expression."
   ],
-  "tagline": "Custom social media management assistant for my father's company.",
+  "tagline": "Custom social media management assistant for my father's company. ",
   "title": "DCT Asistan"
 }
