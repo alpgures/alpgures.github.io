@@ -327,6 +327,10 @@
               if (c.mode === "traverse") c.t += c.sp * dt; else c.t += dt;
               if (c.free > 0) {
                 c.px += c.vx * dt; c.py += c.vy * dt;
+                // flung chips curve around the mountains too, never dip in
+                var fw = CW(), fh = CH();
+                var flim = skyLimit(Math.max(0, Math.min(1, c.px / fw))) * fh - 10;
+                if (c.py > flim) { c.py = flim; if (c.vy > 0) c.vy = 0; }
                 var damp = Math.exp(-1.4 * dt);
                 c.vx *= damp; c.vy *= damp;
                 c.free = Math.max(0, c.free - dt / 4.5);
