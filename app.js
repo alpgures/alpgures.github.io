@@ -404,7 +404,7 @@
         }
         // Greetings: first the big five (TR/EN/JA/VI/DE) in random order,
         // then the rest of the list, reshuffled every cycle, no repeats.
-        var first5 = ["merhaba", "hello", "こんにちは", "xin chào", "hallo"];
+        var first5 = ["merhaba", "hello", "こんにちは", "xin chào", "hallo"].filter(function (w) { return words.indexOf(w) !== -1; });
         var gSeq = shuffled(first5), gRest = [];
         function nextGreeting() {
           if (!gSeq.length) {
