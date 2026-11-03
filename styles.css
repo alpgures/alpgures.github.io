@@ -424,6 +424,8 @@ footer {
 
 .proj-story p { margin-bottom: 1.1em; font-size: 18px; }
 
+#about p { margin-bottom: 1.1em; }
+
 .fact-grid { display: grid; gap: 0; border-top: 1px solid var(--line); }
 .fact-grid > div {
   display: grid;
