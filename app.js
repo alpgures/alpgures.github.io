@@ -285,11 +285,21 @@
         });
 
         chips.forEach(place);
+        /* Mobile: frame the tall left peak so the mountains read higher. */
+        function frameMountains() {
+          try {
+            var tsvg = document.querySelector(".hero .taurus");
+            if (!tsvg) return;
+            tsvg.setAttribute("preserveAspectRatio",
+              window.matchMedia("(max-width: 600px)").matches ? "xMinYMax slice" : "xMidYMax slice");
+          } catch (e) {}
+        }
+        frameMountains();
         buildRidge();
         var rT = null;
         window.addEventListener("resize", function () {
           if (rT) clearTimeout(rT);
-          rT = setTimeout(buildRidge, 200);
+          rT = setTimeout(function () { frameMountains(); buildRidge(); }, 200);
         });
         var last = performance.now();
         var frameNo = 0;
