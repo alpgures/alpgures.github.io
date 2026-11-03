@@ -331,6 +331,25 @@ section h2 {
 
 /* Contact */
 
+#contact .contact-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+  flex-wrap: wrap;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 22px;
+}
+#contact .contact-head h2 {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+#contact .contact-links {
+  justify-content: flex-end;
+  margin-top: 0;
+}
 .contact-link { display: inline-flex; align-items: center; gap: 8px; }
 .contact-link svg { flex-shrink: 0; }
 .contact-links {
@@ -347,8 +366,8 @@ section h2 {
 
 footer {
   max-width: 740px;
-  margin: 64px auto 0;
-  padding: 24px 28px 40px;
+  margin: 28px auto 0;
+  padding: 20px 28px 36px;
   border-top: 1px solid var(--line);
   color: var(--muted);
   font-size: 14px;
