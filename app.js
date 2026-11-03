@@ -39,9 +39,15 @@
     .then(function (data) {
       document.querySelectorAll("[data-field]").forEach(function (el) {
         var val = get(data, el.getAttribute("data-field"));
-        if (val == null) return;
         var attr = el.getAttribute("data-attr");
         var label = el.getAttribute("data-label");
+        if (val == null || String(val).trim() === "") {
+          // Empty optional fields (e.g. contact blurb): hide the element
+          // instead of leaving an empty shell. Attribute-only targets
+          // (email/link hrefs) are required fields, leave them alone.
+          if (!attr && el.children.length === 0) el.style.display = "none";
+          return;
+        }
         if (attr) {
           var prefix = el.getAttribute("data-prefix") || "";
           el.setAttribute(attr, prefix + val);

@@ -82,7 +82,7 @@ collections:
             name: contact
             widget: object
             fields:
-              - { label: "Blurb", name: blurb, widget: text }
+              - { label: "Blurb", name: blurb, widget: text, required: false }
               - { label: "Email", name: email, widget: string }
               - { label: "LinkedIn URL", name: linkedin, widget: string }
       - name: project-kotoban
