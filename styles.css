@@ -82,6 +82,9 @@ main {
 }
 
 section { padding: 56px 0 8px; }
+/* Anchor jumps (nav Work/About/Contact): land below the sticky nav with
+   breathing room so section titles are never clipped. */
+section[id] { scroll-margin-top: 96px; }
 section h2 {
   font-size: 30px;
   margin-bottom: 22px;

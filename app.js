@@ -90,12 +90,16 @@
         var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         var CW = function () { return chipsBox.clientWidth; };
         var CH = function () { return chipsBox.clientHeight; };
-        // wanderer pockets: open airspace, never over mountains or text
+        // wanderer pockets: open airspace, never over mountains or text.
+        // The last two flank the hero text so bubbles surround it;
+        // chips behind the text fade out (see frame loop) to stay legible.
         var pockets = [
           [0.02, 0.20, 0.08, 0.30],
           [0.80, 0.96, 0.08, 0.30],
           [0.03, 0.18, 0.38, 0.50],
-          [0.80, 0.97, 0.38, 0.55]
+          [0.80, 0.97, 0.38, 0.55],
+          [0.62, 0.90, 0.28, 0.50],
+          [0.10, 0.45, 0.58, 0.68]
         ];
         // Mountain-aware ceiling: sample the RENDERED ridge paths (so slice
         // cropping, responsive sizes etc. are all accounted for) and forbid
@@ -200,7 +204,7 @@
           inner.className = "chip";
           inner.textContent = w;
           inner.style.opacity = (0.45 + Math.random() * 0.3).toFixed(2);
-          inner.style.animationDuration = (8 + Math.random() * 6).toFixed(1) + "s";
+          inner.style.animationDuration = (16 + Math.random() * 8).toFixed(1) + "s";
           inner.style.animationDelay = (-Math.random() * 10).toFixed(1) + "s";
           outer.appendChild(inner);
           chipsBox.appendChild(outer);
@@ -217,16 +221,16 @@
             c.by = pk[2] + Math.random() * (pk[3] - pk[2]);
             c.ay = 0.015 + Math.random() * 0.012;
             c.by = Math.max(0.03, Math.min(c.by, maxWanderY(c.bx, c.ay)));
-            c.t = Math.random() * 100; c.sp = 0.10 + Math.random() * 0.12;
+            c.t = Math.random() * 100; c.sp = 0.06 + Math.random() * 0.07;
             c.ph1 = Math.random() * 6.28; c.ph2 = Math.random() * 6.28;
             c.ax = 0.018 + Math.random() * 0.012;
           } else {
             var ltr = Math.random() < 0.5;
             c.mode = "traverse";
             c.fx = ltr ? -0.22 : 1.12; c.tx = ltr ? 1.12 : -0.22;
-            c.lane = 0.08 + ((i + Math.random()) / n) * 0.30;
+            c.lane = 0.08 + ((i + Math.random()) / n) * 0.38;
             c.dy = Math.random() * 0.07 - 0.035;
-            c.t = Math.random(); c.sp = 1 / (100 + Math.random() * 40);
+            c.t = Math.random(); c.sp = 1 / (180 + Math.random() * 60);
           }
           outer.className = c.mode === "wander" ? "chip-w" : "chip-x";
           outer._chip = c;
