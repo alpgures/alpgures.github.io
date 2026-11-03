@@ -55,7 +55,13 @@
         var items = get(data, el.getAttribute("data-list")) || [];
         var tag = el.getAttribute("data-tag") || "p";
         el.innerHTML = items
-          .map(function (t) { return "<" + tag + ">" + esc(t) + "</" + tag + ">"; })
+          .map(function (t) {
+            // Blank lines inside one item also start a new paragraph,
+            // so Decap text with line spacing renders as spaced paragraphs.
+            return String(t).split(/\n\s*\n/).map(function (para) {
+              return "<" + tag + ">" + esc(para) + "</" + tag + ">";
+            }).join("");
+          })
           .join("");
       });
 
