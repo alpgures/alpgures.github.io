@@ -1,7 +1,7 @@
 /* Renders a project page from data/projects/<slug>.json (?p=<slug>). */
 
 (function () {
-  var ORDER = ["kotoban", "planeframe", "annemin-tarifleri", "dct-asistan"];
+  var ORDER = ["alpbrowser", "kotoban", "planeframe", "annemin-tarifleri", "dct-asistan"];
 
   function esc(s) {
     return String(s)
@@ -55,7 +55,7 @@
 
       var idx = ORDER.indexOf(slug);
       var next = ORDER[(idx + 1) % ORDER.length];
-      var label = { kotoban: "Kotoban", planeframe: "PlaneFrame", "annemin-tarifleri": "Annemin Tarifleri", "dct-asistan": "DCT Asistan" }[next];
+      var label = { alpbrowser: "Alp Browser", kotoban: "Kotoban", planeframe: "PlaneFrame", "annemin-tarifleri": "Annemin Tarifleri", "dct-asistan": "DCT Asistan" }[next];
       document.getElementById("proj-next").innerHTML =
         '<a href="project.html?p=' + next + '">Next: ' + esc(label) + " →</a>";
 

@@ -20,8 +20,9 @@
       .map(function (p, i) {
         var scene = sceneFor(p.slug, p.image, p.title);
         var delay = i === 1 ? " rv-d1" : i === 2 ? " rv-d2" : "";
+        var wide = p.featured ? " card-wide" : "";
         return (
-          '<a class="card rv' + delay + '" href="projects/project.html?p=' + esc(p.slug) + '">' +
+          '<a class="card' + wide + ' rv' + delay + '" href="projects/project.html?p=' + esc(p.slug) + '">' +
           '<div class="card-scene">' + scene + "</div>" +
           '<div class="card-body"><h3>' + esc(p.title) + "</h3>" +
           "<p>" + esc(p.blurb) + "</p>" +
@@ -217,6 +218,11 @@
           var f = c.free * c.free;
           var x = sx * (1 - f) + c.px * f;
           var y = sy * (1 - f) + c.py * f;
+          // Collision separation lives in a decaying offset, never in the
+          // trajectory — rewriting bx/by/lane on every contact is what
+          // made chips snap back and shake.
+          x += c.ox; y += c.oy;
+          c.ox *= 0.9; c.oy *= 0.9;
           syncPair(c, x, y);
         }
 
@@ -234,6 +240,7 @@
           var c = {
             el: outer, dragging: false,
             free: 0, px: 0, py: 0, vx: 0, vy: 0,
+            ox: 0, oy: 0,
             baseOp: parseFloat(inner.style.opacity) || 0.6, op: 1, _lastOp: 1
           };
           if (i % 3 === 2) {
@@ -377,41 +384,52 @@
         });
         var last = performance.now();
         var frameNo = 0;
-        function nudge(c, ddx, ddy, w, h) {
-          if (c.free > 0.3) { c.px += ddx * 0.6; c.py += ddy * 0.6; }
-          else if (c.mode === "traverse") {
-            c.lane = Math.max(0.08, Math.min(0.38, c.lane + (ddy / h) * 0.6));
-            c.t += (ddx / w) / (c.tx - c.fx) * 0.6;
-          } else {
-            c.bx = Math.max(0.01, Math.min(0.95, c.bx + (ddx / w) * 0.6));
-            c.by = Math.max(0.03, Math.min(maxWanderY(c.bx, c.ay), c.by + (ddy / h) * 0.6));
+        // Separation steering: test the main copies plus any on-screen
+        // ghost (wrap mirror) — ghosts used to overlap silently at the
+        // edges, which is how chips got too close. Pushes go into the
+        // decaying offset, never into the trajectory.
+        function separatePair(A, B, w) {
+          var ptsA = [[A._x, A._y]];
+          if (A.ghost && A._gx > -A._rx && A._gx < w + A._rx) ptsA.push([A._gx, A._gy]);
+          var ptsB = [[B._x, B._y]];
+          if (B.ghost && B._gx > -B._rx && B._gx < w + B._rx) ptsB.push([B._gx, B._gy]);
+          var rx = A._rx + B._rx, ry = A._ry + B._ry;
+          for (var i = 0; i < ptsA.length; i++) {
+            for (var j = 0; j < ptsB.length; j++) {
+              var dx = ptsB[j][0] - ptsA[i][0], dy = ptsB[j][1] - ptsA[i][1];
+              var qx = dx / rx, qy = dy / ry;
+              var q2 = qx * qx + qy * qy;
+              if (q2 < 1 && q2 > 0.0001) {
+                var q = Math.sqrt(q2);
+                var d = Math.sqrt(dx * dx + dy * dy);
+                var nx = dx / d, ny = dy / d;
+                var push = (1 - q) * 12;
+                A.ox -= nx * push; A.oy -= ny * push;
+                B.ox += nx * push; B.oy += ny * push;
+              }
+            }
           }
         }
         function collide() {
-          var w = CW(), h = CH();
+          var w = CW();
           for (var a = 0; a < chips.length; a++) {
             var A = chips[a];
             if (A.dragging) continue;
             for (var b = a + 1; b < chips.length; b++) {
               var B = chips[b];
               if (B.dragging) continue;
-              var dx = B._x - A._x, dy = B._y - A._y;
-              var rr = A._r + B._r;
-              var d2 = dx * dx + dy * dy;
-              if (d2 < rr * rr && d2 > 1) {
-                var d = Math.sqrt(d2);
-                var nx = dx / d, ny = dy / d;
-                var push = (rr - d) / 2;
-                nudge(A, -nx * push, -ny * push, w, h);
-                nudge(B, nx * push, ny * push, w, h);
-              }
+              separatePair(A, B, w);
             }
           }
         }
         function measure() {
           for (var k = 0; k < chips.length; k++) {
             var el = chips[k].el.firstChild;
-            chips[k]._r = el ? el.offsetWidth / 2 + 3 : 30;
+            // Elliptical collision radii: a wide chip needs room sideways
+            // but only a chip-height vertically. A circular radius sized
+            // by width shoved chips far apart up/down and back again.
+            chips[k]._rx = el ? el.offsetWidth / 2 + 12 : 30;
+            chips[k]._ry = el ? el.offsetHeight / 2 + 10 : 26;
           }
         }
         measure();
@@ -466,8 +484,10 @@
                 var behind = false;
                 for (var bi = 0; bi < heroRects.length; bi++) {
                   var hb = heroRects[bi];
-                  if ((c._x > hb.x0 && c._x < hb.x1 && c._y > hb.y0 && c._y < hb.y1) ||
-                      (c._gx !== undefined && c._gx > hb.x0 && c._gx < hb.x1 && c._gy > hb.y0 && c._gy < hb.y1)) { behind = true; break; }
+                  // Whole chip box, not just its centre: a wide chip's edge
+                  // used to overlap the text while its centre sat outside.
+                  if ((c._x + c._rx > hb.x0 && c._x - c._rx < hb.x1 && c._y + c._ry > hb.y0 && c._y - c._ry < hb.y1) ||
+                      (c._gx !== undefined && c._gx + c._rx > hb.x0 && c._gx - c._rx < hb.x1 && c._gy + c._ry > hb.y0 && c._gy - c._ry < hb.y1)) { behind = true; break; }
                 }
                 var tgt = behind ? 0.14 : 1;
                 c.op += (tgt - c.op) * Math.min(1, dt * 5);

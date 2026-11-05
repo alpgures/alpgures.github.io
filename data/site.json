@@ -120,6 +120,13 @@
   },
   "projects": [
     {
+      "blurb": "A native macOS browser, rewritten from scratch in Swift — same sidebar, spaces, and speed, all original code.",
+      "featured": true,
+      "image": "",
+      "slug": "alpbrowser",
+      "title": "Alp Browser"
+    },
+    {
       "blurb": "Learn vocabulary in 12 languages with the power of spaced repetition.",
       "image": "images/dash-ja.png",
       "slug": "kotoban",

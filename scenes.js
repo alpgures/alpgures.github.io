@@ -46,7 +46,48 @@ function sceneFor(slug, image, title) {
   if (slug === "kotoban") return sceneKotoban();
   if (slug === "planeframe") return scenePlane();
   if (slug === "dct-asistan") return sceneDct();
+  if (slug === "alpbrowser") return sceneAlpbrowser();
   return sceneRecipeUI();
+}
+
+/* alpbrowser: Arc-style browser mockup in the site palette.
+   Light screens, slate accents — no dark grainy gradient.
+   Sidebar keeps its own color (warm #f1ece2) with cycling tabs.
+   Tab names are Alp's real Arc favorites. No floating chips. */
+function sceneAlpbrowser() {
+  function tab(y, label, cls) {
+    return (
+      '<g class="scn-tab ' + cls + '">' +
+      '<rect x="80" y="' + y + '" width="84" height="22" rx="7" fill="#f6f1e8"/>' +
+      '<text x="122" y="' + (y + 15) + '" text-anchor="middle" font-size="8" font-family="Inter, sans-serif" fill="#1b1815">' + label + "</text>" +
+      "</g>"
+    );
+  }
+  return (
+    '<svg class="scn sc-alp" viewBox="0 0 400 250" aria-hidden="true">' +
+    '<circle class="scn-dot" cx="370" cy="216" r="6" fill="#93a0b4" opacity="0.25"/>' +
+    '<circle class="scn-dot d2" cx="30" cy="44" r="7" fill="#93a0b4" opacity="0.18"/>' +
+    '<g class="scn-window">' +
+    '<rect x="70" y="18" width="260" height="214" rx="12" fill="#fffdf8" stroke="#e6e0d6" stroke-width="2"/>' +
+    '<rect x="70" y="18" width="104" height="214" rx="12" fill="#f1ece2"/>' +
+    '<rect x="122" y="18" width="52" height="214" fill="#f1ece2"/>' +
+    '<line x1="174" y1="18" x2="174" y2="232" stroke="#e6e0d6" stroke-width="1.5"/>' +
+    '<circle cx="86" cy="36" r="4.5" fill="#7d8aa0"/><circle cx="98" cy="36" r="4.5" fill="#9aa5bb"/><circle cx="110" cy="36" r="4.5" fill="#5b6b84"/>' +
+    '<rect x="80" y="48" width="84" height="16" rx="8" fill="#fffdf8" stroke="#e6e0d6" stroke-width="1"/>' +
+    '<text x="122" y="58" text-anchor="middle" font-size="8" font-family="Inter, sans-serif" fill="#6f6a62">alpbrowser.app</text>' +
+    tab(74, "Canvas", "t1") +
+    tab(102, "WhatsApp", "t2") +
+    tab(130, "Notion", "t3") +
+    '<circle cx="102" cy="206" r="4" fill="#5b6b84"/><circle cx="122" cy="206" r="4" fill="#cfc8b8"/><circle cx="142" cy="206" r="4" fill="#cfc8b8"/>' +
+    '<text x="252" y="66" text-anchor="middle" font-size="8" letter-spacing="1.5" font-family="Inter, sans-serif" fill="#7d8aa0">START PAGE</text>' +
+    '<text x="252" y="94" text-anchor="middle" font-size="16" font-family="Newsreader, Georgia, serif" font-weight="600" fill="#1b1815">Your new favorite</text>' +
+    '<text x="252" y="116" text-anchor="middle" font-size="16" font-family="Newsreader, Georgia, serif" font-weight="600" fill="#1b1815">browser</text>' +
+    '<text x="252" y="136" text-anchor="middle" font-size="9" font-family="Inter, sans-serif" fill="#6f6a62">human-first, AI-second.</text>' +
+    '<text x="282" y="160" text-anchor="end" font-size="9" font-family="Inter, sans-serif" fill="#5b6b84">Read the story</text>' +
+    '<path d="M287 157 H294 M290 153 L295 157 L290 161" fill="none" stroke="#5b6b84" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
+    '<circle cx="298" cy="196" r="20" fill="none" stroke="#5b6b84" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="88 126" transform="rotate(-90 298 196)"/>' +
+    "</g></svg>"
+  );
 }
 
 /* İğde: cotton picker spindle + DCT Asistan app overview (Bugün/post tab). */
