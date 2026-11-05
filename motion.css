@@ -165,6 +165,31 @@
 .sc-dct .scn-dot { animation: scn-float 5.2s ease-in-out infinite; }
 .sc-dct .scn-dot.d2 { animation-delay: -1.7s; }
 
+/* ---------- alpbrowser: Arc-style browser mockup, site palette ---------- */
+
+.sc-alp .scn-window { animation: scn-float 7s ease-in-out infinite; }
+
+.sc-alp .scn-chip { animation: scn-float 5s ease-in-out infinite; }
+.sc-alp .scn-chip.c2 { animation-delay: -2.5s; }
+
+.sc-alp .scn-dot { animation: scn-float 5.2s ease-in-out infinite; }
+.sc-alp .scn-dot.d2 { animation-delay: -1.7s; }
+
+.sc-alp .scn-tab rect { animation: scn-tab-cycle 9s var(--ease-flow) infinite; }
+.sc-alp .scn-tab.t2 rect { animation-delay: -3s; }
+.sc-alp .scn-tab.t3 rect { animation-delay: -6s; }
+@keyframes scn-tab-cycle {
+  0%, 28% { fill: #5b6b84; }
+  36%, 100% { fill: #f6f1e8; }
+}
+.sc-alp .scn-tab text { animation: scn-tab-text 9s var(--ease-flow) infinite; }
+.sc-alp .scn-tab.t2 text { animation-delay: -3s; }
+.sc-alp .scn-tab.t3 text { animation-delay: -6s; }
+@keyframes scn-tab-text {
+  0%, 28% { fill: #fffdf8; }
+  36%, 100% { fill: #1b1815; }
+}
+
 /* ---------- Scroll reveal ---------- */
 
 .rv {
