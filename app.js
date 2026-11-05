@@ -19,7 +19,7 @@
     return items
       .map(function (p, i) {
         var scene = sceneFor(p.slug, p.image, p.title);
-        var delay = i === 1 ? " rv-d1" : i === 2 ? " rv-d2" : "";
+        var delay = i === 1 || i === 3 ? " rv-d1" : i === 2 || i === 4 ? " rv-d2" : "";
         var wide = p.featured ? " card-wide" : "";
         return (
           '<a class="card' + wide + ' rv' + delay + '" href="projects/project.html?p=' + esc(p.slug) + '">' +
@@ -74,6 +74,53 @@
 
       var cards = document.getElementById("project-cards");
       if (cards) cards.innerHTML = renderProjectCards(data.projects || []);
+
+      // One sharp fact per card, pulled from each project's own data file.
+      // Cards render first; facts patch in when they arrive.
+      (function loadCardFacts() {
+        var FACT_LABEL = {
+          kotoban: "Status",
+          planeframe: "Status",
+          alpbrowser: "Platform",
+          "annemin-tarifleri": "Videos",
+          "dct-asistan": "Role"
+        };
+        function pickFact(d, slug) {
+          if (!d || !d.facts || !d.facts.length) return null;
+          var want = FACT_LABEL[slug];
+          for (var i = 0; i < d.facts.length; i++) {
+            if (d.facts[i].label === want) return d.facts[i];
+          }
+          return d.facts[0];
+        }
+        var links = cards.querySelectorAll("a.card");
+        var slugs = [];
+        links.forEach(function (a) {
+          var m = /[?&]p=([^&]+)/.exec(a.getAttribute("href") || "");
+          if (m) slugs.push(decodeURIComponent(m[1]));
+        });
+        Promise.all(slugs.map(function (s) {
+          return fetch("data/projects/" + s + ".json", { cache: "no-store" })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .catch(function () { return null; });
+        })).then(function (results) {
+          results.forEach(function (d, i) {
+            var fact = pickFact(d, slugs[i]);
+            if (!fact || !links[i]) return;
+            var body = links[i].querySelector(".card-body");
+            var cta = body && body.querySelector(".card-cta");
+            if (!body || !cta) return;
+            var div = document.createElement("div");
+            div.className = "card-fact";
+            var label = document.createElement("span");
+            label.className = "card-fact-label";
+            label.textContent = fact.label;
+            div.appendChild(label);
+            div.appendChild(document.createTextNode(fact.value));
+            body.insertBefore(div, cta);
+          });
+        });
+      })();
 
       // Hero: floating language chips, fully interactive (JS-driven rAF).
       // Drag a bubble to fling it: on release it keeps flying in the drag
@@ -699,6 +746,55 @@
         });
       }, { threshold: 0.1 });
       document.querySelectorAll(".rv").forEach(function (el) { io.observe(el); });
+
+      // Apple-style scroll: the hero settles as you leave it, the mountains
+      // parallax, the nav frosts in, and a hairline tracks reading progress.
+      // rAF-throttled; transforms skipped entirely for reduced motion.
+      try {
+        var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var heroEl = document.querySelector(".hero");
+        var heroInner = document.querySelector(".hero-inner");
+        var taurusEl = document.querySelector(".taurus");
+        var navEl = document.querySelector(".nav");
+        var scrollTicking = false;
+        function onScrollFrame() {
+          scrollTicking = false;
+          var y = window.scrollY || 0;
+          var max = document.documentElement.scrollHeight - window.innerHeight;
+          document.documentElement.style.setProperty("--scroll-progress", (max > 0 ? (y / max) * 100 : 0) + "%");
+          if (navEl) navEl.classList.toggle("scrolled", y > 40);
+          if (reducedMotion) return;
+          var h = heroEl ? heroEl.offsetHeight : 1;
+          var p = Math.min(y / h, 1);
+          if (heroInner) {
+            heroInner.style.opacity = String(1 - p * 0.9);
+            heroInner.style.transform = "translateY(" + (-28 - p * 40) + "px) scale(" + (1 - p * 0.04) + ")";
+          }
+          if (taurusEl) taurusEl.style.transform = "translateY(" + Math.min(y * 0.18, 90) + "px)";
+
+          // Horizontal work carousel: vertical scroll through the tall
+          // .work-scroll track drives the card row left.
+          var workSection = document.querySelector(".work-scroll");
+          var workRow = document.getElementById("project-cards");
+          if (workSection && workRow && !reducedMotion && window.innerWidth > 700) {
+            var rect = workSection.getBoundingClientRect();
+            var span = workSection.offsetHeight - window.innerHeight;
+            var prog = span > 0 ? Math.min(Math.max(-rect.top / span, 0), 1) : 0;
+            var maxX = Math.max(workRow.scrollWidth - window.innerWidth, 0);
+            workRow.style.transform = "translateX(" + (-prog * maxX) + "px)";
+          } else if (workRow) {
+            workRow.style.transform = "";
+          }
+        }
+        function onScroll() {
+          if (scrollTicking) return;
+          scrollTicking = true;
+          requestAnimationFrame(onScrollFrame);
+        }
+        window.addEventListener("scroll", onScroll, { passive: true });
+        window.addEventListener("resize", onScroll, { passive: true });
+        onScroll();
+      } catch (e) { /* scroll polish is optional; never break the page */ }
     })
     .catch(function (err) {
       console.error("Could not load site content:", err);

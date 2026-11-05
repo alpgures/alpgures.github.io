@@ -15,8 +15,63 @@
 
 html { scroll-behavior: smooth; }
 
+/* ---------- Horizontal work carousel: vertical scroll drives a
+   horizontal swipe (Apple-style). The section is a tall scroll track;
+   the sticky viewport pins while the card row slides left. ---------- */
+.work-scroll {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  height: 320vh;
+  padding: 0;
+}
+.work-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.work-sticky h2 {
+  width: 100%;
+  max-width: 740px;
+  margin: 0 auto 22px;
+  padding: 0 28px 10px;
+}
+.work-track { overflow: visible; }
+.work-scroll .cards {
+  display: flex;
+  gap: 22px;
+  width: max-content;
+  padding-left: max(28px, calc((100vw - 740px) / 2));
+  padding-right: 28px;
+  will-change: transform;
+}
+.work-scroll .cards .card { flex: 0 0 520px; }
+.work-scroll .cards .card-wide { flex-basis: 760px; }
+
+/* Mobile + reduced motion: the carousel becomes the plain vertical grid. */
+@media (max-width: 700px), (prefers-reduced-motion: reduce) {
+  .work-scroll { width: auto; margin: 0; height: auto; padding: 56px 0 8px; }
+  .work-sticky { position: static; height: auto; overflow: visible; display: block; }
+  .work-sticky h2 { max-width: none; margin: 0 0 22px; padding: 0 0 10px; }
+  .work-scroll .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    width: auto;
+    padding: 0;
+    will-change: auto;
+  }
+  .work-scroll .cards .card,
+  .work-scroll .cards .card-wide { flex: none; }
+}
+
 body {
   background: var(--paper);
+  overflow-x: clip;
   color: var(--ink);
   font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
   font-size: 17px;
@@ -44,9 +99,28 @@ a:hover { text-decoration: underline; }
   justify-content: space-between;
   align-items: center;
   padding: 14px 28px;
-  background: rgba(20, 21, 24, 0.92);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--line);
+  /* Transparent over the hero; frosts in once you scroll. */
+  background: rgba(20, 21, 24, 0);
+  backdrop-filter: blur(0px);
+  border-bottom: 1px solid transparent;
+  transition: background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease;
+}
+.nav.scrolled {
+  background: rgba(20, 21, 24, 0.78);
+  backdrop-filter: blur(14px) saturate(1.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  border-bottom-color: var(--line);
+}
+/* Hairline reading-progress bar, driven by --scroll-progress in app.js. */
+.nav::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 2px;
+  width: var(--scroll-progress, 0%);
+  background: var(--accent);
+  opacity: 0.7;
 }
 
 .nav-name {
@@ -150,13 +224,21 @@ section h2 {
   display: inline-block;
   font-size: 17px;
   font-weight: 500;
-  color: var(--muted);
-  background: rgba(27, 29, 34, 0.8);
-  border: 1px solid var(--line);
+  color: var(--ink);
+  /* Liquid glass: the pill refracts the sky behind it (SVG displacement
+     filter #lg, defined in index.html). Where backdrop-filter: url() is
+     unsupported (Firefox), this still reads as a frosted glass pill. */
+  background: rgba(231, 228, 219, 0.07);
+  border: 1px solid rgba(231, 228, 219, 0.16);
   border-radius: 999px;
   padding: 6px 17px;
   white-space: nowrap;
   animation: chip-bob ease-in-out infinite;
+  backdrop-filter: url(#lg);
+  -webkit-backdrop-filter: url(#lg);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -10px 18px rgba(0, 0, 0, 0.18);
 }
 @keyframes chip-bob {
   0%, 100% { transform: translateY(-5px); }
@@ -405,9 +487,11 @@ main:has(#contact) + footer { border-top: none; }
   overflow: hidden;
   background: var(--surface);
   color: var(--ink);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.35s var(--ease-flow), box-shadow 0.35s var(--ease-flow);
 }
-.card:hover { text-decoration: none; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45); }
+.card:hover { text-decoration: none; transform: translateY(-4px); box-shadow: 0 14px 32px rgba(0, 0, 0, 0.5); }
+.card-scene .scn { transition: transform 0.6s var(--ease-flow); }
+.card:hover .card-scene .scn { transform: scale(1.04); }
 
 .card-img { aspect-ratio: 16 / 10; overflow: hidden; background: var(--line); }
 .card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -428,6 +512,23 @@ main:has(#contact) + footer { border-top: none; }
 .card-body h3 { font-size: 22px; }
 .card-body p { font-size: 15px; color: var(--muted); flex: 1; }
 .card-cta { font-size: 15px; font-weight: 600; color: var(--accent); }
+
+/* One sharp fact per card, patched in from the project's own data file. */
+.card-fact {
+  margin-top: 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--muted);
+}
+.card-fact-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-right: 8px;
+}
 
 /* Featured (wide) project card — spans the full grid, scene left, text right. */
 .card-wide { grid-column: 1 / -1; display: grid; grid-template-columns: 1.15fr 1fr; }
