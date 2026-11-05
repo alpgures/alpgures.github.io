@@ -436,8 +436,8 @@
         var heroEl = document.querySelector(".hero .hero-inner");
         // Fade zones are the ACTUAL text of each hero line (measured with a
         // Range, so block width never counts), not the whole hero-inner box.
-        // That used to swallow the halo: anything near the text faded to
-        // ~10% and the bubbles read as edge decoration instead of a frame.
+        // Chips on the text fade to 5% of base opacity, so the words stay
+        // legible with no scrim behind them; chips beside a line stay bright.
         var heroRects = [];
         function measureHero() {
           heroRects = [];
@@ -489,7 +489,7 @@
                   if ((c._x + c._rx > hb.x0 && c._x - c._rx < hb.x1 && c._y + c._ry > hb.y0 && c._y - c._ry < hb.y1) ||
                       (c._gx !== undefined && c._gx + c._rx > hb.x0 && c._gx - c._rx < hb.x1 && c._gy + c._ry > hb.y0 && c._gy - c._ry < hb.y1)) { behind = true; break; }
                 }
-                var tgt = behind ? 0.14 : 1;
+                var tgt = behind ? 0.05 : 1;
                 c.op += (tgt - c.op) * Math.min(1, dt * 5);
                 if (Math.abs(c.op - c._lastOp) > 0.02) {
                   c.el.firstChild.style.opacity = (c.baseOp * c.op).toFixed(3);

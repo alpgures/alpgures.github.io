@@ -112,7 +112,7 @@ collections:
               - { label: "Label", name: label, widget: string }
               - { label: "URL", name: url, widget: string }
       - name: project-kotoban
-        label: "Project: Kotoban"
+        label: "Project: kotobạn"
         file: "data/projects/kotoban.json"
         fields:
           - { label: "Title", name: title, widget: string }

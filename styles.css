@@ -163,16 +163,6 @@ section h2 {
   50% { transform: translateY(5px); }
 }
 .hero-inner { position: relative; z-index: 3; width: 100%; max-width: 740px; margin: 0 auto; padding: 0 28px; transform: translateY(-28px); }
-/* Soft scrim behind the hero text so drifting bubbles never compete with it. */
-.hero-inner::before {
-  content: "";
-  position: absolute;
-  inset: -28px -16px;
-  z-index: -1;
-  border-radius: 36px;
-  background: radial-gradient(ellipse 88% 88% at 50% 46%, rgba(13, 14, 17, 0.62) 0%, rgba(13, 14, 17, 0.34) 55%, rgba(13, 14, 17, 0) 100%);
-  pointer-events: none;
-}
 
 .hero-greeting {
   font-size: clamp(20px, 2.8vw, 30px);
