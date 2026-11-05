@@ -10,13 +10,13 @@
   },
   "experience": [
     {
-      "org": "Chen Laboratory",
-      "place": "Brown University · Providence, RI",
+      "org": "Xiaodi Chen Laboratory",
+      "place": "Brown University | Women & Infants Hospital · Providence, RI",
       "title": "Undergraduate Researcher",
       "date": "May 2026 – Present",
       "summary": "Behavioral neuroscience research in a neuroprotection lab, turning recurring manual analyses into repeatable data workflows.",
-      "link": "https://www.brown.edu",
-      "link_label": "brown.edu",
+      "link": "https://vivo.brown.edu/display/xc24",
+      "link_label": "About the Chen Lab",
       "bullets": [
         "Build R and Python (pandas) data pipelines over 4.5 TB of behavioral and imaging data for a neonatal brain injury study, converting recurring manual analyses into repeatable workflows.",
         "Built monitoring dashboards tracking analysis progress and data quality for the PI and lab team, with automated alerts for stalled or failed runs."
