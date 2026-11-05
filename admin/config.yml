@@ -85,6 +85,32 @@ collections:
               - { label: "Blurb", name: blurb, widget: text, required: false }
               - { label: "Email", name: email, widget: string }
               - { label: "LinkedIn URL", name: linkedin, widget: string }
+      - name: project-alpbrowser
+        label: "Project: Alp Browser"
+        file: "data/projects/alpbrowser.json"
+        fields:
+          - { label: "Title", name: title, widget: string }
+          - { label: "Tagline", name: tagline, widget: text }
+          - label: "Story paragraphs"
+            name: story
+            widget: list
+            field: { label: "Paragraph", name: paragraph, widget: text }
+          - label: "Facts"
+            name: facts
+            widget: list
+            fields:
+              - { label: "Label", name: label, widget: string }
+              - { label: "Value", name: value, widget: string }
+          - label: "Gallery images"
+            name: gallery
+            widget: list
+            field: { label: "Image", name: image, widget: image }
+          - label: "Links"
+            name: links
+            widget: list
+            fields:
+              - { label: "Label", name: label, widget: string }
+              - { label: "URL", name: url, widget: string }
       - name: project-kotoban
         label: "Project: Kotoban"
         file: "data/projects/kotoban.json"
