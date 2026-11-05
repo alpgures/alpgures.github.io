@@ -148,13 +148,13 @@ section h2 {
 
 .chips .chip {
   display: inline-block;
-  font-size: 14.5px;
+  font-size: 17px;
   font-weight: 500;
   color: var(--muted);
   background: rgba(27, 29, 34, 0.8);
   border: 1px solid var(--line);
   border-radius: 999px;
-  padding: 5px 14px;
+  padding: 6px 17px;
   white-space: nowrap;
   animation: chip-bob ease-in-out infinite;
 }
