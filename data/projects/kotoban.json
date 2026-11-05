@@ -32,12 +32,13 @@
   ],
   "links": [
     {
-      "label": "kotoban.app",
+      "label": "Try kotobạn!",
       "url": "https://kotoban.app"
     }
   ],
   "story": [
-    "The name mashes up 言葉 (kotoba, Japanese for “word”) and bạn (Vietnamese for “friend”). I was studying Japanese and Vietnamese at the same time and couldn't find one app that did spaced repetition, dictionary lookup, and reading practice the way I wanted. So I built it.",
+    "When I first started learning Vietnamese, my fifth language, I found it increasingly difficult to learn all the vocabulary needed while retaining all of my Japanese and German knowledge. I had tried spaced repetition on flashcards before, and as great as they were for Biology classes, they didn't feel interactive enough for hands-on language learning. That's when I was inspired to build kotobạn. ",
+    "The name mashes up 言葉 (kotoba, Japanese for “word”) and bạn (Vietnamese for “friend”). Word friend!",
     "kotobạn is a multi-user progressive web app, currently in invite-only closed beta. It has a full design system — Ink & Lacquer, in light and dark — built mobile-first at 390px and scaled up. Under the hood it's FastAPI and SQLite on an Oracle Cloud box, with magic-link sign-in, invite requests, and an admin portal.",
     "The content pipeline is the part I'm proudest of: vocabulary and reading material across twelve languages, generated and curated in batches, with audio throughout. It's the study tool I wished existed, and now it's the one I actually use."
   ],
