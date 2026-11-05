@@ -494,7 +494,7 @@
         var heroEl = document.querySelector(".hero .hero-inner");
         // Fade zones are the ACTUAL text of each hero line (measured with a
         // Range, so block width never counts), not the whole hero-inner box.
-        // Chips centred on the text fade to 10% of base opacity, so the
+        // Chips centred on the text fade to 20% of base opacity, so the
         // words stay legible; chips in the dead space beside a line stay
         // bright — only a centre actually on the text dims.
         var heroRects = [];
@@ -551,10 +551,14 @@
                       (c._gx !== undefined && c._gx > hb.x0 && c._gx < hb.x1 && c._gy > hb.y0 && c._gy < hb.y1)) { behind = true; break; }
                 }
                 /* Bubbles behind a hero text line dim so the text stays
-                   legible — but the floor is 0.35, not 0.10: at 0.10 the
-                   bubbles near the text went nearly invisible, which
-                   read as broken, not as legibility (Alp, 2026-11-05). */
-                var tgt = behind ? 0.35 : 1;
+                   legible — the floor is 0.20. At 0.10 the bubbles near
+                   the text went nearly invisible, which read as broken
+                   (Alp, 2026-11-05); at 0.35 the dimming was too subtle
+                   to read as dimming at all on the live site, because the
+                   18% tint was already faint (Alp, 2026-11-05). With the
+                   stronger 30% tint, 0.20 stays clearly present while
+                   reading as clearly dimmer than full. */
+                var tgt = behind ? 0.2 : 1;
                 c.op += (tgt - c.op) * Math.min(1, dt * 5);
                 if (Math.abs(c.op - c._lastOp) > 0.02) {
                   c.el.firstChild.style.opacity = (c.baseOp * c.op).toFixed(3);

@@ -10,7 +10,7 @@
   --surface: #1b1d22;
   --soft: #c9c5ba;
   /* Liquid-glass rim strength (Alp's prototype setting, 2026-11-05). */
-  --rim: 0.45;
+  --rim: 0.6;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -321,10 +321,11 @@ section h2 {
      backdrop-filter: url() check get html.glass-ok and the real
      refraction (SVG displacement filter #lg, defined in index.html).
      The 7% glass tint was still barely visible on the dark sky even
-     at full opacity (Alp, 2026-11-05), so the glass tier now uses an
-     18% tint and a 38% rim — clearly present, still translucent. */
-  background: rgba(27, 29, 34, 0.6);
-  border: 1px solid var(--line);
+     at full opacity (Alp, 2026-11-05), and 18% was still too faint
+     (Alp, 2026-11-05, live on his Mac). The glass tier now uses a
+     30% tint and a 55% rim — clearly present, still translucent. */
+  background: rgba(27, 29, 34, 0.72);
+  border: 1px solid rgba(231, 228, 219, 0.3);
   border-radius: 999px;
   padding: 6px 17px;
   white-space: nowrap;
@@ -336,8 +337,8 @@ section h2 {
     inset 0 -10px 18px rgba(0, 0, 0, 0.18);
 }
 html.glass-ok .chips .chip {
-  background: rgba(231, 228, 219, 0.18);
-  border-color: rgba(231, 228, 219, 0.38);
+  background: rgba(231, 228, 219, 0.3);
+  border-color: rgba(231, 228, 219, 0.55);
   backdrop-filter: url(#lg);
   -webkit-backdrop-filter: url(#lg);
 }
@@ -431,21 +432,24 @@ html.glass-ok .chips .chip {
    hero text fade). */
 .scroll-cue {
   position: absolute;
-  right: 28px;
-  bottom: 28px;
+  right: 44px;
+  bottom: 44px;
   z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   color: var(--muted);
   text-decoration: none;
   transition: opacity 0.3s ease;
 }
 .scroll-cue:hover { color: var(--ink); text-decoration: none; }
 .scroll-cue-text {
-  font-size: 12px;
-  letter-spacing: 0.1em;
+  /* Newsreader serif, not the plain Inter sans — Alp hates the sans here
+     (2026-11-05), and the cue was too small and too close to the corner. */
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 15px;
+  letter-spacing: 0.04em;
   white-space: nowrap;
   animation: cue-float 3.2s ease-in-out infinite;
 }
@@ -613,8 +617,8 @@ main:has(#contact) + footer { border-top: none; }
   .nav-hero.scrolled { padding: 14px 0; }
   .nav-row { padding: 0 20px; }
   .nav-hero .nav-links { display: none; }
-  .scroll-cue { right: 20px; bottom: 20px; }
-  .scroll-cue-text { font-size: 11px; }
+  .scroll-cue { right: 28px; bottom: 28px; }
+  .scroll-cue-text { font-size: 13px; }
   .hero { padding: 56px 0 28px; }
   .hero-inner { max-width: 400px; padding: 0 20px; }
   .hero-love { font-size: min(8vw, 31px) !important; }
