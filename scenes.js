@@ -85,7 +85,7 @@ function sceneAlpbrowser() {
     '<text x="252" y="136" text-anchor="middle" font-size="9" font-family="Inter, sans-serif" fill="#6f6a62">human-first, AI-second.</text>' +
     '<text x="282" y="160" text-anchor="end" font-size="9" font-family="Inter, sans-serif" fill="#5b6b84">Read the story</text>' +
     '<path d="M287 157 H294 M290 153 L295 157 L290 161" fill="none" stroke="#5b6b84" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>' +
-    '<circle cx="298" cy="196" r="20" fill="none" stroke="#5b6b84" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="88 126" transform="rotate(-90 298 196)"/>' +
+    '<g class="scn-ringspin"><circle cx="298" cy="196" r="20" fill="none" stroke="#5b6b84" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="88 126" transform="rotate(-90 298 196)"/></g>' +
     "</g></svg>"
   );
 }

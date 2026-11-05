@@ -175,6 +175,12 @@
 .sc-alp .scn-dot { animation: scn-float 5.2s ease-in-out infinite; }
 .sc-alp .scn-dot.d2 { animation-delay: -1.7s; }
 
+.sc-alp .scn-ringspin {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: scn-spin 1.2s linear infinite;
+}
+
 .sc-alp .scn-tab rect { animation: scn-tab-cycle 9s var(--ease-flow) infinite; }
 .sc-alp .scn-tab.t2 rect { animation-delay: -3s; }
 .sc-alp .scn-tab.t3 rect { animation-delay: -6s; }
