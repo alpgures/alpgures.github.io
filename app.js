@@ -234,7 +234,11 @@
           } else {
             var ltr = Math.random() < 0.5;
             c.mode = "traverse";
-            c.fx = ltr ? -0.22 : 1.12; c.tx = ltr ? 1.12 : -0.22;
+            // Edge wraparound: the run starts just off one edge and ends
+            // just off the other, so a bubble that leaves right starts
+            // coming back from the left at once instead of vanishing for
+            // ~40s of overshoot mid-cycle.
+            c.fx = ltr ? -0.02 : 1.02; c.tx = ltr ? 1.02 : -0.02;
             c.lane = 0.08 + ((i + Math.random()) / n) * 0.38;
             c.dy = Math.random() * 0.07 - 0.035;
             // Start on screen: pick the initial crossing point inside the
