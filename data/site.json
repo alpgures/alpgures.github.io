@@ -120,7 +120,7 @@
   },
   "projects": [
     {
-      "blurb": "A native macOS browser, rewritten from scratch in Swift — same sidebar, spaces, and speed, all original code.",
+      "blurb": "A native macOS browser, rewritten from scratch in Swift — perfect replacement to my favorite browser getting sunset. ",
       "featured": true,
       "image": "",
       "slug": "alpbrowser",
