@@ -469,6 +469,8 @@
         function greetDisplay(w) {
           // Latin-alphabet greetings get a capital in the headline box;
           // the floating bubbles keep their own casing.
+          // Spanish gets its opening mark in the headline only: ¡Hola!
+          if (w.toLowerCase() === "hola") return "¡Hola";
           if (/^[a-z]/.test(w)) return w.charAt(0).toUpperCase() + w.slice(1);
           return w;
         }
