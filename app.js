@@ -446,7 +446,13 @@
         // ghost (wrap mirror) — ghosts used to overlap silently at the
         // edges, which is how chips got too close. Pushes go into the
         // decaying offset, never into the trajectory.
-        function separatePair(A, B, w) {
+        // NOTE (2026-11-05): the pushes used to be instant 12px jumps on
+        // ANY contact (q2 < 1), every 3rd frame — a visible sawtooth shake,
+        // worse on 120Hz displays where they fired twice as often. Now
+        // only genuine overlap (q2 < 0.7) pushes, half as hard, and scaled
+        // by dt so the total push per second is the same at any refresh
+        // rate. Barely-touching chips just drift past each other.
+        function separatePair(A, B, w, dt) {
           var ptsA = [[A._x, A._y]];
           if (A.ghost && A._gx > -A._rx && A._gx < w + A._rx) ptsA.push([A._gx, A._gy]);
           var ptsB = [[B._x, B._y]];
@@ -457,18 +463,18 @@
               var dx = ptsB[j][0] - ptsA[i][0], dy = ptsB[j][1] - ptsA[i][1];
               var qx = dx / rx, qy = dy / ry;
               var q2 = qx * qx + qy * qy;
-              if (q2 < 1 && q2 > 0.0001) {
+              if (q2 < 0.7 && q2 > 0.0001) {
                 var q = Math.sqrt(q2);
                 var d = Math.sqrt(dx * dx + dy * dy);
                 var nx = dx / d, ny = dy / d;
-                var push = (1 - q) * 12;
+                var push = (1 - q) * 6 * Math.min(2, dt * 60);
                 A.ox -= nx * push; A.oy -= ny * push;
                 B.ox += nx * push; B.oy += ny * push;
               }
             }
           }
         }
-        function collide() {
+        function collide(dt) {
           var w = CW();
           for (var a = 0; a < chips.length; a++) {
             var A = chips[a];
@@ -476,7 +482,7 @@
             for (var b = a + 1; b < chips.length; b++) {
               var B = chips[b];
               if (B.dragging) continue;
-              separatePair(A, B, w);
+              separatePair(A, B, w, dt);
             }
           }
         }
@@ -491,7 +497,15 @@
           }
         }
         measure();
-        var heroEl = document.querySelector(".hero .hero-inner");
+        /* NOTE (2026-11-05): this must NOT be named `heroEl`. A second
+           `var heroEl` for the scroll handler (".hero") lives in the same
+           function scope below, and `var` is function-scoped — it silently
+           overwrote this reference with `.hero`, so measureHero() measured
+           .hero's children (.hero-bg, .hero-inner, .scroll-cue) instead of
+           the text lines. .hero-bg's Range covers the whole hero plus the
+           ghost chips a full width to the left, so EVERY chip tested as
+           behind the text and sat at the 0.20 dim floor. */
+        var heroInnerEl = document.querySelector(".hero .hero-inner");
         // Fade zones are the ACTUAL text of each hero line (measured with a
         // Range, so block width never counts), not the whole hero-inner box.
         // Chips centred on the text fade to 20% of base opacity, so the
@@ -500,10 +514,10 @@
         var heroRects = [];
         function measureHero() {
           heroRects = [];
-          if (!heroEl) return;
+          if (!heroInnerEl) return;
           var r = chipsBox.getBoundingClientRect();
           var padX = 14, padY = 10;
-          var kids = heroEl.children;
+          var kids = heroInnerEl.children;
           for (var mi = 0; mi < kids.length; mi++) {
             try {
               var rg = document.createRange();
@@ -522,7 +536,7 @@
         if (document.fonts && document.fonts.ready)
           document.fonts.ready.then(function () { measureHero(); measure(); });
         (function frame(now) {
-          var dt = Math.min(0.1, (now - last) / 1000); last = now;
+          var dt = Math.max(0, Math.min(0.1, (now - last) / 1000)); last = now;
           if (!reduced) {
             for (var k = 0; k < chips.length; k++) {
               var c = chips[k];
@@ -567,7 +581,7 @@
                 }
               }
             }
-            if (++frameNo % 3 === 0) collide();
+            if (++frameNo % 3 === 0) collide(dt);
             // Rotating words change line widths; re-measure fade zones
             // regularly so the halo tracks the current word.
             if (frameNo % 30 === 0) measureHero();
