@@ -90,16 +90,19 @@
         var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         var CW = function () { return chipsBox.clientWidth; };
         var CH = function () { return chipsBox.clientHeight; };
-        // wanderer pockets: open airspace, never over mountains or text.
-        // The last two flank the hero text so bubbles surround it;
-        // chips behind the text fade out (see frame loop) to stay legible.
+        // wanderer pockets: open airspace, never over mountains. The last
+        // three are the halo: right of the text, right of the buttons, and
+        // above the greeting, so bubbles frame the hero instead of hugging
+        // the edges. Chips that land on a line of text fade out (see frame
+        // loop) to stay legible; chips beside a line stay visible.
         var pockets = [
           [0.02, 0.20, 0.08, 0.30],
           [0.80, 0.96, 0.08, 0.30],
           [0.03, 0.18, 0.38, 0.50],
           [0.80, 0.97, 0.38, 0.55],
           [0.62, 0.90, 0.28, 0.50],
-          [0.10, 0.45, 0.58, 0.68]
+          [0.36, 0.62, 0.44, 0.58],
+          [0.08, 0.50, 0.05, 0.16]
         ];
         // Mountain-aware ceiling: sample the RENDERED ridge paths (so slice
         // cropping, responsive sizes etc. are all accounted for) and forbid
@@ -358,16 +361,29 @@
         }
         measure();
         var heroEl = document.querySelector(".hero .hero-inner");
-        var heroBox = null;
+        // Fade zones are the ACTUAL text of each hero line (measured with a
+        // Range, so block width never counts), not the whole hero-inner box.
+        // That used to swallow the halo: anything near the text faded to
+        // ~10% and the bubbles read as edge decoration instead of a frame.
+        var heroRects = [];
         function measureHero() {
+          heroRects = [];
           if (!heroEl) return;
           var r = chipsBox.getBoundingClientRect();
-          var h = heroEl.getBoundingClientRect();
-          var padX = 46, padY = 26;
-          heroBox = {
-            x0: h.left - r.left - padX, x1: h.right - r.left + padX,
-            y0: h.top - r.top - padY, y1: h.bottom - r.top + padY
-          };
+          var padX = 14, padY = 10;
+          var kids = heroEl.children;
+          for (var mi = 0; mi < kids.length; mi++) {
+            try {
+              var rg = document.createRange();
+              rg.selectNodeContents(kids[mi]);
+              var b = rg.getBoundingClientRect();
+              if (!b.width || !b.height) continue;
+              heroRects.push({
+                x0: b.left - r.left - padX, x1: b.right - r.left + padX,
+                y0: b.top - r.top - padY, y1: b.bottom - r.top + padY
+              });
+            } catch (e) {}
+          }
         }
         measureHero();
         window.addEventListener("resize", function () { measureHero(); measure(); });
@@ -391,9 +407,12 @@
                 c.free = Math.max(0, c.free - dt / 4.5);
               }
               place(c);
-              if (heroBox) {
-                var behind = c._x > heroBox.x0 && c._x < heroBox.x1 &&
-                             c._y > heroBox.y0 && c._y < heroBox.y1;
+              if (heroRects.length) {
+                var behind = false;
+                for (var bi = 0; bi < heroRects.length; bi++) {
+                  var hb = heroRects[bi];
+                  if (c._x > hb.x0 && c._x < hb.x1 && c._y > hb.y0 && c._y < hb.y1) { behind = true; break; }
+                }
                 var tgt = behind ? 0.14 : 1;
                 c.op += (tgt - c.op) * Math.min(1, dt * 5);
                 if (Math.abs(c.op - c._lastOp) > 0.02) {
@@ -403,6 +422,9 @@
               }
             }
             if (++frameNo % 3 === 0) collide();
+            // Rotating words change line widths; re-measure fade zones
+            // regularly so the halo tracks the current word.
+            if (frameNo % 30 === 0) measureHero();
           }
           requestAnimationFrame(frame);
         })(last);
