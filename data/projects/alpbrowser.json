@@ -1,1 +1,37 @@
-{"facts":[{"label":"Status","value":"In development — clean-room rewrite in progress"},{"label":"Platform","value":"Native macOS app (SwiftUI + AppKit)"},{"label":"Engine","value":"WKWebView, with tab hibernation and a built-in ad blocker"},{"label":"Sync","value":"Encrypted sidebar vaults via my own server"},{"label":"License","value":"MIT (planned)"}],"links":[{"label":"alpbrowser.app","url":"https://alpbrowser.app"}],"story":["I loved Arc — the sidebar, the spaces, the way tabs got out of the way. But I wanted a browser that was mine, built from scratch, and open for anyone to read.","So I'm rewriting it clean-room: native SwiftUI and AppKit on WKWebView, with the same spaces, three-tier sidebar, one-click import from my own Arc data, tab hibernation, and a built-in ad blocker. No code from Arc, no Arc assets, no Arc trademarks — the look and feel, rebuilt.","It's in development now, and when it's ready it will be MIT-licensed and live at alpbrowser.app."],"tagline":"Your new favorite browser — human-first, AI-second.","title":"Alp Browser"}
+{
+  "facts": [
+    {
+      "label": "Status",
+      "value": "In development — clean-room rewrite in progress"
+    },
+    {
+      "label": "Platform",
+      "value": "Native macOS app (SwiftUI + AppKit)"
+    },
+    {
+      "label": "Engine",
+      "value": "WKWebView, with tab hibernation and a built-in ad blocker"
+    },
+    {
+      "label": "Sync",
+      "value": "Encrypted sidebar vaults stored on Oracle Cloud. "
+    },
+    {
+      "label": "License",
+      "value": "MIT (planned)"
+    }
+  ],
+  "links": [
+    {
+      "label": "Check out Alp Browser",
+      "url": "https://alpbrowser.app"
+    }
+  ],
+  "story": [
+    "For the past couple of years, I'd been lovingly using Arc Browser. I loved its sidebar, the spaces, the way tabs got out of the way. When they announced its shutdown, I was devastated, and I knew I wanted a browser that I could depend on in the long term — built with productivity, convenience, and privacy in mind. ",
+    "So I'm rewriting it clean-room: native SwiftUI and AppKit on WKWebView, with the same spaces, three-tier sidebar, one-click import from my own Arc data, tab hibernation, and a built-in ad blocker. No code from Arc, no Arc assets, no Arc trademarks. The look and feel, rebuilt.",
+    "It's in development now, and when it's ready it will be live at alpbrowser.app!"
+  ],
+  "tagline": "Say hello to Alp. (not me, the browser)",
+  "title": "Alp Browser"
+}
