@@ -9,6 +9,8 @@
   --accent-soft: #232b38;
   --surface: #1b1d22;
   --soft: #c9c5ba;
+  /* Liquid-glass rim strength (Alp's prototype setting, 2026-11-05). */
+  --rim: 0.45;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -51,7 +53,16 @@ html { scroll-behavior: smooth; }
   will-change: transform;
 }
 .work-scroll .cards .card { flex: 0 0 520px; }
-.work-scroll .cards .card-wide { flex-basis: 760px; }
+/* In the carousel every card is vertical (scene on top, text below),
+   including the Alp Browser featured card — the wide side-by-side layout
+   only applies in the grid (mobile fallback). */
+.work-scroll .cards .card-wide {
+  flex: 0 0 520px;
+  display: flex;
+  flex-direction: column;
+}
+.work-scroll .cards .card-wide .card-body { padding: 18px 20px 20px; }
+.work-scroll .cards .card-wide .card-body h3 { font-size: 22px; }
 
 /* Mobile + reduced motion: the carousel becomes the plain vertical grid. */
 @media (max-width: 700px), (prefers-reduced-motion: reduce) {
@@ -96,21 +107,43 @@ a:hover { text-decoration: underline; }
   top: 0;
   z-index: 10;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 14px 28px;
-  /* Transparent over the hero; frosts in once you scroll. */
-  background: rgba(20, 21, 24, 0);
-  backdrop-filter: blur(0px);
-  border-bottom: 1px solid transparent;
+  /* Frosted bar by default (project / experience pages). The homepage
+     overrides this with .nav-hero (gradient, scrolls away). */
+  background: rgba(20, 21, 24, 0.85);
+  backdrop-filter: blur(14px) saturate(1.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  border-bottom: 1px solid var(--line);
   transition: background 0.4s ease, backdrop-filter 0.4s ease, border-color 0.4s ease;
 }
-.nav.scrolled {
+/* Homepage hero nav: blends into the hero with a vertical dark-to-
+   transparent gradient (dark behind the buttons, fading out just below
+   them), then scrolls away with the hero. It only comes back once you've
+   scrolled past the hero, fading in as a frosted bar (kotoban-style). */
+.nav-hero {
+  position: absolute;
+  left: 0;
+  right: 0;
+  padding: 14px 28px 36px;
+  background: linear-gradient(to bottom, rgba(20, 21, 24, 0.92) 0%, rgba(20, 21, 24, 0.92) 60%, rgba(20, 21, 24, 0) 100%);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: none;
+}
+.nav-hero.scrolled {
+  position: fixed;
+  left: 0;
+  right: 0;
+  padding: 14px 28px;
   background: rgba(20, 21, 24, 0.78);
   backdrop-filter: blur(14px) saturate(1.4);
   -webkit-backdrop-filter: blur(14px) saturate(1.4);
-  border-bottom-color: var(--line);
+  border-bottom: 1px solid var(--line);
+  animation: nav-fade-in 0.45s ease;
 }
+@keyframes nav-fade-in { from { opacity: 0; } to { opacity: 1; } }
 /* Hairline reading-progress bar, driven by --scroll-progress in app.js. */
 .nav::after {
   content: "";
@@ -124,6 +157,10 @@ a:hover { text-decoration: underline; }
 }
 
 .nav-name {
+  position: absolute;
+  left: 28px;
+  top: 50%;
+  transform: translateY(-50%);
   font-family: "Newsreader", Georgia, serif;
   font-weight: 600;
   font-size: 19px;
@@ -240,7 +277,7 @@ section h2 {
   backdrop-filter: blur(10px) saturate(1.3);
   -webkit-backdrop-filter: blur(10px) saturate(1.3);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, var(--rim)),
     inset 0 -10px 18px rgba(0, 0, 0, 0.18);
 }
 html.glass-ok .chips .chip {
@@ -473,6 +510,7 @@ main:has(#contact) + footer { border-top: none; }
 
 @media (max-width: 600px) {
   .nav-links a:not(.nav-resume) { display: none; }
+  .nav-name { left: 20px; }
   .hero { padding: 56px 0 28px; }
   .hero-inner { max-width: 400px; padding: 0 20px; }
   .hero-love { font-size: min(8vw, 31px) !important; }

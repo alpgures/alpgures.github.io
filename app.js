@@ -289,7 +289,7 @@
           var inner = document.createElement("span");
           inner.className = "chip";
           inner.textContent = w;
-          inner.style.opacity = (0.45 + Math.random() * 0.3).toFixed(2);
+          inner.style.opacity = (0.85 + Math.random() * 0.15).toFixed(2);
           inner.style.animationDuration = (16 + Math.random() * 8).toFixed(1) + "s";
           inner.style.animationDelay = (-Math.random() * 10).toFixed(1) + "s";
           outer.appendChild(inner);
@@ -773,7 +773,14 @@
           var y = window.scrollY || 0;
           var max = document.documentElement.scrollHeight - window.innerHeight;
           document.documentElement.style.setProperty("--scroll-progress", (max > 0 ? (y / max) * 100 : 0) + "%");
-          if (navEl) navEl.classList.toggle("scrolled", y > 40);
+          if (navEl) {
+            /* The hero nav scrolls away with the hero; it only comes back
+               (frosted, fading in) once the work section reaches the top
+               of the viewport — i.e. you've navigated away from the hero. */
+            var ws = document.querySelector(".work-scroll");
+            var showNav = ws ? ws.getBoundingClientRect().top <= 100 : y > 40;
+            navEl.classList.toggle("scrolled", showNav);
+          }
           if (reducedMotion) return;
           var h = heroEl ? heroEl.offsetHeight : 1;
           var p = Math.min(y / h, 1);
