@@ -176,6 +176,22 @@
           }
         }
 
+        // Position a traverser's main chip and its wrap mirror together.
+        // _x/_y track the primary (on-screen) copy for fade/collision;
+        // _gx/_gy track the other copy so the fade check covers edge
+        // crossings, where both copies are partly visible at once.
+        function syncPair(c, mx, my) {
+          c.el.style.transform = "translate(" + mx.toFixed(1) + "px," + my.toFixed(1) + "px)";
+          var gx = mx;
+          if (c.mode === "traverse" && c.ghost) {
+            gx = mx - (c.tx - c.fx) * CW();
+            c.ghost.style.transform = "translate(" + gx.toFixed(1) + "px," + my.toFixed(1) + "px)";
+          }
+          if (c.mode === "traverse" && c.ghost && c.tx < c.fx) { c._x = gx; c._gx = mx; }
+          else { c._x = mx; c._gx = gx; }
+          c._y = my; c._gy = my;
+        }
+
         function place(c) {
           var w = CW(), h = CH(), sx, sy;
           if (c.mode === "traverse") {
@@ -201,8 +217,7 @@
           var f = c.free * c.free;
           var x = sx * (1 - f) + c.px * f;
           var y = sy * (1 - f) + c.py * f;
-          c.el.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px)";
-          c._x = x; c._y = y;
+          syncPair(c, x, y);
         }
 
         words.forEach(function (w, i) {
@@ -234,62 +249,97 @@
           } else {
             var ltr = Math.random() < 0.5;
             c.mode = "traverse";
-            // Edge wraparound: the run starts just off one edge and ends
-            // just off the other, so a bubble that leaves right starts
-            // coming back from the left at once instead of vanishing for
-            // ~40s of overshoot mid-cycle.
-            c.fx = ltr ? -0.02 : 1.02; c.tx = ltr ? 1.02 : -0.02;
+            // Seamless wrap: the run spans exactly one screen width
+            // (left-to-right, or right-to-left as 0 to -1), and a mirror
+            // copy rides exactly one width over, so the slice of a chip
+            // that exits one side enters the other side at the same time.
+            c.fx = 0; c.tx = ltr ? 1 : -1;
             c.lane = 0.08 + ((i + Math.random()) / n) * 0.38;
             c.dy = Math.random() * 0.07 - 0.035;
             // Start on screen: pick the initial crossing point inside the
             // viewport instead of a random phase, so no drifter begins its
             // life off canvas and the hero reads full from the first frame.
             var sx0 = 0.02 + Math.random() * 0.96;
-            c.t = (sx0 - c.fx) / (c.tx - c.fx); c.sp = 1 / (180 + Math.random() * 60);
+            c.t = ltr ? sx0 : 1 - sx0; c.sp = 1 / (180 + Math.random() * 60);
           }
           outer.className = c.mode === "wander" ? "chip-w" : "chip-x";
           outer._chip = c;
           chips.push(c);
 
-          inner.addEventListener("pointerdown", function (ev) {
-            ev.preventDefault();
-            var cc = outer._chip;
-            cc.dragging = true; cc.free = 0;
-            cc.vx = 0; cc.vy = 0; cc._mx = undefined;
-            try { inner.setPointerCapture(ev.pointerId); } catch (e) {}
-            var r = chipsBox.getBoundingClientRect();
-            cc.grabDX = ev.clientX - r.left - cc._x;
-            cc.grabDY = ev.clientY - r.top - cc._y;
-            inner.style.cursor = "grabbing";
-          });
-          inner.addEventListener("pointermove", function (ev) {
-            var cc = outer._chip;
-            if (!cc.dragging) return;
-            var r = chipsBox.getBoundingClientRect();
-            var x = ev.clientX - r.left - cc.grabDX;
-            var y = ev.clientY - r.top - cc.grabDY;
-            var nowT = ev.timeStamp / 1000;
-            if (cc._mx !== undefined) {
-              var dtm = Math.max(0.008, nowT - cc._mt);
-              cc.vx = cc.vx * 0.7 + ((x - cc._mx) / dtm) * 0.3;
-              cc.vy = cc.vy * 0.7 + ((y - cc._my) / dtm) * 0.3;
-            }
-            cc._mx = x; cc._my = y; cc._mt = nowT;
-            cc.el.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px)";
-            cc._x = x; cc._y = y;
-          });
+          // Seamless-wrap mirror: traversers render a second copy exactly
+          // one screen width over, so the slice exiting one side enters
+          // the other side at once. The mirror is a clone (same text, same
+          // bob phase: identical duration/delay, inserted in the same
+          // frame), and it drags as one with the main chip.
+          var gInner = null;
+          if (c.mode === "traverse") {
+            var gOuter = document.createElement("span");
+            gInner = inner.cloneNode(true);
+            gOuter.appendChild(gInner);
+            gOuter.className = "chip-x";
+            chipsBox.appendChild(gOuter);
+            c.ghost = gOuter;
+          }
+
+          function bindChipDrag(elInner, isGhost) {
+            elInner.addEventListener("pointerdown", function (ev) {
+              ev.preventDefault();
+              var cc = outer._chip;
+              cc.dragging = true; cc.free = 0;
+              cc.vx = 0; cc.vy = 0; cc._mx = undefined;
+              try { elInner.setPointerCapture(ev.pointerId); } catch (e) {}
+              var r = chipsBox.getBoundingClientRect();
+              // Grab against whichever copy was actually touched.
+              var gx0 = isGhost ? (cc.tx > cc.fx ? cc._gx : cc._x) : (cc.tx > cc.fx ? cc._x : cc._gx);
+              cc.grabDX = ev.clientX - r.left - gx0;
+              cc.grabDY = ev.clientY - r.top - cc._y;
+              cc._grabGhost = isGhost;
+              elInner.style.cursor = "grabbing";
+            });
+            elInner.addEventListener("pointermove", function (ev) {
+              var cc = outer._chip;
+              if (!cc.dragging) return;
+              var r = chipsBox.getBoundingClientRect();
+              var x = ev.clientX - r.left - cc.grabDX;
+              var y = ev.clientY - r.top - cc.grabDY;
+              var nowT = ev.timeStamp / 1000;
+              if (cc._mx !== undefined) {
+                var dtm = Math.max(0.008, nowT - cc._mt);
+                cc.vx = cc.vx * 0.7 + ((x - cc._mx) / dtm) * 0.3;
+                cc.vy = cc.vy * 0.7 + ((y - cc._my) / dtm) * 0.3;
+              }
+              cc._mx = x; cc._my = y; cc._mt = nowT;
+              // A grab on the mirror moves the pair: translate the pointer
+              // back to main coordinates, then sync both copies.
+              var mx = cc._grabGhost ? x + (cc.tx - cc.fx) * r.width : x;
+              syncPair(cc, mx, y);
+            });
+            elInner.addEventListener("pointerup", drop);
+            elInner.addEventListener("pointercancel", drop);
+            elInner.addEventListener("wheel", function (ev) {
+              ev.preventDefault();
+              var cc = outer._chip;
+              if (cc.mode === "traverse") cc.t += ev.deltaY * 0.0004;
+              else cc.t += ev.deltaY * 0.03;
+              if (!cc.dragging) place(cc);
+            }, { passive: false });
+          }
           function drop() {
             var cc = outer._chip;
             if (!cc.dragging) return;
             cc.dragging = false;
             inner.style.cursor = "";
+            if (cc.ghost) cc.ghost.firstChild.style.cursor = "";
+            cc._grabGhost = false;
             var sp = Math.sqrt(cc.vx * cc.vx + cc.vy * cc.vy);
             if (sp > 1400) { cc.vx *= 1400 / sp; cc.vy *= 1400 / sp; }
             // permanently rebase the trajectory through the drop point,
-            // so the chip keeps its new path instead of snapping back
+            // so the chip keeps its new path instead of snapping back.
+            // _x is the primary (visible) copy; convert to main coords.
             var rr = chipsBox.getBoundingClientRect();
             var ww = rr.width || 1, hh = rr.height || 1;
-            var dx = cc._x / ww, dy = cc._y / hh;
+            var mainX = (cc.mode === "traverse" && cc.ghost) ? (cc.tx > cc.fx ? cc._x : cc._gx) : cc._x;
+            var dx = mainX / ww, dy = cc._y / hh;
             dy = Math.min(dy, skyLimit(Math.max(0, Math.min(1, dx))) - 0.02);
             dy = Math.max(0.02, dy);
             if (cc.mode === "traverse") {
@@ -301,18 +351,11 @@
               cc.bx = Math.max(0.01, Math.min(0.95, dx));
               cc.by = Math.max(0.03, Math.min(maxWanderY(cc.bx, cc.ay), dy));
             }
-            cc.px = cc._x; cc.py = cc._y; // fling from the drop point
+            cc.px = mainX; cc.py = cc._y; // fling from the drop point
             cc.free = 1;
           }
-          inner.addEventListener("pointerup", drop);
-          inner.addEventListener("pointercancel", drop);
-          inner.addEventListener("wheel", function (ev) {
-            ev.preventDefault();
-            var cc = outer._chip;
-            if (cc.mode === "traverse") cc.t += ev.deltaY * 0.0004;
-            else cc.t += ev.deltaY * 0.03;
-            if (!cc.dragging) place(cc);
-          }, { passive: false });
+          bindChipDrag(inner, false);
+          if (gInner) bindChipDrag(gInner, true);
         });
 
         chips.forEach(place);
@@ -423,12 +466,14 @@
                 var behind = false;
                 for (var bi = 0; bi < heroRects.length; bi++) {
                   var hb = heroRects[bi];
-                  if (c._x > hb.x0 && c._x < hb.x1 && c._y > hb.y0 && c._y < hb.y1) { behind = true; break; }
+                  if ((c._x > hb.x0 && c._x < hb.x1 && c._y > hb.y0 && c._y < hb.y1) ||
+                      (c._gx !== undefined && c._gx > hb.x0 && c._gx < hb.x1 && c._gy > hb.y0 && c._gy < hb.y1)) { behind = true; break; }
                 }
                 var tgt = behind ? 0.14 : 1;
                 c.op += (tgt - c.op) * Math.min(1, dt * 5);
                 if (Math.abs(c.op - c._lastOp) > 0.02) {
                   c.el.firstChild.style.opacity = (c.baseOp * c.op).toFixed(3);
+                  if (c.ghost) c.ghost.firstChild.style.opacity = (c.baseOp * c.op).toFixed(3);
                   c._lastOp = c.op;
                 }
               }
