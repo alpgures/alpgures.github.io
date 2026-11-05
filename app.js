@@ -1,6 +1,17 @@
 /* Renders alpgures.me from data/site.json (the file Decap CMS edits). */
 
 (function () {
+  /* Liquid-glass support check: only browsers that accept an SVG filter
+     reference in backdrop-filter get the refracting chips (html.glass-ok).
+     Safari drops url() there, which left the light glass tint nearly
+     invisible — those browsers keep the frosted pill instead. The check
+     runs synchronously here, before the chips are built. */
+  try {
+    var _g = document.createElement("div");
+    _g.style.backdropFilter = "url(#lg)";
+    if (_g.style.backdropFilter) document.documentElement.classList.add("glass-ok");
+  } catch (e) {}
+
   function get(obj, path) {
     return path.split(".").reduce(function (acc, key) {
       return acc == null ? acc : acc[key];
