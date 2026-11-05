@@ -265,7 +265,7 @@ section h2 {
   font-weight: 600;
   font-size: 16px;
   padding: 12px 26px;
-  border-radius: 999px;
+  border-radius: 16px;
 }
 .btn:hover { text-decoration: none; background: #7d8ca3; color: #141518; }
 
