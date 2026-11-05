@@ -550,7 +550,11 @@
                   if ((c._x > hb.x0 && c._x < hb.x1 && c._y > hb.y0 && c._y < hb.y1) ||
                       (c._gx !== undefined && c._gx > hb.x0 && c._gx < hb.x1 && c._gy > hb.y0 && c._gy < hb.y1)) { behind = true; break; }
                 }
-                var tgt = behind ? 0.10 : 1;
+                /* Bubbles behind a hero text line dim so the text stays
+                   legible — but the floor is 0.35, not 0.10: at 0.10 the
+                   bubbles near the text went nearly invisible, which
+                   read as broken, not as legibility (Alp, 2026-11-05). */
+                var tgt = behind ? 0.35 : 1;
                 c.op += (tgt - c.op) * Math.min(1, dt * 5);
                 if (Math.abs(c.op - c._lastOp) > 0.02) {
                   c.el.firstChild.style.opacity = (c.baseOp * c.op).toFixed(3);
@@ -758,6 +762,53 @@
       }, { threshold: 0.1 });
       document.querySelectorAll(".rv").forEach(function (el) { io.observe(el); });
 
+      /* Nav alignment: the nav row spans the hero text — its left edge is
+         the hero text's left edge and its right edge is the right edge of
+         the hero-sub line (the line ending in "real world."). The sub
+         line rarely fills its column exactly, so the row is sized from
+         the line's ACTUAL rendered width (Range, like the chip fade
+         zones), corrected for the heroInner scroll scale. Until the
+         measurement runs, the CSS fallback is the 740px hero column. */
+      function alignNavToHeroText() {
+        try {
+          var sub = document.querySelector(".hero-sub");
+          var navRow = document.querySelector(".nav-row");
+          var heroInner = document.querySelector(".hero-inner");
+          var navEl = document.querySelector(".nav");
+          if (!sub || !navRow || !heroInner || !navEl) return;
+          if (!sub.textContent.trim()) return;
+          var range = document.createRange();
+          range.selectNodeContents(sub);
+          var rects = range.getClientRects();
+          if (!rects.length) return;
+          // Correct for the heroInner scroll scale (transform-origin
+          // 50% 50%): layout x = centre + (screen x - centre) / scale.
+          var hr = heroInner.getBoundingClientRect();
+          var scale = heroInner.offsetWidth ? hr.width / heroInner.offsetWidth : 1;
+          if (!scale) scale = 1;
+          var cx = hr.left + hr.width / 2;
+          var left = Infinity, right = -Infinity;
+          for (var i = 0; i < rects.length; i++) {
+            if (!rects[i].width) continue;
+            left = Math.min(left, cx + (rects[i].left - cx) / scale);
+            right = Math.max(right, cx + (rects[i].right - cx) / scale);
+          }
+          if (!isFinite(left) || !isFinite(right) || right <= left) return;
+          var cs = getComputedStyle(navRow);
+          var padL = parseFloat(cs.paddingLeft) || 0;
+          var padR = parseFloat(cs.paddingRight) || 0;
+          var navPadL = parseFloat(getComputedStyle(navEl).paddingLeft) || 0;
+          navRow.style.width = (right - left + padL + padR) + "px";
+          navRow.style.marginLeft = (left - navPadL - padL) + "px";
+          navRow.style.marginRight = "auto";
+          navRow.style.maxWidth = "none";
+        } catch (e) { /* nav alignment is polish; never break the page */ }
+      }
+      alignNavToHeroText();
+      if (document.fonts && document.fonts.ready)
+        document.fonts.ready.then(alignNavToHeroText);
+      window.addEventListener("resize", alignNavToHeroText);
+
       // Apple-style scroll: the hero settles as you leave it, the mountains
       // parallax, the nav frosts in, and a hairline tracks reading progress.
       // rAF-throttled; transforms skipped entirely for reduced motion.
@@ -768,6 +819,23 @@
         var taurusEl = document.querySelector(".taurus");
         var navEl = document.querySelector(".nav");
         var scrollTicking = false;
+        /* Anchor jumps (nav Work / About / Contact, hero "See my work"):
+           a smooth scroll to a section below the work carousel sweeps
+           the whole 250vh track in under a second, so the card row
+           whips left extremely fast. While an anchor jump is running,
+           the carousel transform is frozen — the page still scrolls
+           smoothly and vertically, the cards just don't swipe. The
+           flag clears on scrollend (or a 1.2s safety timeout) and the
+           transform is re-synced to the landing scroll position. */
+        var anchorJumping = false;
+        var anchorJumpTimer = null;
+        function endAnchorJump() {
+          if (!anchorJumping && !anchorJumpTimer) return;
+          anchorJumping = false;
+          if (anchorJumpTimer) { clearTimeout(anchorJumpTimer); anchorJumpTimer = null; }
+          window.removeEventListener("scrollend", endAnchorJump);
+          onScrollFrame();
+        }
         function onScrollFrame() {
           scrollTicking = false;
           var y = window.scrollY || 0;
@@ -788,20 +856,31 @@
             heroInner.style.opacity = String(1 - p * 0.9);
             heroInner.style.transform = "translateY(" + (-28 - p * 40) + "px) scale(" + (1 - p * 0.04) + ")";
           }
+          /* Scroll cue fades out with the hero (gone once you've scrolled
+             past it); pointer-events off once invisible so it never
+             intercepts clicks over the work section. */
+          var cueEl = document.querySelector(".scroll-cue");
+          if (cueEl) {
+            cueEl.style.opacity = String(1 - p);
+            cueEl.style.pointerEvents = p > 0.85 ? "none" : "";
+          }
           if (taurusEl) taurusEl.style.transform = "translateY(" + Math.min(y * 0.18, 90) + "px)";
 
           // Horizontal work carousel: vertical scroll through the tall
-          // .work-scroll track drives the card row left.
-          var workSection = document.querySelector(".work-scroll");
-          var workRow = document.getElementById("project-cards");
-          if (workSection && workRow && !reducedMotion && window.innerWidth > 700) {
-            var rect = workSection.getBoundingClientRect();
-            var span = workSection.offsetHeight - window.innerHeight;
-            var prog = span > 0 ? Math.min(Math.max(-rect.top / span, 0), 1) : 0;
-            var maxX = Math.max(workRow.scrollWidth - window.innerWidth, 0);
-            workRow.style.transform = "translateX(" + (-prog * maxX) + "px)";
-          } else if (workRow) {
-            workRow.style.transform = "";
+          // .work-scroll track drives the card row left. Skipped while
+          // an anchor jump is running (see anchorJumping above).
+          if (!anchorJumping) {
+            var workSection = document.querySelector(".work-scroll");
+            var workRow = document.getElementById("project-cards");
+            if (workSection && workRow && !reducedMotion && window.innerWidth > 700) {
+              var rect = workSection.getBoundingClientRect();
+              var span = workSection.offsetHeight - window.innerHeight;
+              var prog = span > 0 ? Math.min(Math.max(-rect.top / span, 0), 1) : 0;
+              var maxX = Math.max(workRow.scrollWidth - window.innerWidth, 0);
+              workRow.style.transform = "translateX(" + (-prog * maxX) + "px)";
+            } else if (workRow) {
+              workRow.style.transform = "";
+            }
           }
         }
         function onScroll() {
@@ -812,6 +891,18 @@
         window.addEventListener("scroll", onScroll, { passive: true });
         window.addEventListener("resize", onScroll, { passive: true });
         onScroll();
+        /* Anchor-jump freeze: clicking a nav/hero anchor (Work, About,
+           Contact, "See my work", the scroll cue) starts a smooth
+           scroll; freeze the carousel until it lands so the card row
+           doesn't whip across while the page glides past it. */
+        Array.prototype.forEach.call(document.querySelectorAll('a[href^="#"]'), function (a) {
+          a.addEventListener("click", function () {
+            anchorJumping = true;
+            if (anchorJumpTimer) clearTimeout(anchorJumpTimer);
+            anchorJumpTimer = setTimeout(endAnchorJump, 1200);
+            window.addEventListener("scrollend", endAnchorJump);
+          });
+        });
       } catch (e) { /* scroll polish is optional; never break the page */ }
     })
     .catch(function (err) {

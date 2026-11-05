@@ -127,6 +127,11 @@ a:hover { text-decoration: underline; }
   left: 0;
   right: 0;
   padding: 14px 28px 36px;
+  /* flex-start, not center: the row is placed by its own margins
+     (auto margins centre it until the JS alignment sets an explicit
+     left margin). With center, the JS-set margins got re-centred and
+     the row shrank on narrow screens instead of holding its width. */
+  justify-content: flex-start;
   background: linear-gradient(to bottom, rgba(20, 21, 24, 0.92) 0%, rgba(20, 21, 24, 0.92) 60%, rgba(20, 21, 24, 0) 100%);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -163,10 +168,31 @@ a:hover { text-decoration: underline; }
   transform: translateY(-50%);
   font-family: "Newsreader", Georgia, serif;
   font-weight: 600;
-  font-size: 19px;
+  font-size: 23px;
+  /* Tight line-height: the name must never push the bar taller than the
+     Resume pill (37.5px) once it becomes a flex item on the homepage. */
+  line-height: 1.2;
   color: var(--ink);
+  white-space: nowrap;
 }
 .nav-name:hover { text-decoration: none; color: var(--accent); }
+
+/* Homepage nav row: spans exactly the hero text column (740px, same
+   28px gutters), name at the left edge, middle links centred, Resume at
+   the right edge — spread across the width, not bunched in the middle.
+   The nav itself stays full-width so the gradient / frosted bar and the
+   reading-progress hairline still span the viewport. */
+.nav-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: 740px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+.nav-hero .nav-name { position: static; transform: none; }
 
 .nav-links { display: flex; gap: 22px; align-items: center; }
 .nav-links a {
@@ -180,6 +206,11 @@ a:hover { text-decoration: underline; }
   border: 1px solid var(--accent);
   border-radius: 999px;
   padding: 5px 14px;
+  /* Not inside .nav-links any more, so it no longer inherits the 15px
+     link size from .nav-links a — set it explicitly (17px inherited
+     from body made the pill 3.4px taller and pushed the bar). */
+  font-size: 15px;
+  font-weight: 500;
   color: var(--accent) !important;
 }
 .nav-resume:hover { background: var(--accent); color: #141518 !important; }
@@ -212,6 +243,27 @@ section h2 {
   display: flex;
   align-items: center;
   padding: 32px 0 32vh;
+  /* The nav left the document flow when it became absolute (so it can
+     scroll away with the hero) — that moved the whole hero up by the
+     nav's height (66px) and broke the balance. This margin puts the
+     hero back exactly where it sat when the nav was sticky in flow. */
+  margin-top: 66px;
+}
+/* Hero-to-work blend: the mountains' base (#0e0f12) meets the paper
+   (#141518) at the hero's bottom edge — a hard step. This fade melts
+   the hero's bottom into the paper colour so the transition is
+   seamless. Above the mountains (z-index 1), below the chips
+   (z-index 2) and the hero text / scroll cue (z-index 3). */
+.hero::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 160px;
+  background: linear-gradient(to bottom, rgba(20, 21, 24, 0), var(--paper));
+  z-index: 1;
+  pointer-events: none;
 }
 .hero-bg { position: absolute; inset: 0; pointer-events: none; }
 /* Mesh-gradient sky: Lovable-style color blending, kept to the cool
@@ -267,7 +319,10 @@ section h2 {
      backdrop-filter, and with only a 7% tint the pills went nearly
      invisible there (Alp, 2026-11-05). Browsers that pass the JS
      backdrop-filter: url() check get html.glass-ok and the real
-     refraction (SVG displacement filter #lg, defined in index.html). */
+     refraction (SVG displacement filter #lg, defined in index.html).
+     The 7% glass tint was still barely visible on the dark sky even
+     at full opacity (Alp, 2026-11-05), so the glass tier now uses an
+     18% tint and a 38% rim — clearly present, still translucent. */
   background: rgba(27, 29, 34, 0.6);
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -281,8 +336,8 @@ section h2 {
     inset 0 -10px 18px rgba(0, 0, 0, 0.18);
 }
 html.glass-ok .chips .chip {
-  background: rgba(231, 228, 219, 0.07);
-  border-color: rgba(231, 228, 219, 0.16);
+  background: rgba(231, 228, 219, 0.18);
+  border-color: rgba(231, 228, 219, 0.38);
   backdrop-filter: url(#lg);
   -webkit-backdrop-filter: url(#lg);
 }
@@ -369,6 +424,43 @@ html.glass-ok .chips .chip {
 }
 
 .hero-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+
+/* Scroll cue: bottom-right of the hero, transparent (no pill/box).
+   Minimalist thin arrow bobs hardest; the text floats gently too.
+   Fades with the hero as you scroll (app.js, same progress as the
+   hero text fade). */
+.scroll-cue {
+  position: absolute;
+  right: 28px;
+  bottom: 28px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+.scroll-cue:hover { color: var(--ink); text-decoration: none; }
+.scroll-cue-text {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  animation: cue-float 3.2s ease-in-out infinite;
+}
+.scroll-cue-arrow {
+  display: block;
+  animation: cue-bob 1.6s ease-in-out infinite;
+}
+@keyframes cue-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@keyframes cue-bob {
+  0%, 100% { transform: translateY(0); opacity: 0.55; }
+  50% { transform: translateY(6px); opacity: 1; }
+}
 
 .hero-meta {
   color: var(--muted);
@@ -511,6 +603,18 @@ main:has(#contact) + footer { border-top: none; }
 @media (max-width: 600px) {
   .nav-links a:not(.nav-resume) { display: none; }
   .nav-name { left: 20px; }
+  /* Homepage nav row keeps the hero column's 20px mobile gutters; the
+     middle links are hidden entirely (Resume already sits outside them).
+     The hero nav itself loses its horizontal padding on mobile so the
+     row (not the nav's content box) defines the gutters — otherwise
+     the row is narrower than the hero text and the JS alignment
+     shrinks instead of spanning it. */
+  .nav-hero { padding: 14px 0 36px; }
+  .nav-hero.scrolled { padding: 14px 0; }
+  .nav-row { padding: 0 20px; }
+  .nav-hero .nav-links { display: none; }
+  .scroll-cue { right: 20px; bottom: 20px; }
+  .scroll-cue-text { font-size: 11px; }
   .hero { padding: 56px 0 28px; }
   .hero-inner { max-width: 400px; padding: 0 20px; }
   .hero-love { font-size: min(8vw, 31px) !important; }

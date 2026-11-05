@@ -213,7 +213,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .scn *, .scn, .chip-x, .chip-w, .chip-x .chip, .chip-w .chip, .mesh .blob, .stars circle.tw {
+  .scn *, .scn, .chip-x, .chip-w, .chip-x .chip, .chip-w .chip, .mesh .blob, .stars circle.tw, .scroll-cue, .scroll-cue-text, .scroll-cue-arrow {
     animation: none !important;
   }
   .rv { opacity: 1; translate: none; scale: none; transition: none; }
