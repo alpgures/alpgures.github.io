@@ -375,6 +375,8 @@ footer {
   color: var(--muted);
   font-size: 14px;
 }
+/* On the homepage the contact row already carries a rule; drop the footer one there */
+main:has(#contact) + footer { border-top: none; }
 
 /* Mobile */
 
