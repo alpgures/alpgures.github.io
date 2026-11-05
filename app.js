@@ -436,8 +436,9 @@
         var heroEl = document.querySelector(".hero .hero-inner");
         // Fade zones are the ACTUAL text of each hero line (measured with a
         // Range, so block width never counts), not the whole hero-inner box.
-        // Chips on the text fade to 5% of base opacity, so the words stay
-        // legible with no scrim behind them; chips beside a line stay bright.
+        // Chips centred on the text fade to 10% of base opacity, so the
+        // words stay legible; chips in the dead space beside a line stay
+        // bright — only a centre actually on the text dims.
         var heroRects = [];
         function measureHero() {
           heroRects = [];
@@ -484,12 +485,14 @@
                 var behind = false;
                 for (var bi = 0; bi < heroRects.length; bi++) {
                   var hb = heroRects[bi];
-                  // Whole chip box, not just its centre: a wide chip's edge
-                  // used to overlap the text while its centre sat outside.
-                  if ((c._x + c._rx > hb.x0 && c._x - c._rx < hb.x1 && c._y + c._ry > hb.y0 && c._y - c._ry < hb.y1) ||
-                      (c._gx !== undefined && c._gx + c._rx > hb.x0 && c._gx - c._rx < hb.x1 && c._gy + c._ry > hb.y0 && c._gy - c._ry < hb.y1)) { behind = true; break; }
+                  // Centre only, not the whole chip box: a bubble counts
+                  // as under the text only when its centre sits on the
+                  // text — bubbles in the dead space beside a line stay
+                  // bright even if an edge brushes the text.
+                  if ((c._x > hb.x0 && c._x < hb.x1 && c._y > hb.y0 && c._y < hb.y1) ||
+                      (c._gx !== undefined && c._gx > hb.x0 && c._gx < hb.x1 && c._gy > hb.y0 && c._gy < hb.y1)) { behind = true; break; }
                 }
-                var tgt = behind ? 0.05 : 1;
+                var tgt = behind ? 0.10 : 1;
                 c.op += (tgt - c.op) * Math.min(1, dt * 5);
                 if (Math.abs(c.op - c._lastOp) > 0.02) {
                   c.el.firstChild.style.opacity = (c.baseOp * c.op).toFixed(3);
