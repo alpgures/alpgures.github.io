@@ -93,8 +93,9 @@
         // wanderer pockets: open airspace, never over mountains. The last
         // three are the halo: right of the text, right of the buttons, and
         // above the greeting, so bubbles frame the hero instead of hugging
-        // the edges. Chips that land on a line of text fade out (see frame
-        // loop) to stay legible; chips beside a line stay visible.
+        // the edges; the final three fill the lower sky down to the ridge.
+        // Chips that land on a line of text fade out (see frame loop) to
+        // stay legible; chips beside a line stay visible.
         var pockets = [
           [0.02, 0.20, 0.08, 0.30],
           [0.80, 0.96, 0.08, 0.30],
@@ -102,7 +103,10 @@
           [0.80, 0.97, 0.38, 0.55],
           [0.62, 0.90, 0.28, 0.50],
           [0.36, 0.62, 0.44, 0.58],
-          [0.08, 0.50, 0.05, 0.16]
+          [0.08, 0.50, 0.05, 0.16],
+          [0.02, 0.22, 0.55, 0.72],
+          [0.75, 0.97, 0.55, 0.72],
+          [0.28, 0.50, 0.50, 0.68]
         ];
         // Mountain-aware ceiling: sample the RENDERED ridge paths (so slice
         // cropping, responsive sizes etc. are all accounted for) and forbid
@@ -217,8 +221,8 @@
             free: 0, px: 0, py: 0, vx: 0, vy: 0,
             baseOp: parseFloat(inner.style.opacity) || 0.6, op: 1, _lastOp: 1
           };
-          if (i % 4 === 3) {
-            var pk = pockets[Math.floor(i / 4) % pockets.length];
+          if (i % 3 === 2) {
+            var pk = pockets[Math.floor(i / 3) % pockets.length];
             c.mode = "wander";
             c.bx = pk[0] + Math.random() * (pk[1] - pk[0]);
             c.by = pk[2] + Math.random() * (pk[3] - pk[2]);
@@ -233,7 +237,11 @@
             c.fx = ltr ? -0.22 : 1.12; c.tx = ltr ? 1.12 : -0.22;
             c.lane = 0.08 + ((i + Math.random()) / n) * 0.38;
             c.dy = Math.random() * 0.07 - 0.035;
-            c.t = Math.random(); c.sp = 1 / (180 + Math.random() * 60);
+            // Start on screen: pick the initial crossing point inside the
+            // viewport instead of a random phase, so no drifter begins its
+            // life off canvas and the hero reads full from the first frame.
+            var sx0 = 0.02 + Math.random() * 0.96;
+            c.t = (sx0 - c.fx) / (c.tx - c.fx); c.sp = 1 / (180 + Math.random() * 60);
           }
           outer.className = c.mode === "wander" ? "chip-w" : "chip-x";
           outer._chip = c;
