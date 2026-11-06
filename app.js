@@ -139,9 +139,11 @@
       // no dragging, no wheel scrub, no fling, no bobbing. They sit on
       // straight, evenly spaced horizontal rows with no randomness and
       // no dead space, and every row drifts the opposite way from its
-      // neighbours. They stay at full visibility even where they pass
-      // behind the headline: the headline renders above the pills
-      // (hero-inner z-index 3), so the text is never covered. Rows are
+      // neighbours. (2026-11-06, round 5: bigger pills, 28px, and more
+      // rows, so the sky fills in; a pill now fades selectively while
+      // it passes behind the hero text (see the frame loop), and a dark
+      // halo sits behind the text in CSS, both per Alp. The headline
+      // still renders above the pills (hero-inner z-index 3). Rows are
       // the separation: same row + same direction + same speed means the
       // spacing is kept forever, no collision steering needed.)
       var chipsBox = document.querySelector(".hero .chips");
@@ -161,13 +163,14 @@
         // rows (no random scatter, no dead space). The row count adapts
         // to how much bubble width has to fit across the screen.
         var ROW_Y = [];
+        var PILL_H = 54; // measured pill height, set by layoutRows()
         function computeMaxLane() {
           var minR = 0.40;
           if (RIDGE) {
             minR = Infinity;
             for (var i = 0; i < RIDGE_N; i++) minR = Math.min(minR, RIDGE[i]);
           }
-          return Math.max(0.08, minR - 0.045);
+          return Math.max(0.08, minR - 0.03);
         }
         // Mountain-aware ceiling: sample the RENDERED ridge paths (so slice
         // cropping, responsive sizes etc. are all accounted for) and forbid
@@ -228,11 +231,21 @@
           }
           var totalW = 0;
           for (var ti = 0; ti < items.length; ti++) totalW += items[ti].w;
-          var rows = Math.max(5, Math.min(7, Math.ceil(totalW / (w * 0.8))));
           var maxLane = computeMaxLane();
+          var rows = Math.max(5, Math.min(8, Math.ceil(totalW / (w * 0.8))));
+          // Height cap (2026-11-06, round 5): bigger pills need taller
+          // rows, never stack rows closer than pill height + 10px, so
+          // pills from neighbouring rows can't overlap on short screens.
+          var pillH = 54;
+          var firstMel = chips.length ? chips[0].el.firstChild : null;
+          if (firstMel && firstMel.offsetHeight) pillH = firstMel.offsetHeight;
+          PILL_H = pillH;
+          var vSpan = (maxLane - 0.04) * CH();
+          var maxRowsH = Math.max(5, Math.floor(vSpan / (pillH + 10)) + 1);
+          if (rows > maxRowsH) rows = maxRowsH;
           ROW_Y = [];
           for (var rj = 0; rj < rows; rj++) {
-            ROW_Y.push(0.06 + (rows > 1 ? (rj / (rows - 1)) * (maxLane - 0.06) : 0));
+            ROW_Y.push(0.04 + (rows > 1 ? (rj / (rows - 1)) * (maxLane - 0.04) : 0));
           }
           var rowItems = [];
           var rowW = [];
@@ -255,6 +268,7 @@
             var x = 0;
             for (var j = 0; j < m; j++) {
               var cc = list[j].c;
+              cc._w = list[j].w;
               cc.row = r;
               cc.lane = ROW_Y[r];
               cc.ltr = (r % 2 === 0);
@@ -348,6 +362,7 @@
           rT = setTimeout(function () { frameMountains(); buildRidge(); }, 200);
         });
         var last = performance.now();
+        var heroInnerEl = document.querySelector(".hero-inner");
         (function frame(now) {
           var dt = Math.max(0, Math.min(0.1, (now - last) / 1000)); last = now;
           if (!reduced) {
@@ -355,6 +370,28 @@
               var c = chips[k];
               c.t += c.sp * dt;
               place(c);
+            }
+          }
+          // Selective dimming (2026-11-06, round 5, per Alp): a pill
+          // fades to 0.14 while any part of it (primary or ghost copy)
+          // sits behind the hero text block, and returns to full
+          // opacity once it drifts past. The halo in CSS darkens the
+          // same zone. Chip positions are analytic (from place()), so
+          // this costs two rect reads per frame, not one per chip.
+          if (heroInnerEl) {
+            var boxR = chipsBox.getBoundingClientRect();
+            var hr = heroInnerEl.getBoundingClientRect();
+            var zx0 = hr.left - boxR.left - 16, zx1 = hr.right - boxR.left + 16;
+            var zy0 = hr.top - boxR.top - 16, zy1 = hr.bottom - boxR.top + 16;
+            var dh = PILL_H || 54;
+            for (var di = 0; di < chips.length; di++) {
+              var dc = chips[di];
+              var dw = dc._w || 200;
+              var dim = (dc._x + dw > zx0 && dc._x < zx1 && dc._y + dh > zy0 && dc._y < zy1) ||
+                        (dc._gx + dw > zx0 && dc._gx < zx1 && dc._gy + dh > zy0 && dc._gy < zy1);
+              var target = dim ? "0.14" : "1";
+              if (dc.el.style.opacity !== target) dc.el.style.opacity = target;
+              if (dc.ghost && dc.ghost.style.opacity !== target) dc.ghost.style.opacity = target;
             }
           }
           requestAnimationFrame(frame);

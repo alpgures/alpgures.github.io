@@ -336,13 +336,13 @@ section h2 {
    wheel scrub, no bobbing. They only drift sideways, so they never
    intercept the pointer at all.) */
 .chips .chip { pointer-events: none; }
-.chip-x { position: absolute; left: 0; top: 0; will-change: transform; }
+.chip-x { position: absolute; left: 0; top: 0; will-change: transform; transition: opacity 0.35s ease; }
 
 .chips .chip {
   display: inline-block;
-  /* (2026-11-06: slightly larger — 17px -> 19px, roomier padding — so
-     the bubbles cover more of the sky.) */
-  font-size: 19px;
+  /* (2026-11-06: bigger again, 19px to 28px, roomier padding, Alp
+     wants the bubbles to fill the void much more.) */
+  font-size: 28px;
   font-weight: 500;
   color: var(--ink);
   /* Liquid glass, two tiers. The default is a dark frosted pill (plain
@@ -362,7 +362,7 @@ section h2 {
   background: rgba(27, 29, 34, 0.72);
   border: 1px solid rgba(231, 228, 219, 0.3);
   border-radius: 999px;
-  padding: 8px 20px;
+  padding: 12px 28px;
   white-space: nowrap;
   /* (2026-11-06: no bob animation any more — the bubbles only drift
      sideways, driven by the JS frame loop.) */
@@ -380,18 +380,41 @@ html.glass-ok .chips .chip {
      measured only just above sky luminance. The fill now carries the
      visibility itself (top-lit gradient, 50% -> 38%), the rim is
      stronger, and url(#lg) still adds refraction where the browser
-     renders it. (2026-11-06: the under-text dim floor is gone — the
-     bubbles stay at full visibility everywhere, per Alp.) */
+     renders it. (2026-11-06, round 5: the old blanket dim floor is
+     still gone, but a pill now fades selectively while it passes
+     behind the hero text (JS), and a dark halo sits behind the text
+     (below), both per Alp.) */
   background: linear-gradient(180deg, rgba(231, 228, 219, 0.5), rgba(231, 228, 219, 0.38));
   border-color: rgba(231, 228, 219, 0.65);
   backdrop-filter: url(#lg);
   -webkit-backdrop-filter: url(#lg);
 }
-/* (2026-11-06: the under-text dim floor is gone — the bubbles stay at
-   full visibility even where they pass behind the headline (Alp). The
-   headline renders above the pills (hero-inner z-index 3), so the text
-   itself is never covered.) */
+/* (2026-11-06: legibility, round 5, Alp picked BOTH: a dark halo
+   behind the hero text (this rule) AND selective dimming in app.js
+   (a pill fades while it passes behind the text). The halo is a soft
+   radial scrim inside hero-inner's stacking context (z-index 3), so
+   it sits above the pills and below the text.) */
 .hero-inner { position: relative; z-index: 3; width: 100%; max-width: 740px; margin: 0 auto; padding: 0 28px; transform: translateY(-28px); }
+.hero-inner::before {
+  content: "";
+  position: absolute;
+  inset: -48px -64px;
+  z-index: -1;
+  background: radial-gradient(ellipse 62% 56% at 50% 46%, rgba(8, 9, 12, 0.88), rgba(8, 9, 12, 0.55) 55%, rgba(8, 9, 12, 0) 78%);
+  border-radius: 48px;
+  pointer-events: none;
+}
+@media (max-width: 600px) {
+  .hero-inner::before { inset: -28px -24px; }
+}
+/* (2026-11-06: keep the big pills off small and short screens, 28px
+   pills would crowd a phone or a short laptop window.) */
+@media (max-width: 600px) {
+  .chips .chip { font-size: 19px; padding: 8px 20px; }
+}
+@media (max-height: 820px) and (min-width: 601px) {
+  .chips .chip { font-size: 24px; padding: 10px 24px; }
+}
 
 .hero-greeting {
   font-size: clamp(20px, 2.8vw, 30px);
