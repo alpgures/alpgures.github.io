@@ -323,7 +323,11 @@ section h2 {
      The 7% glass tint was still barely visible on the dark sky even
      at full opacity (Alp, 2026-11-05), and 18% was still too faint
      (Alp, 2026-11-05, live on his Mac). The glass tier now uses a
-     30% tint and a 55% rim — clearly present, still translucent. */
+     30% tint and a 55% rim — clearly present, still translucent.
+     (2026-11-06: 30% was STILL faint in Alp's Alp Browser, where the
+     displacement filter doesn't render — the glass tier now uses a
+     50%-to-38% gradient fill and a 65% rim, so the fill itself
+     carries the pill and the refraction is a bonus where it renders.) */
   background: rgba(27, 29, 34, 0.72);
   border: 1px solid rgba(231, 228, 219, 0.3);
   border-radius: 999px;
@@ -337,8 +341,16 @@ section h2 {
     inset 0 -10px 18px rgba(0, 0, 0, 0.18);
 }
 html.glass-ok .chips .chip {
-  background: rgba(231, 228, 219, 0.3);
-  border-color: rgba(231, 228, 219, 0.55);
+  /* 2026-11-06: the 30% tint was still faint — where the displacement
+     filter doesn't render (Alp's Alp Browser / WKWebView keeps the
+     url() syntax but shows no refraction), a bright pill sat barely
+     above the dark sky, and even where it renders the bright pills
+     measured only just above sky luminance. The fill now carries the
+     visibility itself (top-lit gradient, 50% -> 38%), the rim is
+     stronger, and url(#lg) still adds refraction where the browser
+     renders it. The under-text dim floor (0.20, app.js) is unchanged. */
+  background: linear-gradient(180deg, rgba(231, 228, 219, 0.5), rgba(231, 228, 219, 0.38));
+  border-color: rgba(231, 228, 219, 0.65);
   backdrop-filter: url(#lg);
   -webkit-backdrop-filter: url(#lg);
 }

@@ -276,11 +276,6 @@
           var f = c.free * c.free;
           var x = sx * (1 - f) + c.px * f;
           var y = sy * (1 - f) + c.py * f;
-          // Collision separation lives in a decaying offset, never in the
-          // trajectory — rewriting bx/by/lane on every contact is what
-          // made chips snap back and shake.
-          x += c.ox; y += c.oy;
-          c.ox *= 0.9; c.oy *= 0.9;
           syncPair(c, x, y);
         }
 
@@ -298,7 +293,6 @@
           var c = {
             el: outer, dragging: false,
             free: 0, px: 0, py: 0, vx: 0, vy: 0,
-            ox: 0, oy: 0,
             baseOp: parseFloat(inner.style.opacity) || 0.6, op: 1, _lastOp: 1
           };
           if (i % 3 === 2) {
@@ -444,14 +438,31 @@
         var frameNo = 0;
         // Separation steering: test the main copies plus any on-screen
         // ghost (wrap mirror) — ghosts used to overlap silently at the
-        // edges, which is how chips got too close. Pushes go into the
-        // decaying offset, never into the trajectory.
-        // NOTE (2026-11-05): the pushes used to be instant 12px jumps on
-        // ANY contact (q2 < 1), every 3rd frame — a visible sawtooth shake,
-        // worse on 120Hz displays where they fired twice as often. Now
-        // only genuine overlap (q2 < 0.7) pushes, half as hard, and scaled
-        // by dt so the total push per second is the same at any refresh
-        // rate. Barely-touching chips just drift past each other.
+        // edges, which is how chips got too close.
+        // NOTE (2026-11-06): separation used to be an impulse into a
+        // decaying offset (ox/oy): every 3rd frame it shoved overlapping
+        // chips apart, the offset decayed, and their trajectories pulled
+        // them straight back together — a limit cycle that read as
+        // vibration while stuck, worse on 120Hz. Now an overlap
+        // permanently rebases the two trajectories apart by a tiny step
+        // (same pattern as drop()), so the pair glides apart over about
+        // a second and STAYS apart; nothing jumps, nothing decays back.
+        // Only genuine overlap (q2 < 0.7) rebases, scaled by dt so the
+        // separation speed is the same at any refresh rate. Barely-
+        // touching chips just drift past each other.
+        // Permanently shift a chip's trajectory (same pattern as drop()):
+        // wanderers move their oscillation centre, traversers shift their
+        // whole path sideways and their lane up/down. Clamped to the same
+        // bounds drop() uses, so a rebased chip can never leave the sky.
+        function rebase(c, dxN, dyN) {
+          if (c.mode === "traverse") {
+            c.fx += dxN; c.tx += dxN;
+            c.lane = Math.max(0.08, Math.min(0.38, c.lane + dyN));
+          } else {
+            c.bx = Math.max(0.01, Math.min(0.95, c.bx + dxN));
+            c.by = Math.max(0.03, Math.min(maxWanderY(c.bx, c.ay), c.by + dyN));
+          }
+        }
         function separatePair(A, B, w, dt) {
           var ptsA = [[A._x, A._y]];
           if (A.ghost && A._gx > -A._rx && A._gx < w + A._rx) ptsA.push([A._gx, A._gy]);
@@ -467,9 +478,12 @@
                 var q = Math.sqrt(q2);
                 var d = Math.sqrt(dx * dx + dy * dy);
                 var nx = dx / d, ny = dy / d;
-                var push = (1 - q) * 6 * Math.min(2, dt * 60);
-                A.ox -= nx * push; A.oy -= ny * push;
-                B.ox += nx * push; B.oy += ny * push;
+                // Tiny permanent rebase (normalized units per collide
+                // call): ~0.06 of the hero per second at full overlap,
+                // so a stuck pair glides apart in about a second.
+                var step = (1 - q) * 0.06 * dt * 3;
+                rebase(A, -nx * step, -ny * step);
+                rebase(B, nx * step, ny * step);
               }
             }
           }
@@ -494,6 +508,12 @@
             // by width shoved chips far apart up/down and back again.
             chips[k]._rx = el ? el.offsetWidth / 2 + 12 : 30;
             chips[k]._ry = el ? el.offsetHeight / 2 + 10 : 26;
+            // Half-size for the fade test: a bubble counts as under the
+            // text only when its CENTRE sits on the text (see the frame
+            // loop) — the old corner test dimmed pills that merely
+            // grazed a line with their top-left corner.
+            chips[k]._hw = el ? el.offsetWidth / 2 : 30;
+            chips[k]._hh = el ? el.offsetHeight / 2 : 16;
           }
         }
         measure();
@@ -560,9 +580,17 @@
                   // Centre only, not the whole chip box: a bubble counts
                   // as under the text only when its centre sits on the
                   // text — bubbles in the dead space beside a line stay
-                  // bright even if an edge brushes the text.
-                  if ((c._x > hb.x0 && c._x < hb.x1 && c._y > hb.y0 && c._y < hb.y1) ||
-                      (c._gx !== undefined && c._gx > hb.x0 && c._gx < hb.x1 && c._gy > hb.y0 && c._gy < hb.y1)) { behind = true; break; }
+                  // bright even if an edge brushes the text. (2026-11-06:
+                  // the test used the pill's top-left corner (_x/_y), so
+                  // pills grazing a line with a corner dimmed fully; now
+                  // it uses the centre, _x + _hw / _y + _hh.)
+                  var cx = c._x + (c._hw || 30), cy = c._y + (c._hh || 16);
+                  var onText = (cx > hb.x0 && cx < hb.x1 && cy > hb.y0 && cy < hb.y1);
+                  if (!onText && c._gx !== undefined) {
+                    var gcx = c._gx + (c._hw || 30), gcy = c._gy + (c._hh || 16);
+                    onText = (gcx > hb.x0 && gcx < hb.x1 && gcy > hb.y0 && gcy < hb.y1);
+                  }
+                  if (onText) { behind = true; break; }
                 }
                 /* Bubbles behind a hero text line dim so the text stays
                    legible — the floor is 0.20. At 0.10 the bubbles near
