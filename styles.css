@@ -27,12 +27,15 @@ html { scroll-behavior: smooth; overflow-x: hidden; }
 
 /* ---------- Horizontal work carousel: vertical scroll drives a
    horizontal swipe (Apple-style). The section is a tall scroll track;
-   the sticky viewport pins while the card row slides left. ---------- */
+   the sticky viewport pins while the card row slides left. (2026-11-06:
+   track shortened 250vh -> 200vh so the page starts scrolling down
+   sooner, and the row now travels far enough for the last card to reach
+   the middle; the card in the middle grows + brightens, the rest dim.) */
 .work-scroll {
   width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
-  height: 250vh;
+  height: 200vh;
   padding: 0;
 }
 .work-sticky {
@@ -61,6 +64,11 @@ html { scroll-behavior: smooth; overflow-x: hidden; }
   will-change: transform;
 }
 .work-scroll .cards .card { flex: 0 0 520px; }
+/* In the carousel the JS drives each card's transform + opacity every
+   frame (centre focus), so the transform transition must NOT run here —
+   it would lag the scroll by 0.35s and feel floaty. The shadow
+   transition stays: the focus glow eases in smoothly. */
+.work-scroll .cards .card { transition: box-shadow 0.35s var(--ease-flow); }
 /* In the carousel every card is vertical (scene on top, text below),
    including the Alp Browser featured card — the wide side-by-side layout
    only applies in the grid (mobile fallback). */
@@ -129,18 +137,21 @@ a:hover { text-decoration: underline; }
 /* Homepage hero nav: blends into the hero with a vertical dark-to-
    transparent gradient (dark behind the buttons, fading out just below
    them), then scrolls away with the hero. It only comes back once you've
-   scrolled past the hero, fading in as a frosted bar (kotoban-style). */
+   scrolled past the hero, fading in as a frosted bar (kotoban-style).
+   (2026-11-06: the old two-stop fade ended in a visible edge against
+   the sky — the fade is now a long eased ramp over a taller bar, so the
+   dark-to-sky transition reads as one smooth blend, no line.) */
 .nav-hero {
   position: absolute;
   left: 0;
   right: 0;
-  padding: 14px 28px 36px;
+  padding: 14px 28px 72px;
   /* flex-start, not center: the row is placed by its own margins
      (auto margins centre it until the JS alignment sets an explicit
      left margin). With center, the JS-set margins got re-centred and
      the row shrank on narrow screens instead of holding its width. */
   justify-content: flex-start;
-  background: linear-gradient(to bottom, rgba(20, 21, 24, 0.92) 0%, rgba(20, 21, 24, 0.92) 60%, rgba(20, 21, 24, 0) 100%);
+  background: linear-gradient(to bottom, rgba(20, 21, 24, 0.94) 0%, rgba(20, 21, 24, 0.94) 30%, rgba(20, 21, 24, 0.72) 48%, rgba(20, 21, 24, 0.45) 64%, rgba(20, 21, 24, 0.22) 78%, rgba(20, 21, 24, 0.08) 90%, rgba(20, 21, 24, 0) 100%);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   border-bottom: none;
@@ -312,14 +323,17 @@ section h2 {
 @keyframes twinkle { 0%, 100% { opacity: 0.14; } 50% { opacity: 0.55; } }
 .taurus { position: absolute; left: 0; right: 0; bottom: -2px; width: 100%; height: 58vh; z-index: 1; }
 .chips { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
-.chips .chip { pointer-events: auto; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+/* (2026-11-06: the bubbles are pure ambience now — no dragging, no
+   wheel scrub, no bobbing. They only drift sideways, so they never
+   intercept the pointer at all.) */
+.chips .chip { pointer-events: none; }
 .chip-x { position: absolute; left: 0; top: 0; will-change: transform; }
-
-.chip-w { position: absolute; left: 0; top: 0; will-change: transform; }
 
 .chips .chip {
   display: inline-block;
-  font-size: 17px;
+  /* (2026-11-06: slightly larger — 17px -> 19px, roomier padding — so
+     the bubbles cover more of the sky.) */
+  font-size: 19px;
   font-weight: 500;
   color: var(--ink);
   /* Liquid glass, two tiers. The default is a dark frosted pill (plain
@@ -339,9 +353,10 @@ section h2 {
   background: rgba(27, 29, 34, 0.72);
   border: 1px solid rgba(231, 228, 219, 0.3);
   border-radius: 999px;
-  padding: 6px 17px;
+  padding: 8px 20px;
   white-space: nowrap;
-  animation: chip-bob ease-in-out infinite;
+  /* (2026-11-06: no bob animation any more — the bubbles only drift
+     sideways, driven by the JS frame loop.) */
   backdrop-filter: blur(10px) saturate(1.3);
   -webkit-backdrop-filter: blur(10px) saturate(1.3);
   box-shadow:
@@ -356,16 +371,17 @@ html.glass-ok .chips .chip {
      measured only just above sky luminance. The fill now carries the
      visibility itself (top-lit gradient, 50% -> 38%), the rim is
      stronger, and url(#lg) still adds refraction where the browser
-     renders it. The under-text dim floor (0.20, app.js) is unchanged. */
+     renders it. (2026-11-06: the under-text dim floor is gone — the
+     bubbles stay at full visibility everywhere, per Alp.) */
   background: linear-gradient(180deg, rgba(231, 228, 219, 0.5), rgba(231, 228, 219, 0.38));
   border-color: rgba(231, 228, 219, 0.65);
   backdrop-filter: url(#lg);
   -webkit-backdrop-filter: url(#lg);
 }
-@keyframes chip-bob {
-  0%, 100% { transform: translateY(-5px); }
-  50% { transform: translateY(5px); }
-}
+/* (2026-11-06: the under-text dim floor is gone — the bubbles stay at
+   full visibility even where they pass behind the headline (Alp). The
+   headline renders above the pills (hero-inner z-index 3), so the text
+   itself is never covered.) */
 .hero-inner { position: relative; z-index: 3; width: 100%; max-width: 740px; margin: 0 auto; padding: 0 28px; transform: translateY(-28px); }
 
 .hero-greeting {
@@ -452,7 +468,9 @@ html.glass-ok .chips .chip {
    hero text fade). */
 .scroll-cue {
   position: absolute;
-  right: 44px;
+  /* (2026-11-06: moved a little further left — 44px -> 80px from the
+     right edge — so the cue sits clear of the corner.) */
+  right: 80px;
   bottom: 44px;
   z-index: 3;
   display: flex;
@@ -633,11 +651,11 @@ main:has(#contact) + footer { border-top: none; }
      row (not the nav's content box) defines the gutters — otherwise
      the row is narrower than the hero text and the JS alignment
      shrinks instead of spanning it. */
-  .nav-hero { padding: 14px 0 36px; }
+  .nav-hero { padding: 14px 0 64px; }
   .nav-hero.scrolled { padding: 14px 0; }
   .nav-row { padding: 0 20px; }
   .nav-hero .nav-links { display: none; }
-  .scroll-cue { right: 28px; bottom: 28px; }
+  .scroll-cue { right: 56px; bottom: 28px; }
   .scroll-cue-text { font-size: 13px; }
   .hero { padding: 56px 0 28px; }
   .hero-inner { max-width: 400px; padding: 0 20px; }
@@ -735,6 +753,9 @@ main:has(#contact) + footer { border-top: none; }
 .proj-story p { margin-bottom: 1.1em; font-size: 18px; }
 
 #about p { margin-bottom: 1.1em; }
+/* (2026-11-06: the gap between the work carousel and About was too
+   wide — the section's top padding drops 56px -> 26px.) */
+#about { padding-top: 26px; }
 
 .fact-grid { display: grid; gap: 0; border-top: 1px solid var(--line); }
 .fact-grid > div {

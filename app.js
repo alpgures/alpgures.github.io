@@ -133,11 +133,17 @@
         });
       })();
 
-      // Hero: floating language chips, fully interactive (JS-driven rAF).
-      // Drag a bubble to fling it: on release it keeps flying in the drag
-      // direction with momentum, then eases back into its drift. Mouse-wheel
-      // over a bubble scrubs its progression. Stratified random lanes keep
-      // coverage even; everything else is random each visit.
+      // Hero: floating language chips (JS-driven rAF).
+      // (2026-11-06, Alp: the bubbles are pure ambience now. They drift
+      // sideways only — all at exactly the same rate, no interactivity:
+      // no dragging, no wheel scrub, no fling, no bobbing. They sit on
+      // straight, evenly spaced horizontal rows with no randomness and
+      // no dead space, and every row drifts the opposite way from its
+      // neighbours. They stay at full visibility even where they pass
+      // behind the headline: the headline renders above the pills
+      // (hero-inner z-index 3), so the text is never covered. Rows are
+      // the separation: same row + same direction + same speed means the
+      // spacing is kept forever, no collision steering needed.)
       var chipsBox = document.querySelector(".hero .chips");
       if (chipsBox) {
         var words = (data.hero && data.hero.floating_words) || [
@@ -145,28 +151,24 @@
         ];
         chipsBox.innerHTML = "";
         var chips = [];
-        var n = words.length;
         var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         var CW = function () { return chipsBox.clientWidth; };
         var CH = function () { return chipsBox.clientHeight; };
-        // wanderer pockets: open airspace, never over mountains. The last
-        // three are the halo: right of the text, right of the buttons, and
-        // above the greeting, so bubbles frame the hero instead of hugging
-        // the edges; the final three fill the lower sky down to the ridge.
-        // Chips that land on a line of text fade out (see frame loop) to
-        // stay legible; chips beside a line stay visible.
-        var pockets = [
-          [0.02, 0.20, 0.08, 0.30],
-          [0.80, 0.96, 0.08, 0.30],
-          [0.03, 0.18, 0.38, 0.50],
-          [0.80, 0.97, 0.38, 0.55],
-          [0.62, 0.90, 0.28, 0.50],
-          [0.36, 0.62, 0.44, 0.58],
-          [0.08, 0.50, 0.05, 0.16],
-          [0.02, 0.22, 0.55, 0.72],
-          [0.75, 0.97, 0.55, 0.72],
-          [0.28, 0.50, 0.50, 0.68]
-        ];
+        // One shared drift rate for every bubble: a full crossing takes
+        // 200 seconds, slow and calm.
+        var CHIP_SP = 1 / 200;
+        // Rows: the bubbles sit on straight, evenly spaced horizontal
+        // rows (no random scatter, no dead space). The row count adapts
+        // to how much bubble width has to fit across the screen.
+        var ROW_Y = [];
+        function computeMaxLane() {
+          var minR = 0.40;
+          if (RIDGE) {
+            minR = Infinity;
+            for (var i = 0; i < RIDGE_N; i++) minR = Math.min(minR, RIDGE[i]);
+          }
+          return Math.max(0.08, minR - 0.045);
+        }
         // Mountain-aware ceiling: sample the RENDERED ridge paths (so slice
         // cropping, responsive sizes etc. are all accounted for) and forbid
         // chips below the silhouette, at any viewport.
@@ -208,75 +210,84 @@
           var i = Math.max(0, Math.min(RIDGE_N - 1, Math.floor(xf * RIDGE_N)));
           return RIDGE[i];
         }
-        // Planned trajectories: a chip's whole motion is budgeted against the
-        // ridge UP FRONT, so the per-frame clamp never has to fight anything.
-        function maxWanderY(bx, ay) {
-          var swing = ay * 1.6 + 0.025; // full vertical extent + margin
-          var x0 = Math.max(0, bx - 0.03), x1 = Math.min(1, bx + 0.03);
-          var lim = Math.min(skyLimit(x0), skyLimit(bx), skyLimit(x1));
-          return lim - swing;
-        }
-        function replanChips() {
-          for (var k = 0; k < chips.length; k++) {
-            var c = chips[k];
-            if (c.dragging) continue;
-            if (c.mode === "wander") {
-              c.by = Math.max(0.03, Math.min(c.by, maxWanderY(c.bx, c.ay)));
-            } else {
-              // traverser: lane + max drift must clear the highest peak
-              var minR = 0.40;
-              if (RIDGE) {
-                minR = Infinity;
-                for (var i = 0; i < RIDGE_N; i++) minR = Math.min(minR, RIDGE[i]);
-              }
-              var maxLane = Math.max(0.08, minR - 0.045);
-              if (c.lane > maxLane) c.lane = maxLane;
+        // Lay the bubbles out on their rows: evenly spaced rows across
+        // the sky, each row drifting the opposite way from its neighbours.
+        // The widest pills are dealt first to the currently lightest row
+        // (greedy balance), so no row ends up a solid chain of touching
+        // pills and none is half empty; each row is then laid out with
+        // even gaps, including the wrap gap. Re-run on resize (rows and
+        // lanes adapt to the new width/ridge) and when the webfont lands
+        // (pill widths change).
+        function layoutRows() {
+          if (!chips.length) return;
+          var w = CW() || 1;
+          var items = [];
+          for (var mi = 0; mi < chips.length; mi++) {
+            var mel = chips[mi].el.firstChild;
+            items.push({ c: chips[mi], w: mel ? mel.offsetWidth : 100 });
+          }
+          var totalW = 0;
+          for (var ti = 0; ti < items.length; ti++) totalW += items[ti].w;
+          var rows = Math.max(5, Math.min(7, Math.ceil(totalW / (w * 0.8))));
+          var maxLane = computeMaxLane();
+          ROW_Y = [];
+          for (var rj = 0; rj < rows; rj++) {
+            ROW_Y.push(0.06 + (rows > 1 ? (rj / (rows - 1)) * (maxLane - 0.06) : 0));
+          }
+          var rowItems = [];
+          var rowW = [];
+          for (var rk = 0; rk < rows; rk++) { rowItems.push([]); rowW.push(0); }
+          var sorted = items.slice().sort(function (a, b) { return b.w - a.w; });
+          for (var si = 0; si < sorted.length; si++) {
+            var lightest = 0;
+            for (var li = 1; li < rows; li++) if (rowW[li] < rowW[lightest]) lightest = li;
+            rowItems[lightest].push(sorted[si]);
+            rowW[lightest] += sorted[si].w;
+          }
+          for (var r = 0; r < rows; r++) {
+            var list = rowItems[r];
+            // Keep the row's reading order stable (by original index).
+            list.sort(function (a, b) { return a.c._idx - b.c._idx; });
+            var m = list.length;
+            if (!m) continue;
+            var gap = (w - rowW[r]) / m;
+            if (gap < 0) gap = 0;
+            var x = 0;
+            for (var j = 0; j < m; j++) {
+              var cc = list[j].c;
+              cc.row = r;
+              cc.lane = ROW_Y[r];
+              cc.ltr = (r % 2 === 0);
+              cc.fx = 0; cc.tx = cc.ltr ? 1 : -1;
+              var v = x / w;
+              cc.t = cc.ltr ? v : 1 - v;
+              x += list[j].w + gap;
             }
           }
         }
+        function replanChips() { layoutRows(); }
 
-        // Position a traverser's main chip and its wrap mirror together.
-        // _x/_y track the primary (on-screen) copy for fade/collision;
-        // _gx/_gy track the other copy so the fade check covers edge
-        // crossings, where both copies are partly visible at once.
+        // Position a chip and its wrap mirror together. _x/_y track the
+        // primary (on-screen) copy; _gx/_gy track the other copy so edge
+        // crossings stay seamless.
         function syncPair(c, mx, my) {
           c.el.style.transform = "translate(" + mx.toFixed(1) + "px," + my.toFixed(1) + "px)";
           var gx = mx;
-          if (c.mode === "traverse" && c.ghost) {
+          if (c.ghost) {
             gx = mx - (c.tx - c.fx) * CW();
             c.ghost.style.transform = "translate(" + gx.toFixed(1) + "px," + my.toFixed(1) + "px)";
           }
-          if (c.mode === "traverse" && c.ghost && c.tx < c.fx) { c._x = gx; c._gx = mx; }
+          if (c.ghost && c.tx < c.fx) { c._x = gx; c._gx = mx; }
           else { c._x = mx; c._gx = gx; }
           c._y = my; c._gy = my;
         }
 
         function place(c) {
-          var w = CW(), h = CH(), sx, sy;
-          if (c.mode === "traverse") {
-            var p = ((c.t % 1) + 1) % 1;
-            sx = (c.fx + (c.tx - c.fx) * p) * w;
-            sy = (c.lane + c.dy * p) * h;
-          } else {
-            sx = (c.bx + c.ax * Math.sin(c.t * c.sp * 3 + c.ph1) +
-                  c.ax * 0.6 * Math.sin(c.t * c.sp * 7 + c.ph2)) * w;
-            sy = (c.by + c.ay * Math.cos(c.t * c.sp * 2.4 + c.ph2) +
-                  c.ay * 0.6 * Math.cos(c.t * c.sp * 5.2 + c.ph1)) * h;
-          }
-          if (c.mode === "wander" && !c.dragging) {
-            // soft ceiling: curve away before touching, hard guarantee at the limit
-            var lim = skyLimit(sx / w) * h;
-            var zone = 0.07 * h;
-            if (sy > lim) { sy = lim; }
-            else if (sy > lim - zone) {
-              var kk = 1 - (lim - sy) / zone;
-              sy = sy - kk * kk * zone * 0.45;
-            }
-          }
-          var f = c.free * c.free;
-          var x = sx * (1 - f) + c.px * f;
-          var y = sy * (1 - f) + c.py * f;
-          syncPair(c, x, y);
+          var w = CW(), h = CH();
+          var p = ((c.t % 1) + 1) % 1;
+          var sx = (c.fx + (c.tx - c.fx) * p) * w;
+          var sy = c.lane * h;
+          syncPair(c, sx, sy);
         }
 
         words.forEach(function (w, i) {
@@ -285,139 +296,33 @@
           inner.className = "chip";
           inner.textContent = w;
           inner.style.opacity = (0.85 + Math.random() * 0.15).toFixed(2);
-          inner.style.animationDuration = (16 + Math.random() * 8).toFixed(1) + "s";
-          inner.style.animationDelay = (-Math.random() * 10).toFixed(1) + "s";
           outer.appendChild(inner);
           chipsBox.appendChild(outer);
 
-          var c = {
-            el: outer, dragging: false,
-            free: 0, px: 0, py: 0, vx: 0, vy: 0,
-            baseOp: parseFloat(inner.style.opacity) || 0.6, op: 1, _lastOp: 1
-          };
-          if (i % 3 === 2) {
-            var pk = pockets[Math.floor(i / 3) % pockets.length];
-            c.mode = "wander";
-            c.bx = pk[0] + Math.random() * (pk[1] - pk[0]);
-            c.by = pk[2] + Math.random() * (pk[3] - pk[2]);
-            c.ay = 0.015 + Math.random() * 0.012;
-            c.by = Math.max(0.03, Math.min(c.by, maxWanderY(c.bx, c.ay)));
-            c.t = Math.random() * 100; c.sp = 0.06 + Math.random() * 0.07;
-            c.ph1 = Math.random() * 6.28; c.ph2 = Math.random() * 6.28;
-            c.ax = 0.018 + Math.random() * 0.012;
-          } else {
-            var ltr = Math.random() < 0.5;
-            c.mode = "traverse";
-            // Seamless wrap: the run spans exactly one screen width
-            // (left-to-right, or right-to-left as 0 to -1), and a mirror
-            // copy rides exactly one width over, so the slice of a chip
-            // that exits one side enters the other side at the same time.
-            c.fx = 0; c.tx = ltr ? 1 : -1;
-            c.lane = 0.08 + ((i + Math.random()) / n) * 0.38;
-            c.dy = Math.random() * 0.07 - 0.035;
-            // Start on screen: pick the initial crossing point inside the
-            // viewport instead of a random phase, so no drifter begins its
-            // life off canvas and the hero reads full from the first frame.
-            var sx0 = 0.02 + Math.random() * 0.96;
-            c.t = ltr ? sx0 : 1 - sx0; c.sp = 1 / (180 + Math.random() * 60);
-          }
-          outer.className = c.mode === "wander" ? "chip-w" : "chip-x";
+          // Row, lane, direction and spacing are set by layoutRows()
+          // (called from buildRidge below): straight even rows, each
+          // drifting the opposite way from its neighbours. Seamless wrap:
+          // the run spans exactly one screen width (left-to-right, or
+          // right-to-left as 0 to -1), and a mirror copy rides exactly
+          // one width over, so the slice of a chip that exits one side
+          // enters the other side at the same time.
+          var c = { el: outer, sp: CHIP_SP, t: 0, lane: 0.1, ltr: true, fx: 0, tx: 1, row: 0, _idx: i };
+          outer.className = "chip-x";
           outer._chip = c;
           chips.push(c);
 
-          // Seamless-wrap mirror: traversers render a second copy exactly
-          // one screen width over, so the slice exiting one side enters
-          // the other side at once. The mirror is a clone (same text, same
-          // bob phase: identical duration/delay, inserted in the same
-          // frame), and it drags as one with the main chip.
-          var gInner = null;
-          if (c.mode === "traverse") {
-            var gOuter = document.createElement("span");
-            gInner = inner.cloneNode(true);
-            gOuter.appendChild(gInner);
-            gOuter.className = "chip-x";
-            chipsBox.appendChild(gOuter);
-            c.ghost = gOuter;
-          }
-
-          function bindChipDrag(elInner, isGhost) {
-            elInner.addEventListener("pointerdown", function (ev) {
-              ev.preventDefault();
-              var cc = outer._chip;
-              cc.dragging = true; cc.free = 0;
-              cc.vx = 0; cc.vy = 0; cc._mx = undefined;
-              try { elInner.setPointerCapture(ev.pointerId); } catch (e) {}
-              var r = chipsBox.getBoundingClientRect();
-              // Grab against whichever copy was actually touched.
-              var gx0 = isGhost ? (cc.tx > cc.fx ? cc._gx : cc._x) : (cc.tx > cc.fx ? cc._x : cc._gx);
-              cc.grabDX = ev.clientX - r.left - gx0;
-              cc.grabDY = ev.clientY - r.top - cc._y;
-              cc._grabGhost = isGhost;
-              elInner.style.cursor = "grabbing";
-            });
-            elInner.addEventListener("pointermove", function (ev) {
-              var cc = outer._chip;
-              if (!cc.dragging) return;
-              var r = chipsBox.getBoundingClientRect();
-              var x = ev.clientX - r.left - cc.grabDX;
-              var y = ev.clientY - r.top - cc.grabDY;
-              var nowT = ev.timeStamp / 1000;
-              if (cc._mx !== undefined) {
-                var dtm = Math.max(0.008, nowT - cc._mt);
-                cc.vx = cc.vx * 0.7 + ((x - cc._mx) / dtm) * 0.3;
-                cc.vy = cc.vy * 0.7 + ((y - cc._my) / dtm) * 0.3;
-              }
-              cc._mx = x; cc._my = y; cc._mt = nowT;
-              // A grab on the mirror moves the pair: translate the pointer
-              // back to main coordinates, then sync both copies.
-              var mx = cc._grabGhost ? x + (cc.tx - cc.fx) * r.width : x;
-              syncPair(cc, mx, y);
-            });
-            elInner.addEventListener("pointerup", drop);
-            elInner.addEventListener("pointercancel", drop);
-            elInner.addEventListener("wheel", function (ev) {
-              ev.preventDefault();
-              var cc = outer._chip;
-              if (cc.mode === "traverse") cc.t += ev.deltaY * 0.0004;
-              else cc.t += ev.deltaY * 0.03;
-              if (!cc.dragging) place(cc);
-            }, { passive: false });
-          }
-          function drop() {
-            var cc = outer._chip;
-            if (!cc.dragging) return;
-            cc.dragging = false;
-            inner.style.cursor = "";
-            if (cc.ghost) cc.ghost.firstChild.style.cursor = "";
-            cc._grabGhost = false;
-            var sp = Math.sqrt(cc.vx * cc.vx + cc.vy * cc.vy);
-            if (sp > 1400) { cc.vx *= 1400 / sp; cc.vy *= 1400 / sp; }
-            // permanently rebase the trajectory through the drop point,
-            // so the chip keeps its new path instead of snapping back.
-            // _x is the primary (visible) copy; convert to main coords.
-            var rr = chipsBox.getBoundingClientRect();
-            var ww = rr.width || 1, hh = rr.height || 1;
-            var mainX = (cc.mode === "traverse" && cc.ghost) ? (cc.tx > cc.fx ? cc._x : cc._gx) : cc._x;
-            var dx = mainX / ww, dy = cc._y / hh;
-            dy = Math.min(dy, skyLimit(Math.max(0, Math.min(1, dx))) - 0.02);
-            dy = Math.max(0.02, dy);
-            if (cc.mode === "traverse") {
-              var p0 = ((cc.t % 1) + 1) % 1;
-              var shift = dx - (cc.fx + (cc.tx - cc.fx) * p0);
-              cc.fx += shift; cc.tx += shift;
-              cc.lane = Math.max(0.08, Math.min(0.38, dy - cc.dy * p0));
-            } else {
-              cc.bx = Math.max(0.01, Math.min(0.95, dx));
-              cc.by = Math.max(0.03, Math.min(maxWanderY(cc.bx, cc.ay), dy));
-            }
-            cc.px = mainX; cc.py = cc._y; // fling from the drop point
-            cc.free = 1;
-          }
-          bindChipDrag(inner, false);
-          if (gInner) bindChipDrag(gInner, true);
+          // Seamless-wrap mirror: every chip renders a second copy
+          // exactly one screen width over, so the slice exiting one side
+          // enters the other side at once. The mirror is a clone (same
+          // text, inserted in the same frame).
+          var gInner = inner.cloneNode(true);
+          var gOuter = document.createElement("span");
+          gOuter.appendChild(gInner);
+          gOuter.className = "chip-x";
+          chipsBox.appendChild(gOuter);
+          c.ghost = gOuter;
         });
 
-        chips.forEach(place);
         /* Mobile: frame the tall left peak so the mountains read higher. */
         function frameMountains() {
           try {
@@ -429,190 +334,28 @@
         }
         frameMountains();
         buildRidge();
+        // buildRidge already laid the rows out (via replanChips); run it
+        // once more directly so the rows exist even if the ridge sampling
+        // failed, and re-run when the webfont lands (pill widths change).
+        layoutRows();
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(function () { layoutRows(); chips.forEach(place); });
+        }
+        chips.forEach(place);
         var rT = null;
         window.addEventListener("resize", function () {
           if (rT) clearTimeout(rT);
           rT = setTimeout(function () { frameMountains(); buildRidge(); }, 200);
         });
         var last = performance.now();
-        var frameNo = 0;
-        // Separation steering: test the main copies plus any on-screen
-        // ghost (wrap mirror) — ghosts used to overlap silently at the
-        // edges, which is how chips got too close.
-        // NOTE (2026-11-06): separation used to be an impulse into a
-        // decaying offset (ox/oy): every 3rd frame it shoved overlapping
-        // chips apart, the offset decayed, and their trajectories pulled
-        // them straight back together — a limit cycle that read as
-        // vibration while stuck, worse on 120Hz. Now an overlap
-        // permanently rebases the two trajectories apart by a tiny step
-        // (same pattern as drop()), so the pair glides apart over about
-        // a second and STAYS apart; nothing jumps, nothing decays back.
-        // Only genuine overlap (q2 < 0.7) rebases, scaled by dt so the
-        // separation speed is the same at any refresh rate. Barely-
-        // touching chips just drift past each other.
-        // Permanently shift a chip's trajectory (same pattern as drop()):
-        // wanderers move their oscillation centre, traversers shift their
-        // whole path sideways and their lane up/down. Clamped to the same
-        // bounds drop() uses, so a rebased chip can never leave the sky.
-        function rebase(c, dxN, dyN) {
-          if (c.mode === "traverse") {
-            c.fx += dxN; c.tx += dxN;
-            c.lane = Math.max(0.08, Math.min(0.38, c.lane + dyN));
-          } else {
-            c.bx = Math.max(0.01, Math.min(0.95, c.bx + dxN));
-            c.by = Math.max(0.03, Math.min(maxWanderY(c.bx, c.ay), c.by + dyN));
-          }
-        }
-        function separatePair(A, B, w, dt) {
-          var ptsA = [[A._x, A._y]];
-          if (A.ghost && A._gx > -A._rx && A._gx < w + A._rx) ptsA.push([A._gx, A._gy]);
-          var ptsB = [[B._x, B._y]];
-          if (B.ghost && B._gx > -B._rx && B._gx < w + B._rx) ptsB.push([B._gx, B._gy]);
-          var rx = A._rx + B._rx, ry = A._ry + B._ry;
-          for (var i = 0; i < ptsA.length; i++) {
-            for (var j = 0; j < ptsB.length; j++) {
-              var dx = ptsB[j][0] - ptsA[i][0], dy = ptsB[j][1] - ptsA[i][1];
-              var qx = dx / rx, qy = dy / ry;
-              var q2 = qx * qx + qy * qy;
-              if (q2 < 0.7 && q2 > 0.0001) {
-                var q = Math.sqrt(q2);
-                var d = Math.sqrt(dx * dx + dy * dy);
-                var nx = dx / d, ny = dy / d;
-                // Tiny permanent rebase (normalized units per collide
-                // call): ~0.06 of the hero per second at full overlap,
-                // so a stuck pair glides apart in about a second.
-                var step = (1 - q) * 0.06 * dt * 3;
-                rebase(A, -nx * step, -ny * step);
-                rebase(B, nx * step, ny * step);
-              }
-            }
-          }
-        }
-        function collide(dt) {
-          var w = CW();
-          for (var a = 0; a < chips.length; a++) {
-            var A = chips[a];
-            if (A.dragging) continue;
-            for (var b = a + 1; b < chips.length; b++) {
-              var B = chips[b];
-              if (B.dragging) continue;
-              separatePair(A, B, w, dt);
-            }
-          }
-        }
-        function measure() {
-          for (var k = 0; k < chips.length; k++) {
-            var el = chips[k].el.firstChild;
-            // Elliptical collision radii: a wide chip needs room sideways
-            // but only a chip-height vertically. A circular radius sized
-            // by width shoved chips far apart up/down and back again.
-            chips[k]._rx = el ? el.offsetWidth / 2 + 12 : 30;
-            chips[k]._ry = el ? el.offsetHeight / 2 + 10 : 26;
-            // Half-size for the fade test: a bubble counts as under the
-            // text only when its CENTRE sits on the text (see the frame
-            // loop) — the old corner test dimmed pills that merely
-            // grazed a line with their top-left corner.
-            chips[k]._hw = el ? el.offsetWidth / 2 : 30;
-            chips[k]._hh = el ? el.offsetHeight / 2 : 16;
-          }
-        }
-        measure();
-        /* NOTE (2026-11-05): this must NOT be named `heroEl`. A second
-           `var heroEl` for the scroll handler (".hero") lives in the same
-           function scope below, and `var` is function-scoped — it silently
-           overwrote this reference with `.hero`, so measureHero() measured
-           .hero's children (.hero-bg, .hero-inner, .scroll-cue) instead of
-           the text lines. .hero-bg's Range covers the whole hero plus the
-           ghost chips a full width to the left, so EVERY chip tested as
-           behind the text and sat at the 0.20 dim floor. */
-        var heroInnerEl = document.querySelector(".hero .hero-inner");
-        // Fade zones are the ACTUAL text of each hero line (measured with a
-        // Range, so block width never counts), not the whole hero-inner box.
-        // Chips centred on the text fade to 20% of base opacity, so the
-        // words stay legible; chips in the dead space beside a line stay
-        // bright — only a centre actually on the text dims.
-        var heroRects = [];
-        function measureHero() {
-          heroRects = [];
-          if (!heroInnerEl) return;
-          var r = chipsBox.getBoundingClientRect();
-          var padX = 14, padY = 10;
-          var kids = heroInnerEl.children;
-          for (var mi = 0; mi < kids.length; mi++) {
-            try {
-              var rg = document.createRange();
-              rg.selectNodeContents(kids[mi]);
-              var b = rg.getBoundingClientRect();
-              if (!b.width || !b.height) continue;
-              heroRects.push({
-                x0: b.left - r.left - padX, x1: b.right - r.left + padX,
-                y0: b.top - r.top - padY, y1: b.bottom - r.top + padY
-              });
-            } catch (e) {}
-          }
-        }
-        measureHero();
-        window.addEventListener("resize", function () { measureHero(); measure(); });
-        if (document.fonts && document.fonts.ready)
-          document.fonts.ready.then(function () { measureHero(); measure(); });
         (function frame(now) {
           var dt = Math.max(0, Math.min(0.1, (now - last) / 1000)); last = now;
           if (!reduced) {
             for (var k = 0; k < chips.length; k++) {
               var c = chips[k];
-              if (c.dragging) continue;
-              if (c.mode === "traverse") c.t += c.sp * dt; else c.t += dt;
-              if (c.free > 0) {
-                c.px += c.vx * dt; c.py += c.vy * dt;
-                // flung chips curve around the mountains too, never dip in
-                var fw = CW(), fh = CH();
-                var flim = skyLimit(Math.max(0, Math.min(1, c.px / fw))) * fh - 10;
-                if (c.py > flim) { c.py = flim; if (c.vy > 0) c.vy = 0; }
-                var damp = Math.exp(-1.4 * dt);
-                c.vx *= damp; c.vy *= damp;
-                c.free = Math.max(0, c.free - dt / 4.5);
-              }
+              c.t += c.sp * dt;
               place(c);
-              if (heroRects.length) {
-                var behind = false;
-                for (var bi = 0; bi < heroRects.length; bi++) {
-                  var hb = heroRects[bi];
-                  // Centre only, not the whole chip box: a bubble counts
-                  // as under the text only when its centre sits on the
-                  // text — bubbles in the dead space beside a line stay
-                  // bright even if an edge brushes the text. (2026-11-06:
-                  // the test used the pill's top-left corner (_x/_y), so
-                  // pills grazing a line with a corner dimmed fully; now
-                  // it uses the centre, _x + _hw / _y + _hh.)
-                  var cx = c._x + (c._hw || 30), cy = c._y + (c._hh || 16);
-                  var onText = (cx > hb.x0 && cx < hb.x1 && cy > hb.y0 && cy < hb.y1);
-                  if (!onText && c._gx !== undefined) {
-                    var gcx = c._gx + (c._hw || 30), gcy = c._gy + (c._hh || 16);
-                    onText = (gcx > hb.x0 && gcx < hb.x1 && gcy > hb.y0 && gcy < hb.y1);
-                  }
-                  if (onText) { behind = true; break; }
-                }
-                /* Bubbles behind a hero text line dim so the text stays
-                   legible — the floor is 0.20. At 0.10 the bubbles near
-                   the text went nearly invisible, which read as broken
-                   (Alp, 2026-11-05); at 0.35 the dimming was too subtle
-                   to read as dimming at all on the live site, because the
-                   18% tint was already faint (Alp, 2026-11-05). With the
-                   stronger 30% tint, 0.20 stays clearly present while
-                   reading as clearly dimmer than full. */
-                var tgt = behind ? 0.2 : 1;
-                c.op += (tgt - c.op) * Math.min(1, dt * 5);
-                if (Math.abs(c.op - c._lastOp) > 0.02) {
-                  c.el.firstChild.style.opacity = (c.baseOp * c.op).toFixed(3);
-                  if (c.ghost) c.ghost.firstChild.style.opacity = (c.baseOp * c.op).toFixed(3);
-                  c._lastOp = c.op;
-                }
-              }
             }
-            if (++frameNo % 3 === 0) collide(dt);
-            // Rotating words change line widths; re-measure fade zones
-            // regularly so the halo tracks the current word.
-            if (frameNo % 30 === 0) measureHero();
           }
           requestAnimationFrame(frame);
         })(last);
@@ -867,7 +610,7 @@
         var scrollTicking = false;
         /* Anchor jumps (nav Work / About / Contact, hero "See my work"):
            a smooth scroll to a section below the work carousel sweeps
-           the whole 250vh track in under a second, so the card row
+           the whole 200vh track in under a second, so the card row
            whips left extremely fast. While an anchor jump is running,
            the carousel transform is frozen — the page still scrolls
            smoothly and vertically, the cards just don't swipe. The
@@ -890,10 +633,26 @@
           if (navEl) {
             /* The hero nav scrolls away with the hero; it only comes back
                (frosted, fading in) once the work section reaches the top
-               of the viewport — i.e. you've navigated away from the hero. */
+               of the viewport — i.e. you've navigated away from the hero.
+               (2026-11-06: the switch back used to happen the moment the
+               work section dropped below 100px, so on a fast scroll up
+               the nav snapped from fixed (viewport top) to absolute
+               (hero top, hundreds of px above the viewport) and vanished
+               mid-fling — the hero/nav glitch. Now the frosted bar stays
+               pinned until you're essentially at the very top (y <= 8),
+               where fixed and absolute coincide, so the swap is seamless.
+               In between, the state is held, never toggled.) */
             var ws = document.querySelector(".work-scroll");
-            var showNav = ws ? ws.getBoundingClientRect().top <= 100 : y > 40;
-            navEl.classList.toggle("scrolled", showNav);
+            if (ws) {
+              var wsTop = ws.getBoundingClientRect().top;
+              var showNav;
+              if (wsTop <= 100) showNav = true;
+              else if (y <= 8) showNav = false;
+              else showNav = navEl.classList.contains("scrolled");
+              navEl.classList.toggle("scrolled", showNav);
+            } else {
+              navEl.classList.toggle("scrolled", y > 40);
+            }
           }
           if (reducedMotion) return;
           var h = heroEl ? heroEl.offsetHeight : 1;
@@ -915,6 +674,12 @@
           // Horizontal work carousel: vertical scroll through the tall
           // .work-scroll track drives the card row left. Skipped while
           // an anchor jump is running (see anchorJumping above).
+          // (2026-11-06: the row now travels far enough for the LAST card
+          // to reach the middle — maxX is the last card's centre, not the
+          // row's right edge. The motion is eased (easeOutCubic) so it
+          // slides fast then settles: snappier, Apple-like. And the card
+          // nearest the middle of the screen grows + brightens while the
+          // rest dim, so the eye always knows which project is in focus.)
           if (!anchorJumping) {
             var workSection = document.querySelector(".work-scroll");
             var workRow = document.getElementById("project-cards");
@@ -922,10 +687,42 @@
               var rect = workSection.getBoundingClientRect();
               var span = workSection.offsetHeight - window.innerHeight;
               var prog = span > 0 ? Math.min(Math.max(-rect.top / span, 0), 1) : 0;
-              var maxX = Math.max(workRow.scrollWidth - window.innerWidth, 0);
-              workRow.style.transform = "translateX(" + (-prog * maxX) + "px)";
+              // Ease the scrub: fast at first, settling gently onto the
+              // last card — the snappy-then-still feel.
+              var eased = 1 - Math.pow(1 - prog, 3);
+              // Travel until the LAST card's centre sits at the middle of
+              // the screen (the old right-edge stop left it stranded at
+              // the right).
+              var rowKids = workRow.children;
+              var lastCard = rowKids.length ? rowKids[rowKids.length - 1] : null;
+              var maxX = 0;
+              if (lastCard) {
+                maxX = Math.max(lastCard.offsetLeft + lastCard.offsetWidth / 2 - window.innerWidth / 2, 0);
+              }
+              var tx = -eased * maxX;
+              workRow.style.transform = "translateX(" + tx + "px)";
+              // Centre focus: each card's distance from the middle of the
+              // screen drives its scale, lift, brightness and glow. The
+              // card in the middle pops; the rest recede.
+              var viewCx = window.innerWidth / 2;
+              var falloff = window.innerWidth * 0.75;
+              for (var fci = 0; fci < rowKids.length; fci++) {
+                var focusCard = rowKids[fci];
+                var cardCx = focusCard.offsetLeft + focusCard.offsetWidth / 2 + tx;
+                var focus = Math.max(0, Math.min(1, 1 - Math.abs(cardCx - viewCx) / falloff));
+                var focusScale = 0.97 + 0.05 * focus;
+                focusCard.style.transform = "translateY(" + (-6 * focus).toFixed(1) + "px) scale(" + focusScale.toFixed(3) + ")";
+                focusCard.style.opacity = (0.55 + 0.45 * focus).toFixed(3);
+                focusCard.style.boxShadow = "0 " + (8 + 10 * focus).toFixed(0) + "px " + (24 + 20 * focus).toFixed(0) + "px rgba(0, 0, 0, " + (0.35 + 0.25 * focus).toFixed(2) + ")";
+              }
             } else if (workRow) {
               workRow.style.transform = "";
+              var rowKids2 = workRow.children;
+              for (var fcj = 0; fcj < rowKids2.length; fcj++) {
+                rowKids2[fcj].style.transform = "";
+                rowKids2[fcj].style.opacity = "";
+                rowKids2[fcj].style.boxShadow = "";
+              }
             }
           }
         }
@@ -955,3 +752,4 @@
       console.error("Could not load site content:", err);
     });
 })();
+
