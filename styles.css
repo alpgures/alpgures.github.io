@@ -140,7 +140,16 @@ a:hover { text-decoration: underline; }
    scrolled past the hero, fading in as a frosted bar (kotoban-style).
    (2026-11-06: the old two-stop fade ended in a visible edge against
    the sky — the fade is now a long eased ramp over a taller bar, so the
-   dark-to-sky transition reads as one smooth blend, no line.) */
+   dark-to-sky transition reads as one smooth blend, no line.)
+   (2026-11-06, round 4.1: the ramp alone did NOT kill the seam. The nav
+   sits OUTSIDE the hero, absolute at page top, while the hero starts
+   66px down (margin-top) — so above y=66 the nav fades over solid page
+   background (#141518, identical to the nav colour) and below y=66 over
+   the sky. The backdrop itself jumps at the hero's top edge, so any
+   mid-fade alpha there reads as a hard horizontal line (~y=68). The
+   solid 0.94 stop therefore runs to 62% — past the hero's top edge
+   (66/124 = 53% desktop, ~58% mobile) — so both sides of that edge are
+   the same colour, and the visible fade happens entirely over sky.) */
 .nav-hero {
   position: absolute;
   left: 0;
@@ -151,7 +160,7 @@ a:hover { text-decoration: underline; }
      left margin). With center, the JS-set margins got re-centred and
      the row shrank on narrow screens instead of holding its width. */
   justify-content: flex-start;
-  background: linear-gradient(to bottom, rgba(20, 21, 24, 0.94) 0%, rgba(20, 21, 24, 0.94) 30%, rgba(20, 21, 24, 0.72) 48%, rgba(20, 21, 24, 0.45) 64%, rgba(20, 21, 24, 0.22) 78%, rgba(20, 21, 24, 0.08) 90%, rgba(20, 21, 24, 0) 100%);
+  background: linear-gradient(to bottom, rgba(20, 21, 24, 0.94) 0%, rgba(20, 21, 24, 0.94) 62%, rgba(20, 21, 24, 0.68) 73%, rgba(20, 21, 24, 0.42) 82%, rgba(20, 21, 24, 0.20) 90%, rgba(20, 21, 24, 0.07) 96%, rgba(20, 21, 24, 0) 100%);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   border-bottom: none;
