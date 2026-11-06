@@ -15,7 +15,15 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-behavior: smooth; }
+/* Horizontal scroll must be impossible, on every engine. body already
+   has overflow-x: clip, but that alone does not hold in WebKit (Alp
+   Browser): a 100vw element (the work carousel breakout) can make the
+   document wider than the visible area there, and the page can then be
+   scrolled sideways, which slides the whole hero left and cuts the
+   headline off at the viewport edge (seen 2026-11-06). overflow-x:
+   hidden on html is the belt that actually holds in WebKit; it does not
+   affect vertical scrolling or the sticky carousel. */
+html { scroll-behavior: smooth; overflow-x: hidden; }
 
 /* ---------- Horizontal work carousel: vertical scroll drives a
    horizontal swipe (Apple-style). The section is a tall scroll track;
