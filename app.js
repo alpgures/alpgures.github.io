@@ -140,9 +140,9 @@
       // straight, evenly spaced horizontal rows with no randomness and
       // no dead space, and every row drifts the opposite way from its
       // neighbours. (2026-11-06, round 5: bigger pills, 28px, and more
-      // rows, so the sky fills in; a pill now fades selectively while
-      // it passes behind the hero text (see the frame loop), and a dark
-      // halo sits behind the text in CSS, both per Alp. The headline
+      // rows, so the sky fills in; a pill now fades on a distance
+      // gradient as it nears the hero text (see the frame loop), and a
+      // dark halo sits behind the text in CSS, both per Alp. The headline
       // still renders above the pills (hero-inner z-index 3). Rows are
       // the separation: same row + same direction + same speed means the
       // spacing is kept forever, no collision steering needed.)
@@ -372,26 +372,39 @@
               place(c);
             }
           }
-          // Selective dimming (2026-11-06, round 5, per Alp): a pill
-          // fades to 0.14 while any part of it (primary or ghost copy)
-          // sits behind the hero text block, and returns to full
-          // opacity once it drifts past. The halo in CSS darkens the
-          // same zone. Chip positions are analytic (from place()), so
-          // this costs two rect reads per frame, not one per chip.
+          // Opacity gradient (2026-11-06, round 5.1, per Alp): a pill
+          // does not switch dim on/off at the text edge, it fades
+          // gradually as it approaches the hero text and brightens
+          // gradually as it leaves. Opacity is a function of the
+          // pill's distance from the text block: 0.14 while touching
+          // it, ramping to 1.0 over a 150px falloff. Each copy
+          // (primary and ghost) gets its own opacity from its own
+          // position. The halo in CSS darkens the same zone. Chip
+          // positions are analytic (from place()), so this costs two
+          // rect reads per frame, not one per chip.
           if (heroInnerEl) {
             var boxR = chipsBox.getBoundingClientRect();
             var hr = heroInnerEl.getBoundingClientRect();
-            var zx0 = hr.left - boxR.left - 16, zx1 = hr.right - boxR.left + 16;
-            var zy0 = hr.top - boxR.top - 16, zy1 = hr.bottom - boxR.top + 16;
+            var zx0 = hr.left - boxR.left, zx1 = hr.right - boxR.left;
+            var zy0 = hr.top - boxR.top, zy1 = hr.bottom - boxR.top;
             var dh = PILL_H || 54;
+            var FADE = 150;
+            var gradOp = function (x, y, w, h) {
+              var dx = Math.max(zx0 - (x + w), x - zx1, 0);
+              var dy = Math.max(zy0 - (y + h), y - zy1, 0);
+              var d = Math.sqrt(dx * dx + dy * dy);
+              var f = Math.min(1, d / FADE);
+              return (0.14 + 0.86 * f).toFixed(3);
+            };
             for (var di = 0; di < chips.length; di++) {
               var dc = chips[di];
               var dw = dc._w || 200;
-              var dim = (dc._x + dw > zx0 && dc._x < zx1 && dc._y + dh > zy0 && dc._y < zy1) ||
-                        (dc._gx + dw > zx0 && dc._gx < zx1 && dc._gy + dh > zy0 && dc._gy < zy1);
-              var target = dim ? "0.14" : "1";
-              if (dc.el.style.opacity !== target) dc.el.style.opacity = target;
-              if (dc.ghost && dc.ghost.style.opacity !== target) dc.ghost.style.opacity = target;
+              var opP = gradOp(dc._x, dc._y, dw, dh);
+              if (dc.el.style.opacity !== opP) dc.el.style.opacity = opP;
+              if (dc.ghost) {
+                var opG = gradOp(dc._gx, dc._gy, dw, dh);
+                if (dc.ghost.style.opacity !== opG) dc.ghost.style.opacity = opG;
+              }
             }
           }
           requestAnimationFrame(frame);
