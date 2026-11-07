@@ -398,14 +398,14 @@ html.glass-ok .chips .chip {
 .hero-inner::before {
   content: "";
   position: absolute;
-  inset: -48px -64px;
+  inset: -72px -96px;
   z-index: -1;
-  background: radial-gradient(ellipse 62% 56% at 50% 46%, rgba(8, 9, 12, 0.88), rgba(8, 9, 12, 0.55) 55%, rgba(8, 9, 12, 0) 78%);
-  border-radius: 48px;
+  background: radial-gradient(ellipse 62% 56% at 50% 46%, rgba(8, 9, 12, 0.92), rgba(8, 9, 12, 0.72) 45%, rgba(8, 9, 12, 0.35) 68%, rgba(8, 9, 12, 0) 88%);
+  border-radius: 64px;
   pointer-events: none;
 }
 @media (max-width: 600px) {
-  .hero-inner::before { inset: -28px -24px; }
+  .hero-inner::before { inset: -40px -36px; }
 }
 /* (2026-11-06: keep the big pills off small and short screens, 28px
    pills would crowd a phone or a short laptop window.) */

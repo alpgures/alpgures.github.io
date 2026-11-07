@@ -140,12 +140,14 @@
       // straight, evenly spaced horizontal rows with no randomness and
       // no dead space, and every row drifts the opposite way from its
       // neighbours. (2026-11-06, round 5: bigger pills, 28px, and more
-      // rows, so the sky fills in; a pill now fades on a distance
-      // gradient as it nears the hero text (see the frame loop), and a
-      // dark halo sits behind the text in CSS, both per Alp. The headline
-      // still renders above the pills (hero-inner z-index 3). Rows are
-      // the separation: same row + same direction + same speed means the
-      // spacing is kept forever, no collision steering needed.)
+      // rows, so the sky fills in. (2026-11-06, round 5.2, per Alp:
+      // "let's just have the hero text have a halo" — the pill
+      // dimming from rounds 5/5.1 is removed; pills stay full
+      // opacity and only the dark halo in CSS sits behind the text.)
+      // The headline still renders above the pills (hero-inner
+      // z-index 3). Rows are the separation: same row + same
+      // direction + same speed means the spacing is kept forever,
+      // no collision steering needed.)
       var chipsBox = document.querySelector(".hero .chips");
       if (chipsBox) {
         var words = (data.hero && data.hero.floating_words) || [
@@ -372,41 +374,12 @@
               place(c);
             }
           }
-          // Opacity gradient (2026-11-06, round 5.1, per Alp): a pill
-          // does not switch dim on/off at the text edge, it fades
-          // gradually as it approaches the hero text and brightens
-          // gradually as it leaves. Opacity is a function of the
-          // pill's distance from the text block: 0.14 while touching
-          // it, ramping to 1.0 over a 150px falloff. Each copy
-          // (primary and ghost) gets its own opacity from its own
-          // position. The halo in CSS darkens the same zone. Chip
-          // positions are analytic (from place()), so this costs two
-          // rect reads per frame, not one per chip.
-          if (heroInnerEl) {
-            var boxR = chipsBox.getBoundingClientRect();
-            var hr = heroInnerEl.getBoundingClientRect();
-            var zx0 = hr.left - boxR.left, zx1 = hr.right - boxR.left;
-            var zy0 = hr.top - boxR.top, zy1 = hr.bottom - boxR.top;
-            var dh = PILL_H || 54;
-            var FADE = 150;
-            var gradOp = function (x, y, w, h) {
-              var dx = Math.max(zx0 - (x + w), x - zx1, 0);
-              var dy = Math.max(zy0 - (y + h), y - zy1, 0);
-              var d = Math.sqrt(dx * dx + dy * dy);
-              var f = Math.min(1, d / FADE);
-              return (0.14 + 0.86 * f).toFixed(3);
-            };
-            for (var di = 0; di < chips.length; di++) {
-              var dc = chips[di];
-              var dw = dc._w || 200;
-              var opP = gradOp(dc._x, dc._y, dw, dh);
-              if (dc.el.style.opacity !== opP) dc.el.style.opacity = opP;
-              if (dc.ghost) {
-                var opG = gradOp(dc._gx, dc._gy, dw, dh);
-                if (dc.ghost.style.opacity !== opG) dc.ghost.style.opacity = opG;
-              }
-            }
-          }
+          // Round 5.2 (2026-11-06, per Alp: "let's just have the hero
+          // text have a halo"): the pill dimming from rounds 5/5.1 is
+          // REMOVED — Alp said the gradient version was wrong. Pills
+          // stay full opacity everywhere; legibility now comes only
+          // from the halo scrim behind the hero text in styles.css
+          // (.hero-inner::before). No per-frame rect reads here anymore.
           requestAnimationFrame(frame);
         })(last);
       }
