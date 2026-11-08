@@ -420,19 +420,68 @@
           } catch (e) {}
         }
         frameMountains();
+        /* Round 7.1 (2026-11-07, per Alp: "only behind the text
+           lines"): the round-7 ellipse cleared a giant oval and
+           emptied the middle of the hero. Now the mask fades the
+           bubbles only in thin strips directly behind the five hero
+           text lines (greeting, headline, subtitle, location,
+           buttons), so the bubbles stay visible between the lines and
+           at the sides. The mask is an SVG built from the lines'
+           measured boxes: white everywhere (visible) with blurred
+           black strips (hidden) behind each line, so the transition
+           is a soft gradient, not a hard edge. The SVG is white on
+           transparent, so it reads the same under alpha and luminance
+           mask modes. Positions come from offsetTop/offsetLeft
+           (layout positions, unaffected by scrolling or the
+           hero-inner transform) minus the hero-inner's 28px rest
+           translateY. Block boxes are used, so word rotation (which
+           only changes the inner boxes' widths) never moves the
+           strips. Regenerated on load, font load and resize. */
+        function updateLegibilityMask() {
+          try {
+            var hero = document.querySelector(".hero");
+            var box = document.querySelector(".chips");
+            var inner = document.querySelector(".hero-inner");
+            if (!hero || !box || !inner) return;
+            var W = hero.offsetWidth, H = hero.offsetHeight;
+            if (!W || !H) return;
+            var lines = inner.querySelectorAll(".hero-greeting, .hero-love, .hero-sub, .hero-meta, .hero-actions");
+            var rects = "";
+            for (var i = 0; i < lines.length; i++) {
+              var el = lines[i];
+              var x = inner.offsetLeft + el.offsetLeft;
+              var y = inner.offsetTop - 28 + el.offsetTop;
+              var w = el.offsetWidth, h = el.offsetHeight;
+              if (!w || !h) continue;
+              /* Inset a few px so the blur feather, not the rect edge,
+                 defines the transition; rx rounds the strip ends. */
+              rects += '<rect x="' + (x + 4) + '" y="' + (y + 5) + '" width="' + (w - 8) + '" height="' + (h - 10) + '" rx="22"/>';
+            }
+            if (!rects) return;
+            var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">'
+              + '<defs><filter id="f" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="11"/></filter>'
+              + '<mask id="m"><rect width="' + W + '" height="' + H + '" fill="white"/><g filter="url(#f)" fill="black">' + rects + '</g></mask></defs>'
+              + '<rect width="' + W + '" height="' + H + '" fill="white" mask="url(#m)"/></svg>';
+            var url = 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")';
+            box.style.webkitMaskImage = url;
+            box.style.maskImage = url;
+            box.style.maskMode = "alpha";
+          } catch (e) { /* mask is polish; never break the page */ }
+        }
         buildRidge();
         // buildRidge already laid the rows out (via replanChips); run it
         // once more directly so the rows exist even if the ridge sampling
         // failed, and re-run when the webfont lands (pill widths change).
         layoutRows();
+        updateLegibilityMask();
         if (document.fonts && document.fonts.ready) {
-          document.fonts.ready.then(function () { layoutRows(); chips.forEach(place); });
+          document.fonts.ready.then(function () { layoutRows(); chips.forEach(place); updateLegibilityMask(); });
         }
         chips.forEach(place);
         var rT = null;
         window.addEventListener("resize", function () {
           if (rT) clearTimeout(rT);
-          rT = setTimeout(function () { frameMountains(); buildRidge(); }, 200);
+          rT = setTimeout(function () { frameMountains(); buildRidge(); updateLegibilityMask(); }, 200);
         });
         var last = performance.now();
         var heroInnerEl = document.querySelector(".hero-inner");
@@ -449,9 +498,10 @@
           // text have a halo"): the pill dimming from rounds 5/5.1 is
           // REMOVED — Alp said the gradient version was wrong. Pills
           // stay full opacity everywhere. Round 7 (2026-11-07): the
-          // halo itself is gone too (it shadowed the wrong part) —
-          // legibility now comes from the mask on .chips in styles.css,
-          // which fades the part of each pill under the hero text.
+          // halo itself is gone too (it shadowed the wrong part).
+          // Round 7.1: legibility now comes from the per-line mask in
+          // updateLegibilityMask() above — thin strips behind the
+          // five hero text lines only, bubbles visible between them.
           // No per-frame rect reads here anymore.
           requestAnimationFrame(frame);
         })(last);

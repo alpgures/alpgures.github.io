@@ -334,29 +334,11 @@ section h2 {
 .stars circle.tw { animation: twinkle 7s ease-in-out infinite; }
 @keyframes twinkle { 0%, 100% { opacity: 0.14; } 50% { opacity: 0.55; } }
 .taurus { position: absolute; left: 0; right: 0; bottom: -2px; width: 100%; height: 58vh; z-index: 2; }
-.chips {
-  position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none;
-  /* (2026-11-07, round 7, per Alp: the halo is gone; legibility now
-     comes from fading the bubbles themselves where they pass under
-     the hero text. This mask is per-pixel, not per-bubble: the part
-     of a pill under the legibility zone fades out, the part outside
-     stays, with a soft transitional gradient at the zone edge. The
-     zone is the hero text block: 740px wide, centred, its centre at
-     ~34% down the hero (the 32vh bottom padding pushes the centred
-     block up from 50%). Transparent out to 78% of the ellipse, fully
-     visible past 96%. -webkit- prefix included: Alp Browser is
-     WebKit, and the unprefixed property alone does not apply there.) */
-  -webkit-mask-image: radial-gradient(ellipse 540px 300px at 50% 34%, transparent 0%, transparent 78%, black 96%);
-  mask-image: radial-gradient(ellipse 540px 300px at 50% 34%, transparent 0%, transparent 78%, black 96%);
-}
-@media (max-width: 600px) {
-  /* Narrower text block (400px) and taller stack on phones: a
-     smaller, taller legibility zone so bubbles survive at the edges. */
-  .chips {
-    -webkit-mask-image: radial-gradient(ellipse 320px 380px at 50% 34%, transparent 0%, transparent 72%, black 94%);
-    mask-image: radial-gradient(ellipse 320px 380px at 50% 34%, transparent 0%, transparent 72%, black 94%);
-  }
-}
+.chips { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+/* (The legibility mask on .chips is set by JS, updateLegibilityMask()
+   in app.js: thin strips behind the five hero text lines only. No
+   CSS mask here — the round-7 ellipse, a giant oval that emptied the
+   middle of the hero, was removed 2026-11-07, round 7.1.) */
 /* (2026-11-06: the bubbles are pure ambience now — no dragging, no
    wheel scrub, no bobbing. They only drift sideways, so they never
    intercept the pointer at all.) */
