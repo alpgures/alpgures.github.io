@@ -161,6 +161,22 @@
         // One shared drift rate for every bubble: a full crossing takes
         // 200 seconds, slow and calm.
         var CHIP_SP = 1 / 200;
+        // (2026-11-07, round 6, per Alp: "lose that gap in between word
+        // bubbles on the same row, it's okay if two ends of the row end
+        // up with duplicate words.") Pills in a row sit a fixed small
+        // gap apart (CHIP_GAP) instead of being spread with even gaps
+        // across the screen width. A row's dealt words are tiled
+        // (repeated) until the run covers the screen width, so the same
+        // word may appear twice on a row, at both ends. The run's
+        // period is the tiled length L, not the screen width: each
+        // chip's fx/tx span L, and its ghost rides exactly one period
+        // over, so the wrap stays seamless. Tile clones (extra copies
+        // of a word for tiling) live in tileClones and are rebuilt on
+        // every layoutRows() run. Lanes, the ridge ceiling and the
+        // z-order are untouched: bubbles stay in the sky, behind the
+        // mountain peaks.
+        var CHIP_GAP = 8;
+        var tileClones = [];
         // Rows: the bubbles sit on straight, evenly spaced horizontal
         // rows (no random scatter, no dead space). The row count adapts
         // to how much bubble width has to fit across the screen.
@@ -218,13 +234,43 @@
         // Lay the bubbles out on their rows: evenly spaced rows across
         // the sky, each row drifting the opposite way from its neighbours.
         // The widest pills are dealt first to the currently lightest row
-        // (greedy balance), so no row ends up a solid chain of touching
-        // pills and none is half empty; each row is then laid out with
-        // even gaps, including the wrap gap. Re-run on resize (rows and
+        // (greedy balance), so every row needs a similar amount of
+        // tiling; each row is then tiled with a fixed small gap (see
+        // CHIP_GAP) instead of even gaps. Re-run on resize (rows and
         // lanes adapt to the new width/ridge) and when the webfont lands
         // (pill widths change).
+        // Tile clone: an extra copy of a base chip, for when a row's
+        // dealt words have to repeat to cover the screen width. Same
+        // text and opacity as the base, own ghost mirror, animated by
+        // the frame loop like any other chip.
+        function makeTileClone(base) {
+          var outer = document.createElement("span");
+          var inner = base.el.firstChild.cloneNode(true);
+          outer.appendChild(inner);
+          chipsBox.appendChild(outer);
+          var c = { el: outer, sp: CHIP_SP, t: 0, lane: 0.1, ltr: true, fx: 0, tx: 1, row: 0, _idx: base._idx, _tile: true };
+          outer.className = "chip-x";
+          outer._chip = c;
+          var gInner = inner.cloneNode(true);
+          var gOuter = document.createElement("span");
+          gOuter.appendChild(gInner);
+          gOuter.className = "chip-x";
+          chipsBox.appendChild(gOuter);
+          c.ghost = gOuter;
+          return c;
+        }
         function layoutRows() {
           if (!chips.length) return;
+          // Drop the previous layout's tile clones (fresh tiling each
+          // run, so clones never get re-dealt as words).
+          for (var ci = 0; ci < tileClones.length; ci++) {
+            var tc = tileClones[ci];
+            if (tc.el && tc.el.parentNode) tc.el.parentNode.removeChild(tc.el);
+            if (tc.ghost && tc.ghost.parentNode) tc.ghost.parentNode.removeChild(tc.ghost);
+            var ix = chips.indexOf(tc);
+            if (ix !== -1) chips.splice(ix, 1);
+          }
+          tileClones = [];
           var w = CW() || 1;
           var items = [];
           for (var mi = 0; mi < chips.length; mi++) {
@@ -265,19 +311,44 @@
             list.sort(function (a, b) { return a.c._idx - b.c._idx; });
             var m = list.length;
             if (!m) continue;
-            var gap = (w - rowW[r]) / m;
-            if (gap < 0) gap = 0;
+            var ltr = (r % 2 === 0);
+            // Tile the row's words (repeat the sequence) until the run
+            // covers the screen width. The period L is the tiled
+            // length, gap included, so the gap is uniform everywhere,
+            // including across the wrap seam — and the same word may
+            // appear twice on the row, at both ends, which Alp is fine
+            // with (2026-11-07, round 6).
+            var seq = [];
+            var L = 0;
+            var k = 0;
+            while (L < w) {
+              var it = list[k % m];
+              seq.push(it);
+              L += it.w + CHIP_GAP;
+              k++;
+            }
             var x = 0;
-            for (var j = 0; j < m; j++) {
-              var cc = list[j].c;
-              cc._w = list[j].w;
+            var used = {};
+            for (var j = 0; j < seq.length; j++) {
+              var base = seq[j].c;
+              var cc;
+              var occ = used[base._idx] || 0;
+              used[base._idx] = occ + 1;
+              if (occ === 0) {
+                cc = base;
+              } else {
+                cc = makeTileClone(base);
+                tileClones.push(cc);
+                chips.push(cc);
+              }
+              cc._w = seq[j].w;
               cc.row = r;
               cc.lane = ROW_Y[r];
-              cc.ltr = (r % 2 === 0);
-              cc.fx = 0; cc.tx = cc.ltr ? 1 : -1;
-              var v = x / w;
-              cc.t = cc.ltr ? v : 1 - v;
-              x += list[j].w + gap;
+              cc.ltr = ltr;
+              cc.fx = 0; cc.tx = ltr ? L / w : -L / w;
+              var v = x / L;
+              cc.t = ltr ? v : 1 - v;
+              x += seq[j].w + CHIP_GAP;
             }
           }
         }
@@ -318,10 +389,10 @@
           // Row, lane, direction and spacing are set by layoutRows()
           // (called from buildRidge below): straight even rows, each
           // drifting the opposite way from its neighbours. Seamless wrap:
-          // the run spans exactly one screen width (left-to-right, or
-          // right-to-left as 0 to -1), and a mirror copy rides exactly
-          // one width over, so the slice of a chip that exits one side
-          // enters the other side at the same time.
+          // the run spans the tiled length L (left-to-right as 0 to L/w,
+          // or right-to-left as 0 to -L/w), and a mirror copy rides
+          // exactly one period over, so the slice of a chip that exits
+          // one side enters the other side at the same time.
           var c = { el: outer, sp: CHIP_SP, t: 0, lane: 0.1, ltr: true, fx: 0, tx: 1, row: 0, _idx: i };
           outer.className = "chip-x";
           outer._chip = c;

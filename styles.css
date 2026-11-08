@@ -554,11 +554,16 @@ html.glass-ok .chips .chip {
 .btn:hover { text-decoration: none; background: #7d8ca3; color: #141518; }
 
 .btn-ghost {
-  background: transparent;
-  color: var(--accent);
-  border: 1px solid var(--accent);
+  /* (2026-11-07, round 6, per Alp: the Experience button was not
+     legible enough — the transparent ghost let a word bubble show
+     through the text. Solid navy now, the same dark navy as the
+     scrolled nav bar, so the text reads and the button still varies
+     against the light "See my work" button.) */
+  background: var(--accent-soft);
+  color: var(--ink);
+  border: 1px solid #2e3846;
 }
-.btn-ghost:hover { background: var(--accent-soft); color: var(--accent); }
+.btn-ghost:hover { background: #2b3442; color: var(--ink); }
 
 /* Entries */
 
