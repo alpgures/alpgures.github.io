@@ -280,8 +280,11 @@ section h2 {
 /* Hero-to-work blend: the mountains' base (#0e0f12) meets the paper
    (#141518) at the hero's bottom edge — a hard step. This fade melts
    the hero's bottom into the paper colour so the transition is
-   seamless. Above the mountains (z-index 1), below the chips
-   (z-index 2) and the hero text / scroll cue (z-index 3). */
+   seamless. (2026-11-07, round 7: the bubbles moved behind the
+   mountains, so the stack is now chips (z-index 1), mountains
+   (z-index 2), this fade (z-index 2, later in the DOM so it still
+   paints over the mountains), and the hero text / scroll cue
+   (z-index 3) above everything.) */
 .hero::after {
   content: "";
   position: absolute;
@@ -290,7 +293,7 @@ section h2 {
   bottom: 0;
   height: 160px;
   background: linear-gradient(to bottom, rgba(20, 21, 24, 0), var(--paper));
-  z-index: 1;
+  z-index: 2;
   pointer-events: none;
 }
 .hero-bg { position: absolute; inset: 0; pointer-events: none; }
@@ -330,8 +333,30 @@ section h2 {
 .stars { position: absolute; left: 0; top: 0; width: 100%; height: 58%; z-index: 0; }
 .stars circle.tw { animation: twinkle 7s ease-in-out infinite; }
 @keyframes twinkle { 0%, 100% { opacity: 0.14; } 50% { opacity: 0.55; } }
-.taurus { position: absolute; left: 0; right: 0; bottom: -2px; width: 100%; height: 58vh; z-index: 1; }
-.chips { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
+.taurus { position: absolute; left: 0; right: 0; bottom: -2px; width: 100%; height: 58vh; z-index: 2; }
+.chips {
+  position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none;
+  /* (2026-11-07, round 7, per Alp: the halo is gone; legibility now
+     comes from fading the bubbles themselves where they pass under
+     the hero text. This mask is per-pixel, not per-bubble: the part
+     of a pill under the legibility zone fades out, the part outside
+     stays, with a soft transitional gradient at the zone edge. The
+     zone is the hero text block: 740px wide, centred, its centre at
+     ~34% down the hero (the 32vh bottom padding pushes the centred
+     block up from 50%). Transparent out to 78% of the ellipse, fully
+     visible past 96%. -webkit- prefix included: Alp Browser is
+     WebKit, and the unprefixed property alone does not apply there.) */
+  -webkit-mask-image: radial-gradient(ellipse 540px 300px at 50% 34%, transparent 0%, transparent 78%, black 96%);
+  mask-image: radial-gradient(ellipse 540px 300px at 50% 34%, transparent 0%, transparent 78%, black 96%);
+}
+@media (max-width: 600px) {
+  /* Narrower text block (400px) and taller stack on phones: a
+     smaller, taller legibility zone so bubbles survive at the edges. */
+  .chips {
+    -webkit-mask-image: radial-gradient(ellipse 320px 380px at 50% 34%, transparent 0%, transparent 72%, black 94%);
+    mask-image: radial-gradient(ellipse 320px 380px at 50% 34%, transparent 0%, transparent 72%, black 94%);
+  }
+}
 /* (2026-11-06: the bubbles are pure ambience now — no dragging, no
    wheel scrub, no bobbing. They only drift sideways, so they never
    intercept the pointer at all.) */
@@ -389,24 +414,11 @@ html.glass-ok .chips .chip {
   backdrop-filter: url(#lg);
   -webkit-backdrop-filter: url(#lg);
 }
-/* (2026-11-06: legibility, round 5, Alp picked BOTH: a dark halo
-   behind the hero text (this rule) AND selective dimming in app.js
-   (a pill fades while it passes behind the text). The halo is a soft
-   radial scrim inside hero-inner's stacking context (z-index 3), so
-   it sits above the pills and below the text.) */
+/* (2026-11-07, round 7, per Alp: the halo is GONE. It cast its
+   shadow on the wrong part and kept sections illegible. Legibility
+   now comes from the mask on .chips (above): the part of each bubble
+   under the hero text fades out, instead of a scrim behind the text.) */
 .hero-inner { position: relative; z-index: 3; width: 100%; max-width: 740px; margin: 0 auto; padding: 0 28px; transform: translateY(-28px); }
-.hero-inner::before {
-  content: "";
-  position: absolute;
-  inset: -80px -104px;
-  z-index: -1;
-  background: radial-gradient(ellipse 62% 56% at 50% 46%, rgba(8, 9, 12, 0.95) 0%, rgba(8, 9, 12, 0.85) 38%, rgba(8, 9, 12, 0.45) 58%, rgba(8, 9, 12, 0) 72%);
-  border-radius: 64px;
-  pointer-events: none;
-}
-@media (max-width: 600px) {
-  .hero-inner::before { inset: -44px -40px; }
-}
 /* (2026-11-06: keep the big pills off small and short screens, 28px
    pills would crowd a phone or a short laptop window.) */
 @media (max-width: 600px) {

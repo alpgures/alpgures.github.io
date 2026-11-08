@@ -448,9 +448,11 @@
           // Round 5.2 (2026-11-06, per Alp: "let's just have the hero
           // text have a halo"): the pill dimming from rounds 5/5.1 is
           // REMOVED — Alp said the gradient version was wrong. Pills
-          // stay full opacity everywhere; legibility now comes only
-          // from the halo scrim behind the hero text in styles.css
-          // (.hero-inner::before). No per-frame rect reads here anymore.
+          // stay full opacity everywhere. Round 7 (2026-11-07): the
+          // halo itself is gone too (it shadowed the wrong part) —
+          // legibility now comes from the mask on .chips in styles.css,
+          // which fades the part of each pill under the hero text.
+          // No per-frame rect reads here anymore.
           requestAnimationFrame(frame);
         })(last);
       }
@@ -692,14 +694,17 @@
         document.fonts.ready.then(alignNavToHeroText);
       window.addEventListener("resize", alignNavToHeroText);
 
-      // Apple-style scroll: the hero settles as you leave it, the mountains
-      // parallax, the nav frosts in, and a hairline tracks reading progress.
+      // Apple-style scroll: the hero settles as you leave it, the nav
+      // frosts in, and a hairline tracks reading progress.
+      // (2026-11-07, round 7: the mountain parallax is gone — it moved
+      // the mountains down in abrupt steps while scrolling in Alp
+      // Browser instead of gliding, so the mountains now stay fixed in
+      // the hero and scroll with the page, exactly where they ought to be.)
       // rAF-throttled; transforms skipped entirely for reduced motion.
       try {
         var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         var heroEl = document.querySelector(".hero");
         var heroInner = document.querySelector(".hero-inner");
-        var taurusEl = document.querySelector(".taurus");
         var navEl = document.querySelector(".nav");
         var scrollTicking = false;
         /* Anchor jumps (nav Work / About / Contact, hero "See my work"):
@@ -763,7 +768,6 @@
             cueEl.style.opacity = String(1 - p);
             cueEl.style.pointerEvents = p > 0.85 ? "none" : "";
           }
-          if (taurusEl) taurusEl.style.transform = "translateY(" + Math.min(y * 0.18, 90) + "px)";
 
           // Horizontal work carousel: vertical scroll through the tall
           // .work-scroll track drives the card row left. Skipped while
