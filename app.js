@@ -437,6 +437,19 @@
            translateY. Block boxes are used, so word rotation (which
            only changes the inner boxes' widths) never moves the
            strips. Regenerated on load, font load and resize. */
+        /* Round 7.2 (2026-11-07): the subtitle and location lines were
+           still hard to read — their strips only hid ~50-65% of the
+           bubbles behind them. A blurred rect hides fully only across
+           its height minus ~2x the blur, and those two lines are the
+           thinnest, so the blur ate their whole strip. Now the mask
+           has two groups: the greeting, headline and buttons keep the
+           soft wide blur (they were already legible), while the
+           subtitle and location lines get taller rects (expanded 8px
+           top and bottom, so the fully-hidden core covers the whole
+           line) with a tighter blur, so the bubbles behind those two
+           thin lines disappear completely while the edge stays a soft
+           gradient. The two lines are 8px apart, so their strips
+           merge into one band behind the subtitle block — intended. */
         function updateLegibilityMask() {
           try {
             var hero = document.querySelector(".hero");
@@ -446,21 +459,30 @@
             var W = hero.offsetWidth, H = hero.offsetHeight;
             if (!W || !H) return;
             var lines = inner.querySelectorAll(".hero-greeting, .hero-love, .hero-sub, .hero-meta, .hero-actions");
-            var rects = "";
+            var rectsA = "", rectsB = "";
             for (var i = 0; i < lines.length; i++) {
               var el = lines[i];
               var x = inner.offsetLeft + el.offsetLeft;
               var y = inner.offsetTop - 28 + el.offsetTop;
               var w = el.offsetWidth, h = el.offsetHeight;
               if (!w || !h) continue;
-              /* Inset a few px so the blur feather, not the rect edge,
-                 defines the transition; rx rounds the strip ends. */
-              rects += '<rect x="' + (x + 4) + '" y="' + (y + 5) + '" width="' + (w - 8) + '" height="' + (h - 10) + '" rx="22"/>';
+              if (el.classList.contains("hero-sub") || el.classList.contains("hero-meta")) {
+                /* Thin lines: expand so the fully-hidden core (rect
+                   height minus ~2x blur) covers the whole line. */
+                rectsB += '<rect x="' + (x + 4) + '" y="' + (y - 8) + '" width="' + (w - 8) + '" height="' + (h + 16) + '" rx="22"/>';
+              } else {
+                /* Inset a few px so the blur feather, not the rect
+                   edge, defines the transition; rx rounds the ends. */
+                rectsA += '<rect x="' + (x + 4) + '" y="' + (y + 5) + '" width="' + (w - 8) + '" height="' + (h - 10) + '" rx="22"/>';
+              }
             }
-            if (!rects) return;
+            if (!rectsA && !rectsB) return;
             var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">'
               + '<defs><filter id="f" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="11"/></filter>'
-              + '<mask id="m"><rect width="' + W + '" height="' + H + '" fill="white"/><g filter="url(#f)" fill="black">' + rects + '</g></mask></defs>'
+              + '<filter id="g" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5"/></filter>'
+              + '<mask id="m"><rect width="' + W + '" height="' + H + '" fill="white"/>'
+              + '<g filter="url(#f)" fill="black">' + rectsA + '</g>'
+              + '<g filter="url(#g)" fill="black">' + rectsB + '</g></mask></defs>'
               + '<rect width="' + W + '" height="' + H + '" fill="white" mask="url(#m)"/></svg>';
             var url = 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")';
             box.style.webkitMaskImage = url;
@@ -502,6 +524,9 @@
           // Round 7.1: legibility now comes from the per-line mask in
           // updateLegibilityMask() above — thin strips behind the
           // five hero text lines only, bubbles visible between them.
+          // Round 7.2: the subtitle/location strips are strengthened
+          // (taller rects, tighter blur) — the wide blur had left
+          // those two thin lines half-visible behind the bubbles.
           // No per-frame rect reads here anymore.
           requestAnimationFrame(frame);
         })(last);
