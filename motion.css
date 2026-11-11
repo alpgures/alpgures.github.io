@@ -197,39 +197,22 @@
 }
 
 
-/* ---------- Round 8: hand-drawn hero scene ---------- */
+/* ---------- Round 9: hand-drawn hero scene ---------- */
 
-/* Draw-on: ridge lines, moon, ground and house draw themselves once,
-   using pathLength="1" so dasharray 1 = the whole path. */
-.taurus .draw-ridge { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ink-draw 2.4s var(--ease-flow) 0.15s forwards; }
-.taurus .draw-ridge.d2 { animation-delay: 0.6s; }
-.taurus .ink-moon { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ink-draw 1.4s var(--ease-flow) 0.9s forwards; }
-.taurus .ink-ground { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ink-draw 1.8s var(--ease-flow) 0.4s forwards; }
-.taurus .ink-house { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ink-draw 1.6s var(--ease-flow) 1.1s forwards; }
+.scene .ink-moon { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ink-draw 1.4s var(--ease-flow) 0.9s forwards; }
 @keyframes ink-draw { to { stroke-dashoffset: 0; } }
 
-/* The house windows light up once the drawing finishes. */
-.taurus .lamp { opacity: 0; animation: lamp-in 1s ease 1.9s forwards; }
-.taurus .lamp-glow { opacity: 0; animation: lamp-glow-in 1.4s ease 1.9s forwards; }
+/* The scene windows light up once the drawing finishes. */
+.scene .lamp { opacity: 0; animation: lamp-in 1s ease 1.9s forwards; }
+.scene .lamp-glow { opacity: 0; animation: lamp-glow-in 1.4s ease 1.9s forwards; }
 @keyframes lamp-in { to { opacity: 0.9; } }
 @keyframes lamp-glow-in { to { opacity: 0.12; } }
 
 /* Birds drift almost imperceptibly. */
-.taurus .bird { animation: bird-drift 26s ease-in-out infinite alternate; }
-.taurus .bird.b2 { animation-delay: -13s; }
+.scene .bird { animation: bird-drift 26s ease-in-out infinite alternate; }
+.scene .bird.b2 { animation-delay: -13s; }
 @keyframes bird-drift { from { transform: translateX(-14px); } to { transform: translateX(14px); } }
 
-/* The walker strolls the ground line, one crossing per ~75s. Legs swing
-   around the hip (transform-origin top of each leg's own box); the
-   period matches the crossing speed so the feet don't slide. */
-.taurus .walker { animation: walk-across 75s linear 1s infinite; }
-@keyframes walk-across { from { transform: translateX(-90px); } to { transform: translateX(1530px); } }
-.walker .leg { transform-box: fill-box; transform-origin: 50% 0%; animation: leg-swing 0.55s ease-in-out infinite alternate; }
-.walker .leg.l2 { animation-delay: -0.275s; }
-@keyframes leg-swing { from { transform: rotate(18deg); } to { transform: rotate(-18deg); } }
-.walker .arm { transform-box: fill-box; transform-origin: 50% 0%; animation: arm-swing 0.55s ease-in-out infinite alternate; }
-.walker .arm.a2 { animation-delay: -0.275s; }
-@keyframes arm-swing { from { transform: rotate(12deg); } to { transform: rotate(-12deg); } }
 
 /* ---------- Scroll reveal ---------- */
 
@@ -248,14 +231,13 @@
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .scn *, .scn, .chip-x, .chip-w, .chip-x .chip, .chip-w .chip, .stars .tw, .scroll-cue, .scroll-cue-text, .scroll-cue-arrow {
+  .scn *, .scn, .chip-x, .chip-w, .chip-x .chip, .chip-w .chip, .scene .tw, .scroll-cue, .scroll-cue-text, .scroll-cue-arrow {
     animation: none !important;
   }
   .rv { opacity: 1; translate: none; scale: none; transition: none; }
-  .taurus .draw-ridge, .taurus .ink-moon, .taurus .ink-ground, .taurus .ink-house { stroke-dashoffset: 0 !important; animation: none !important; }
-  .taurus .walker, .taurus .bird { animation: none !important; }
-  .taurus .lamp { opacity: 0.9 !important; animation: none !important; }
-  .taurus .lamp-glow { opacity: 0.12 !important; animation: none !important; }
+  .scene .bird { animation: none !important; }
+  .scene .lamp { opacity: 0.9 !important; animation: none !important; }
+  .scene .lamp-glow { opacity: 0.12 !important; animation: none !important; }
   .sc-plane .scn-display,
   .sc-plane .scn-dline { opacity: 1 !important; transform: none !important; }
   .sc-plane .scn-plane { opacity: 0 !important; }
@@ -263,5 +245,4 @@
 
 @media (max-width: 700px) {
   .hero { min-height: 96vh; padding-bottom: 34vh; }
-  .taurus { height: 48vh; }
 }

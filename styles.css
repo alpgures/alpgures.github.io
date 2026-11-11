@@ -103,15 +103,15 @@ body {
   background: var(--paper);
   overflow-x: clip;
   color: var(--ink);
-  font-family: "Kalam", "Inter", -apple-system, "Helvetica Neue", sans-serif;
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
   font-size: 18px;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3 {
-  font-family: "Kalam", "Inter", Georgia, serif;
-  font-weight: 700;
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
+  font-weight: 500;
   line-height: 1.2;
   letter-spacing: -0.01em;
 }
@@ -188,8 +188,8 @@ a:hover { text-decoration: underline; }
   left: 28px;
   top: 50%;
   transform: translateY(-50%);
-  font-family: "Kalam", "Inter", Georgia, serif;
-  font-weight: 700;
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
+  font-weight: 600;
   font-size: 24px;
   /* Tight line-height: the name must never push the bar taller than the
      Resume pill (37.5px) once it becomes a flex item on the homepage. */
@@ -219,7 +219,7 @@ a:hover { text-decoration: underline; }
 .nav-links { display: flex; gap: 22px; align-items: center; }
 .nav-links a {
   color: var(--muted);
-  font-family: "Kalam", "Inter", sans-serif;
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
   font-size: 17px;
   font-weight: 400;
 }
@@ -228,7 +228,7 @@ a:hover { text-decoration: underline; }
 .nav-resume {
   border: 1px solid var(--accent);
   border-radius: var(--hand);
-  font-family: "Kalam", "Inter", sans-serif;
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
   padding: 5px 14px;
   /* Not inside .nav-links any more, so it no longer inherits the 15px
      link size from .nav-links a — set it explicitly (17px inherited
@@ -303,10 +303,9 @@ section h2::after {
   pointer-events: none;
 }
 .hero-bg { position: absolute; inset: 0; pointer-events: none; }
-.stars { position: absolute; left: 0; top: 0; width: 100%; height: 58%; z-index: 0; }
-.stars .tw { animation: twinkle 7s ease-in-out infinite; }
+.scene { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+.scene .tw { animation: twinkle 7s ease-in-out infinite; }
 @keyframes twinkle { 0%, 100% { opacity: 0.14; } 50% { opacity: 0.55; } }
-.taurus { position: absolute; left: 0; right: 0; bottom: -2px; width: 100%; height: 58vh; z-index: 2; }
 /* (Round 8, 2026-11-11, per Alp: hide the floating hello bubbles
    for now — another animation gets overlaid later. The div stays
    in the DOM and the JS chip block is parked, not deleted.) */
@@ -388,7 +387,7 @@ html.glass-ok .chips .chip {
 
 .hero-greeting {
   font-size: clamp(20px, 2.8vw, 30px);
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: 0.01em;
   margin: 0 0 10px;
   color: var(--ink);
@@ -410,7 +409,7 @@ html.glass-ok .chips .chip {
 .love-box > span { flex-shrink: 0; line-height: 1; }
 .hero-love {
   font-size: clamp(24px, 6vw, 52px) !important;
-  font-weight: 600;
+  font-weight: 300;
   letter-spacing: -0.01em;
   line-height: 1.15;
   white-space: nowrap;
@@ -452,7 +451,7 @@ html.glass-ok .chips .chip {
 }
 
 .hero-sub {
-  font-family: "Kalam", "Inter", Georgia, serif;
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
   font-size: 24px;
   line-height: 1.45;
   margin: 0 0 8px;
@@ -483,9 +482,8 @@ html.glass-ok .chips .chip {
 }
 .scroll-cue:hover { color: var(--ink); text-decoration: none; }
 .scroll-cue-text {
-  /* Kalam hand-lettered, not the plain Inter sans — Alp hates the sans here
-     (2026-11-05), and the cue was too small and too close to the corner. */
-  font-family: "Kalam", "Inter", Georgia, serif;
+  /* Inter light (Alp, 2026-11-11): no handwritten font, thinner sans. */
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
   font-size: 15px;
   letter-spacing: 0.04em;
   white-space: nowrap;
@@ -514,8 +512,8 @@ html.glass-ok .chips .chip {
   display: inline-block;
   background: var(--accent);
   color: #141518;
-  font-family: "Kalam", "Inter", sans-serif;
-  font-weight: 700;
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
+  font-weight: 600;
   font-size: 17px;
   padding: 8px 20px;
   border-radius: var(--hand);
@@ -667,7 +665,6 @@ main:has(#contact) + footer { border-top: none; }
   .hero { padding: 56px 0 28px; }
   .hero-inner { max-width: 400px; padding: 0 20px; }
   .hero-love { font-size: min(8vw, 31px) !important; }
-  .taurus { height: 70vh; }
   section { padding: 40px 0 6px; }
 }
 
@@ -702,7 +699,7 @@ main:has(#contact) + footer { border-top: none; }
   background: var(--accent-soft);
 }
 .card-img-empty span {
-  font-family: "Kalam", "Inter", Georgia, serif;
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
   font-size: 64px;
   font-weight: 600;
   color: var(--accent);
@@ -711,7 +708,7 @@ main:has(#contact) + footer { border-top: none; }
 .card-body { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
 .card-body h3 { font-size: 22px; }
 .card-body p { font-size: 16px; color: var(--muted); flex: 1; }
-.card-cta { font-family: "Kalam", "Inter", sans-serif; font-size: 17px; font-weight: 700; color: var(--accent); }
+.card-cta { font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif; font-size: 17px; font-weight: 600; color: var(--accent); }
 
 /* One sharp fact per card, patched in from the project's own data file. */
 .card-fact {
@@ -779,7 +776,7 @@ main:has(#contact) + footer { border-top: none; }
   margin: 48px 0 8px;
   padding-top: 20px;
   border-top: 1px solid var(--line);
-  font-family: "Kalam", "Inter", Georgia, serif;
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
   font-size: 24px;
   font-weight: 500;
 }
