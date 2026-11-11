@@ -149,7 +149,11 @@
       // direction + same speed means the spacing is kept forever,
       // no collision steering needed.)
       var chipsBox = document.querySelector(".hero .chips");
-      if (chipsBox) {
+      /* Round 8 (2026-11-11, per Alp): hello bubbles hidden — the
+         whole chip build + rAF loop + legibility mask are parked
+         behind this false, not deleted; a replacement animation
+         gets overlaid later. */
+      if (false && chipsBox) {
         var words = (data.hero && data.hero.floating_words) || [
           "hello", "xin ch\u00e0o", "merhaba",
         ];
@@ -769,8 +773,8 @@
         document.fonts.ready.then(alignNavToHeroText);
       window.addEventListener("resize", alignNavToHeroText);
 
-      // Apple-style scroll: the hero settles as you leave it, the nav
-      // frosts in, and a hairline tracks reading progress.
+      // Apple-style scroll: the hero settles as you leave it and the nav
+      // frosts in. (Round 8: the reading-progress hairline is gone.)
       // (2026-11-07, round 7: the mountain parallax is gone — it moved
       // the mountains down in abrupt steps while scrolling in Alp
       // Browser instead of gliding, so the mountains now stay fixed in
@@ -803,7 +807,7 @@
           scrollTicking = false;
           var y = window.scrollY || 0;
           var max = document.documentElement.scrollHeight - window.innerHeight;
-          document.documentElement.style.setProperty("--scroll-progress", (max > 0 ? (y / max) * 100 : 0) + "%");
+          /* (Round 8: no --scroll-progress — the nav progress bar is gone.) */
           if (navEl) {
             /* The hero nav scrolls away with the hero; it only comes back
                (frosted, fading in) once the work section reaches the top
