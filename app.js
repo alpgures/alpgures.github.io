@@ -744,14 +744,9 @@
         var heroInner = document.querySelector(".hero-inner");
         var navEl = document.querySelector(".nav");
         var scrollTicking = false;
-        /* Anchor jumps (nav Work / About / Contact, hero "See my work"):
-           a smooth scroll to a section below the work carousel sweeps
-           the whole 200vh track in under a second, so the card row
-           whips left extremely fast. While an anchor jump is running,
-           the carousel transform is frozen — the page still scrolls
-           smoothly and vertically, the cards just don't swipe. The
-           flag clears on scrollend (or a 1.2s safety timeout) and the
-           transform is re-synced to the landing scroll position. */
+        /* Anchor jumps are instant now (round 18) — see the click handler
+           below. The old smooth-scroll freeze is retired; anchorJumping
+           stays false and the carousel re-syncs in the jump's frame. */
         var anchorJumping = false;
         var anchorJumpTimer = null;
         function endAnchorJump() {
@@ -765,7 +760,9 @@
           scrollTicking = false;
           var y = window.scrollY || 0;
           var max = document.documentElement.scrollHeight - window.innerHeight;
-          /* (Round 8: no --scroll-progress — the nav progress bar is gone.) */
+          /* Reading-progress hairline (restored round 18): fills with page
+             scroll; the bar only shows past the hero (.nav.scrolled::after). */
+          document.documentElement.style.setProperty("--scroll-progress", String(max > 0 ? Math.min(y / max, 1) : 0));
           if (navEl) {
             /* The hero nav scrolls away with the hero; it only comes back
                (frosted, fading in) once the work section reaches the top
@@ -883,16 +880,29 @@
         window.addEventListener("scroll", onScroll, { passive: true });
         window.addEventListener("resize", onScroll, { passive: true });
         onScroll();
-        /* Anchor-jump freeze: clicking a nav/hero anchor (Work, About,
-           Contact, "See my work", the scroll cue) starts a smooth
-           scroll; freeze the carousel until it lands so the card row
-           doesn't whip across while the page glides past it. */
+        /* Anchor jumps are INSTANT (round 18, Alp 2026-11-12): clicking a
+           nav/hero anchor (Portfolio, About, Contact, "See my work",
+           the scroll cue) used to smooth-scroll, and the sweep across
+           the tall work track stalled and snapped the carousel on
+           landing. Now the jump is instant — the page's smooth
+           scroll-behavior is overridden for this one jump, the target
+           is reached in the same frame, and the carousel + nav are
+           re-synced immediately. No sweep, no stall, no snap. */
         Array.prototype.forEach.call(document.querySelectorAll('a[href^="#"]'), function (a) {
-          a.addEventListener("click", function () {
-            anchorJumping = true;
-            if (anchorJumpTimer) clearTimeout(anchorJumpTimer);
-            anchorJumpTimer = setTimeout(endAnchorJump, 1200);
-            window.addEventListener("scrollend", endAnchorJump);
+          a.addEventListener("click", function (ev) {
+            var href = a.getAttribute("href") || "";
+            var target = href.length > 1 ? document.querySelector(href) : null;
+            if (!target) return;
+            ev.preventDefault();
+            var root = document.documentElement;
+            var prev = root.style.scrollBehavior;
+            root.style.scrollBehavior = "auto";
+            target.scrollIntoView();
+            root.style.scrollBehavior = prev;
+            anchorJumping = false;
+            if (anchorJumpTimer) { clearTimeout(anchorJumpTimer); anchorJumpTimer = null; }
+            window.removeEventListener("scrollend", endAnchorJump);
+            onScrollFrame();
           });
         });
       } catch (e) { /* scroll polish is optional; never break the page */ }

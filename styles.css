@@ -182,9 +182,28 @@ a:hover { text-decoration: underline; }
   animation: nav-fade-in 0.45s ease;
 }
 @keyframes nav-fade-in { from { opacity: 0; } to { opacity: 1; } }
-/* (Round 8, 2026-11-11, per Alp: no progress bar on the menu bar.
-   The .nav::after hairline and the --scroll-progress driver in
-   app.js are removed.) */
+/* (Round 18, Alp 2026-11-12: the reading-progress hairline is back. A
+   2px accent line under the nav, filling left-to-right with page scroll
+   (--scroll-progress, set by app.js). It only shows once you're past the
+   hero (.scrolled, the frosted state) — over the hero the nav stays bare
+   so the art is clean.) */
+.nav-hero::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  background: var(--accent);
+  transform: scaleX(var(--scroll-progress, 0));
+  transform-origin: left;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.nav-hero.scrolled::after { opacity: 1; }
+/* (Round 8 removed the progress bar; round 18 brings it back, past the
+   hero only — see .nav-hero::after below.) */
 .nav-name {
   position: absolute;
   left: 28px;
