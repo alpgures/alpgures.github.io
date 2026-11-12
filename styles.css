@@ -304,6 +304,7 @@ section h2::after {
 }
 .hero-bg { position: absolute; inset: 0; pointer-events: none; }
 .scene { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+.scene .pp { fill: var(--paper); } /* line-art library: paper-filled shapes go dark at night */
 .scene .tw { animation: twinkle 7s ease-in-out infinite; }
 @keyframes twinkle { 0%, 100% { opacity: 0.14; } 50% { opacity: 0.55; } }
 /* (Round 8, 2026-11-11, per Alp: hide the floating hello bubbles
