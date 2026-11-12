@@ -9,6 +9,9 @@
   --accent-soft: #232b38;
   --surface: #1b1d22;
   --soft: #c9c5ba;
+  /* Hand-drawn wobbly radii (Round 8, 2026-11-11). */
+  --hand: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  --hand-alt: 15px 225px 15px 255px / 255px 15px 225px 15px;
   /* Liquid-glass rim strength (Alp's prototype setting, 2026-11-05). */
   --rim: 0.6;
 }
@@ -35,7 +38,9 @@ html { scroll-behavior: smooth; overflow-x: hidden; }
   width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
-  height: 200vh;
+  /* (Round 17, Alp 2026-11-12: 500vh runway, ~100vh per card step, so
+     each project gets a long dwell instead of whipping past.) */
+  height: 500vh;
   padding: 0;
 }
 .work-sticky {
@@ -78,7 +83,7 @@ html { scroll-behavior: smooth; overflow-x: hidden; }
   flex-direction: column;
 }
 .work-scroll .cards .card-wide .card-body { padding: 18px 20px 20px; }
-.work-scroll .cards .card-wide .card-body h3 { font-size: 22px; }
+.work-scroll .cards .card-wide .card-body h3 { font-size: 24px; }
 
 /* Mobile + reduced motion: the carousel becomes the plain vertical grid. */
 @media (max-width: 700px), (prefers-reduced-motion: reduce) {
@@ -101,13 +106,13 @@ body {
   overflow-x: clip;
   color: var(--ink);
   font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
-  font-size: 17px;
+  font-size: 18px;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3 {
-  font-family: "Newsreader", Georgia, serif;
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
   font-weight: 500;
   line-height: 1.2;
   letter-spacing: -0.01em;
@@ -177,26 +182,36 @@ a:hover { text-decoration: underline; }
   animation: nav-fade-in 0.45s ease;
 }
 @keyframes nav-fade-in { from { opacity: 0; } to { opacity: 1; } }
-/* Hairline reading-progress bar, driven by --scroll-progress in app.js. */
-.nav::after {
+/* (Round 18, Alp 2026-11-12: the reading-progress hairline is back. A
+   2px accent line under the nav, filling left-to-right with page scroll
+   (--scroll-progress, set by app.js). It only shows once you're past the
+   hero (.scrolled, the frosted state) — over the hero the nav stays bare
+   so the art is clean.) */
+.nav-hero::after {
   content: "";
   position: absolute;
   left: 0;
-  bottom: -1px;
+  bottom: 0;
   height: 2px;
-  width: var(--scroll-progress, 0%);
+  width: 100%;
   background: var(--accent);
-  opacity: 0.7;
+  transform: scaleX(var(--scroll-progress, 0));
+  transform-origin: left;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
-
+.nav-hero.scrolled::after { opacity: 1; }
+/* (Round 8 removed the progress bar; round 18 brings it back, past the
+   hero only — see .nav-hero::after below.) */
 .nav-name {
   position: absolute;
   left: 28px;
   top: 50%;
   transform: translateY(-50%);
-  font-family: "Newsreader", Georgia, serif;
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
   font-weight: 600;
-  font-size: 23px;
+  font-size: 24px;
   /* Tight line-height: the name must never push the bar taller than the
      Resume pill (37.5px) once it becomes a flex item on the homepage. */
   line-height: 1.2;
@@ -225,14 +240,16 @@ a:hover { text-decoration: underline; }
 .nav-links { display: flex; gap: 22px; align-items: center; }
 .nav-links a {
   color: var(--muted);
-  font-size: 15px;
-  font-weight: 500;
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
+  font-size: 17px;
+  font-weight: 400;
 }
 .nav-links a:hover { color: var(--accent); text-decoration: none; }
 
 .nav-resume {
   border: 1px solid var(--accent);
-  border-radius: 999px;
+  border-radius: var(--hand);
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
   padding: 5px 14px;
   /* Not inside .nav-links any more, so it no longer inherits the 15px
      link size from .nav-links a — set it explicitly (17px inherited
@@ -256,10 +273,18 @@ section { padding: 56px 0 8px; }
    breathing room so section titles are never clipped. */
 section[id] { scroll-margin-top: 96px; }
 section h2 {
-  font-size: 30px;
+  font-size: 32px;
   margin-bottom: 22px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--line);
+  padding-bottom: 4px;
+}
+/* (Round 16, Alp 2026-11-12: no squiggles anywhere.) The heading
+   carries a straight 1px fine-line rule instead of the wavy underline. */
+section h2::after {
+  content: "";
+  display: block;
+  height: 1px;
+  margin-top: 10px;
+  background: var(--line);
 }
 
 /* Hero */
@@ -297,44 +322,14 @@ section h2 {
   pointer-events: none;
 }
 .hero-bg { position: absolute; inset: 0; pointer-events: none; }
-/* Mesh-gradient sky: Lovable-style color blending, kept to the cool
-   Slate & Bone palette (no warm/orange tones). */
-.mesh { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
-.mesh .blob { position: absolute; border-radius: 50%; filter: blur(70px); mix-blend-mode: screen; }
-.blob.b1 {
-  width: 52vw; height: 52vh; left: -10vw; top: -16vh;
-  background: radial-gradient(ellipse at center, rgba(139,147,196,0.55), transparent 70%);
-  animation: blob-drift 95s ease-in-out infinite alternate;
-}
-.blob.b2 {
-  width: 46vw; height: 48vh; right: -8vw; top: -10vh;
-  background: radial-gradient(ellipse at center, rgba(154,143,192,0.5), transparent 70%);
-  animation: blob-drift 120s ease-in-out infinite alternate-reverse;
-}
-.blob.b3 {
-  width: 60vw; height: 40vh; left: 18vw; top: -6vh;
-  background: radial-gradient(ellipse at center, rgba(125,143,192,0.42), transparent 70%);
-  animation: blob-drift 80s ease-in-out infinite alternate;
-}
-.blob.b4 {
-  width: 44vw; height: 30vh; left: 28vw; top: 30vh;
-  background: radial-gradient(ellipse at center, rgba(231,228,219,0.13), transparent 70%);
-  animation: blob-drift 105s ease-in-out infinite alternate-reverse;
-}
-.blob.b5 {
-  width: 40vw; height: 34vh; left: -6vw; top: 26vh;
-  background: radial-gradient(ellipse at center, rgba(91,107,132,0.55), transparent 70%);
-  animation: blob-drift 90s ease-in-out infinite alternate;
-}
-@keyframes blob-drift {
-  from { transform: translate3d(-3vw, -1vh, 0) scale(1); }
-  to { transform: translate3d(3vw, 2vh, 0) scale(1.1); }
-}
-.stars { position: absolute; left: 0; top: 0; width: 100%; height: 58%; z-index: 0; }
-.stars circle.tw { animation: twinkle 7s ease-in-out infinite; }
+.scene { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+.scene .pp { fill: var(--paper); } /* line-art library: paper-filled shapes go dark at night */
+.scene .tw { animation: twinkle 7s ease-in-out infinite; }
 @keyframes twinkle { 0%, 100% { opacity: 0.14; } 50% { opacity: 0.55; } }
-.taurus { position: absolute; left: 0; right: 0; bottom: -2px; width: 100%; height: 58vh; z-index: 2; }
-.chips { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+/* (Round 8, 2026-11-11, per Alp: hide the floating hello bubbles
+   for now — another animation gets overlaid later. The div stays
+   in the DOM and the JS chip block is parked, not deleted.) */
+.chips { display: none; position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
 /* (The legibility mask on .chips is set by JS, updateLegibilityMask()
    in app.js: thin strips behind the five hero text lines only. No
    CSS mask here — the round-7 ellipse, a giant oval that emptied the
@@ -401,6 +396,28 @@ html.glass-ok .chips .chip {
    now comes from the mask on .chips (above): the part of each bubble
    under the hero text fades out, instead of a scrim behind the text.) */
 .hero-inner { position: relative; z-index: 3; width: 100%; max-width: 740px; margin: 0 auto; padding: 0 28px; transform: translateY(-28px); }
+/* (2026-11-11, round 15, legibility: the hero text sat on bare line
+   art — ridge lines crossed the headline, stars sat behind the
+   letters, tower tops crowded the buttons, and the round-7 halo that
+   used to fix this was removed because it was a giant oval that
+   emptied the middle of the hero. This is NOT that halo: a soft
+   radial gradient hugging only the text block, dark directly behind
+   the letters and fading to nothing at its edges, so the scene stays
+   visible everywhere except where it would fight the letterforms.
+   It paints above the scene and below the text (z-index -1 inside
+   .hero-inner's stacking context).) */
+.hero-inner::before {
+  content: "";
+  position: absolute;
+  inset: -70px -110px -60px -110px;
+  z-index: -1;
+  background: radial-gradient(ellipse 60% 55% at 50% 46%,
+    rgba(20, 21, 24, 0.85) 0%,
+    rgba(20, 21, 24, 0.6) 42%,
+    rgba(20, 21, 24, 0.22) 68%,
+    rgba(20, 21, 24, 0) 100%);
+  pointer-events: none;
+}
 /* (2026-11-06: keep the big pills off small and short screens, 28px
    pills would crowd a phone or a short laptop window.) */
 @media (max-width: 600px) {
@@ -411,10 +428,14 @@ html.glass-ok .chips .chip {
 }
 
 .hero-greeting {
-  font-size: clamp(20px, 2.8vw, 30px);
-  font-weight: 700;
+  /* (Round 17, Alp 2026-11-12: 2px larger. The line itself stays put —
+     the REST of the hero text + buttons moves UP toward it instead: the
+     4px gap below (was 10px) pulls the love line, sub, meta and buttons
+     up as a unit, so the first line gets more space around it.) */
+  font-size: clamp(22px, 2.8vw, 32px);
+  font-weight: 500;
   letter-spacing: 0.01em;
-  margin: 0 0 10px;
+  margin: 0 0 4px;
   color: var(--ink);
 }
 .greet-box {
@@ -423,10 +444,7 @@ html.glass-ok .chips .chip {
   box-sizing: border-box;
   overflow: hidden;
   vertical-align: -0.12em;
-  background: var(--accent-soft);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 0.04em 0.3em;
+  padding: 0 0.06em;
   transition: width 0.55s cubic-bezier(0.22,1,0.36,1);
 }
 .greet-word { color: var(--accent); white-space: nowrap; flex-shrink: 0; }
@@ -435,7 +453,7 @@ html.glass-ok .chips .chip {
 .love-box > span { flex-shrink: 0; line-height: 1; }
 .hero-love {
   font-size: clamp(24px, 6vw, 52px) !important;
-  font-weight: 600;
+  font-weight: 300;
   letter-spacing: -0.01em;
   line-height: 1.15;
   white-space: nowrap;
@@ -446,14 +464,11 @@ html.glass-ok .chips .chip {
   display: inline-flex;
   align-items: center;
   box-sizing: border-box;
-  padding: 0.22em 0.32em 0.06em;
+  padding: 0.06em 0.08em;
   overflow: hidden;
   vertical-align: baseline;
   line-height: 1;
   transition: width 0.55s cubic-bezier(0.22,1,0.36,1);
-  background: var(--accent-soft);
-  border: 1px solid var(--line);
-  border-radius: 14px;
   color: var(--ink);
 }
 .love-dot { white-space: nowrap; }
@@ -478,8 +493,8 @@ html.glass-ok .chips .chip {
 }
 
 .hero-sub {
-  font-family: "Newsreader", Georgia, serif;
-  font-size: 22px;
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
+  font-size: 24px;
   line-height: 1.45;
   margin: 0 0 8px;
   color: var(--soft);
@@ -488,50 +503,54 @@ html.glass-ok .chips .chip {
 
 .hero-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 
-/* Scroll cue: bottom-right of the hero, transparent (no pill/box).
-   Minimalist thin arrow bobs hardest; the text floats gently too.
-   Fades with the hero as you scroll (app.js, same progress as the
-   hero text fade). */
+/* Scroll cue: bottom-CENTER of the hero, in a frosted pill (the same
+   pill treatment as the work-card chips) so it reads over ANY part
+   of the scene — it used to sit bottom-right, transparent and muted,
+   right on top of the village's glowing windows. The text stays
+   (Round 16: the pill is gone; see the rule itself.)
+   It still fades with the hero as you scroll (app.js). */
 .scroll-cue {
+  /* (Round 16, Alp 2026-11-12: the frosted pill looked like a generic
+     vibecoded widget. No container at all now — bare ink text + a
+     hand-drawn arrow, part of the line art. Legibility comes from a
+     soft shadow behind the text/arrow, not a box.) */
   position: absolute;
-  /* (2026-11-06: moved a little further left — 44px -> 80px from the
-     right edge — so the cue sits clear of the corner.) */
-  right: 80px;
-  bottom: 44px;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 36px;
   z-index: 3;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   gap: 10px;
-  color: var(--muted);
+  color: var(--ink);
   text-decoration: none;
   transition: opacity 0.3s ease;
 }
 .scroll-cue:hover { color: var(--ink); text-decoration: none; }
 .scroll-cue-text {
-  /* Newsreader serif, not the plain Inter sans — Alp hates the sans here
-     (2026-11-05), and the cue was too small and too close to the corner. */
-  font-family: "Newsreader", Georgia, serif;
-  font-size: 15px;
+  /* Inter light (Alp, 2026-11-11): no handwritten font, thinner sans. */
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
   letter-spacing: 0.04em;
   white-space: nowrap;
-  animation: cue-float 3.2s ease-in-out infinite;
+  text-shadow: 0 1px 10px rgba(20, 21, 24, 0.9), 0 0 3px rgba(20, 21, 24, 0.9);
 }
 .scroll-cue-arrow {
   display: block;
-  animation: cue-bob 1.6s ease-in-out infinite;
-}
-@keyframes cue-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
+  filter: drop-shadow(0 1px 4px rgba(20, 21, 24, 0.85));
+  animation: cue-bob 2s ease-in-out infinite;
 }
 @keyframes cue-bob {
-  0%, 100% { transform: translateY(0); opacity: 0.55; }
-  50% { transform: translateY(6px); opacity: 1; }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
 }
 
 .hero-meta {
-  color: var(--muted);
+  /* (2026-11-11, round 15: --muted was too dim under the ridge lines
+     crossing this line; --soft keeps it secondary but readable.) */
+  color: var(--soft);
   font-size: 15px;
   margin: 0 0 8px;
 }
@@ -540,10 +559,11 @@ html.glass-ok .chips .chip {
   display: inline-block;
   background: var(--accent);
   color: #141518;
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 17px;
   padding: 8px 20px;
-  border-radius: 21px;
+  border-radius: var(--hand);
 }
 .btn:hover { text-decoration: none; background: #7d8ca3; color: #141518; }
 
@@ -553,11 +573,12 @@ html.glass-ok .chips .chip {
      through the text. Solid navy now, the same dark navy as the
      scrolled nav bar, so the text reads and the button still varies
      against the light "See my work" button.) */
-  background: var(--accent-soft);
+  background: transparent;
   color: var(--ink);
-  border: 1px solid #2e3846;
+  border: 1.5px solid rgba(231, 228, 219, 0.45);
+  border-radius: var(--hand-alt);
 }
-.btn-ghost:hover { background: #2b3442; color: var(--ink); }
+.btn-ghost:hover { background: rgba(231, 228, 219, 0.08); color: var(--ink); }
 
 /* Entries */
 
@@ -609,7 +630,7 @@ html.glass-ok .chips .chip {
 .xp-link { display: inline-block; margin-top: 10px; font-size: 14px; color: var(--accent); text-decoration: none; }
 .xp-link:hover { text-decoration: underline; }
 .edu { margin-top: 56px; }
-.edu h2 { font-size: 30px; margin-bottom: 6px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.edu h2 { font-size: 32px; margin-bottom: 6px; padding-bottom: 4px; }
 
 #projects .entry p { color: var(--soft); }
 
@@ -691,7 +712,6 @@ main:has(#contact) + footer { border-top: none; }
   .hero { padding: 56px 0 28px; }
   .hero-inner { max-width: 400px; padding: 0 20px; }
   .hero-love { font-size: min(8vw, 31px) !important; }
-  .taurus { height: 70vh; }
   section { padding: 40px 0 6px; }
 }
 
@@ -704,16 +724,20 @@ main:has(#contact) + footer { border-top: none; }
 }
 
 .card {
+  /* (Round 16, Alp 2026-11-12: the faint border + filled panel read as a
+     generic vibecoded card. Now a clear fine-line ink frame on the bare
+     page — a drawing's frame, not a UI panel. The wobbly radius stays;
+     it is a corner, not a squiggle.) */
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--line);
-  border-radius: 14px;
+  border: 1.5px solid rgba(231, 228, 219, 0.55);
+  border-radius: 16px 22px 14px 20px / 20px 14px 22px 16px;
   overflow: hidden;
-  background: var(--surface);
+  background: transparent;
   color: var(--ink);
   transition: transform 0.35s var(--ease-flow), box-shadow 0.35s var(--ease-flow);
 }
-.card:hover { text-decoration: none; transform: translateY(-4px); box-shadow: 0 14px 32px rgba(0, 0, 0, 0.5); }
+.card:hover { text-decoration: none; transform: translateY(-4px); box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35); }
 .card-scene .scn { transition: transform 0.6s var(--ease-flow); }
 .card:hover .card-scene .scn { transform: scale(1.04); }
 
@@ -726,7 +750,7 @@ main:has(#contact) + footer { border-top: none; }
   background: var(--accent-soft);
 }
 .card-img-empty span {
-  font-family: "Newsreader", Georgia, serif;
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
   font-size: 64px;
   font-weight: 600;
   color: var(--accent);
@@ -734,25 +758,8 @@ main:has(#contact) + footer { border-top: none; }
 
 .card-body { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
 .card-body h3 { font-size: 22px; }
-.card-body p { font-size: 15px; color: var(--muted); flex: 1; }
-.card-cta { font-size: 15px; font-weight: 600; color: var(--accent); }
-
-/* One sharp fact per card, patched in from the project's own data file. */
-.card-fact {
-  margin-top: 4px;
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
-  font-size: 13px;
-  color: var(--muted);
-}
-.card-fact-label {
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--accent);
-  margin-right: 8px;
-}
+.card-body p { font-size: 16px; color: var(--muted); flex: 1; }
+.card-cta { font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif; font-size: 17px; font-weight: 600; color: var(--accent); }
 
 /* Featured (wide) project card — spans the full grid, scene left, text right. */
 .card-wide { grid-column: 1 / -1; display: grid; grid-template-columns: 1.15fr 1fr; }
@@ -803,7 +810,7 @@ main:has(#contact) + footer { border-top: none; }
   margin: 48px 0 8px;
   padding-top: 20px;
   border-top: 1px solid var(--line);
-  font-family: "Newsreader", Georgia, serif;
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
   font-size: 24px;
   font-weight: 500;
 }

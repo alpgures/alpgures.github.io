@@ -37,7 +37,7 @@
           '<div class="card-scene">' + scene + "</div>" +
           '<div class="card-body"><h3>' + esc(p.title) + "</h3>" +
           "<p>" + esc(p.blurb) + "</p>" +
-          '<span class="card-cta">Read the story →</span></div></a>'
+          '<span class="card-cta">Learn more →</span></div></a>'
         );
       })
       .join("");
@@ -86,52 +86,10 @@
       var cards = document.getElementById("project-cards");
       if (cards) cards.innerHTML = renderProjectCards(data.projects || []);
 
-      // One sharp fact per card, pulled from each project's own data file.
-      // Cards render first; facts patch in when they arrive.
-      (function loadCardFacts() {
-        var FACT_LABEL = {
-          kotoban: "Status",
-          planeframe: "Status",
-          alpbrowser: "Platform",
-          "annemin-tarifleri": "Videos",
-          "dct-asistan": "Role"
-        };
-        function pickFact(d, slug) {
-          if (!d || !d.facts || !d.facts.length) return null;
-          var want = FACT_LABEL[slug];
-          for (var i = 0; i < d.facts.length; i++) {
-            if (d.facts[i].label === want) return d.facts[i];
-          }
-          return d.facts[0];
-        }
-        var links = cards.querySelectorAll("a.card");
-        var slugs = [];
-        links.forEach(function (a) {
-          var m = /[?&]p=([^&]+)/.exec(a.getAttribute("href") || "");
-          if (m) slugs.push(decodeURIComponent(m[1]));
-        });
-        Promise.all(slugs.map(function (s) {
-          return fetch("data/projects/" + s + ".json", { cache: "no-store" })
-            .then(function (r) { return r.ok ? r.json() : null; })
-            .catch(function () { return null; });
-        })).then(function (results) {
-          results.forEach(function (d, i) {
-            var fact = pickFact(d, slugs[i]);
-            if (!fact || !links[i]) return;
-            var body = links[i].querySelector(".card-body");
-            var cta = body && body.querySelector(".card-cta");
-            if (!body || !cta) return;
-            var div = document.createElement("div");
-            div.className = "card-fact";
-            var label = document.createElement("span");
-            label.className = "card-fact-label";
-            label.textContent = fact.label;
-            div.appendChild(label);
-            div.appendChild(document.createTextNode(fact.value));
-            body.insertBefore(div, cta);
-          });
-        });
-      })();
+      // (Round 17, Alp 2026-11-12: the one-fact subtitle above the CTA
+      // is gone — he didn't like it. The facts still live in
+      // data/projects/*.json; they just aren't shown on the cards.)
+
 
       // Hero: floating language chips (JS-driven rAF).
       // (2026-11-06, Alp: the bubbles are pure ambience now. They drift
@@ -149,7 +107,11 @@
       // direction + same speed means the spacing is kept forever,
       // no collision steering needed.)
       var chipsBox = document.querySelector(".hero .chips");
-      if (chipsBox) {
+      /* Round 8 (2026-11-11, per Alp): hello bubbles hidden — the
+         whole chip build + rAF loop + legibility mask are parked
+         behind this false, not deleted; a replacement animation
+         gets overlaid later. */
+      if (false && chipsBox) {
         var words = (data.hero && data.hero.floating_words) || [
           "hello", "xin ch\u00e0o", "merhaba",
         ];
@@ -769,8 +731,8 @@
         document.fonts.ready.then(alignNavToHeroText);
       window.addEventListener("resize", alignNavToHeroText);
 
-      // Apple-style scroll: the hero settles as you leave it, the nav
-      // frosts in, and a hairline tracks reading progress.
+      // Apple-style scroll: the hero settles as you leave it and the nav
+      // frosts in. (Round 8: the reading-progress hairline is gone.)
       // (2026-11-07, round 7: the mountain parallax is gone — it moved
       // the mountains down in abrupt steps while scrolling in Alp
       // Browser instead of gliding, so the mountains now stay fixed in
@@ -782,14 +744,9 @@
         var heroInner = document.querySelector(".hero-inner");
         var navEl = document.querySelector(".nav");
         var scrollTicking = false;
-        /* Anchor jumps (nav Work / About / Contact, hero "See my work"):
-           a smooth scroll to a section below the work carousel sweeps
-           the whole 200vh track in under a second, so the card row
-           whips left extremely fast. While an anchor jump is running,
-           the carousel transform is frozen — the page still scrolls
-           smoothly and vertically, the cards just don't swipe. The
-           flag clears on scrollend (or a 1.2s safety timeout) and the
-           transform is re-synced to the landing scroll position. */
+        /* Anchor jumps are instant now (round 18) — see the click handler
+           below. The old smooth-scroll freeze is retired; anchorJumping
+           stays false and the carousel re-syncs in the jump's frame. */
         var anchorJumping = false;
         var anchorJumpTimer = null;
         function endAnchorJump() {
@@ -803,7 +760,9 @@
           scrollTicking = false;
           var y = window.scrollY || 0;
           var max = document.documentElement.scrollHeight - window.innerHeight;
-          document.documentElement.style.setProperty("--scroll-progress", (max > 0 ? (y / max) * 100 : 0) + "%");
+          /* Reading-progress hairline (restored round 18): fills with page
+             scroll; the bar only shows past the hero (.nav.scrolled::after). */
+          document.documentElement.style.setProperty("--scroll-progress", String(max > 0 ? Math.min(y / max, 1) : 0));
           if (navEl) {
             /* The hero nav scrolls away with the hero; it only comes back
                (frosted, fading in) once the work section reaches the top
@@ -849,10 +808,16 @@
           // an anchor jump is running (see anchorJumping above).
           // (2026-11-06: the row now travels far enough for the LAST card
           // to reach the middle — maxX is the last card's centre, not the
-          // row's right edge. The motion is eased (easeOutCubic) so it
-          // slides fast then settles: snappier, Apple-like. And the card
-          // nearest the middle of the screen grows + brightens while the
-          // rest dim, so the eye always knows which project is in focus.)
+          // row's right edge. And the card nearest the middle of the
+          // screen grows + brightens while the rest dim, so the eye always
+          // knows which project is in focus.)
+          // (Round 17, Alp 2026-11-12: Apple-style dwell. The old
+          // easeOutCubic rushed the early cards past and crawled at the
+          // end. Now the row HOLDS on each project while you scroll and
+          // only glides to the next once you've scrolled enough: the
+          // progress is split into one segment per card-to-card step, the
+          // first ~60% of each segment holds still, the last ~40% eases
+          // to the next card. The 500vh runway gives each card ~100vh.)
           if (!anchorJumping) {
             var workSection = document.querySelector(".work-scroll");
             var workRow = document.getElementById("project-cards");
@@ -860,13 +825,21 @@
               var rect = workSection.getBoundingClientRect();
               var span = workSection.offsetHeight - window.innerHeight;
               var prog = span > 0 ? Math.min(Math.max(-rect.top / span, 0), 1) : 0;
-              // Ease the scrub: fast at first, settling gently onto the
-              // last card — the snappy-then-still feel.
-              var eased = 1 - Math.pow(1 - prog, 3);
+              // Dwell mapping: hold on each card, then glide to the next.
+              var rowKids = workRow.children;
+              var steps = Math.max(rowKids.length - 1, 1);
+              var cc = prog * steps;
+              var ci = Math.min(Math.floor(cc), steps - 1);
+              var cf = cc - ci;
+              var ct = 0;
+              if (cf >= 0.6) {
+                var u = (cf - 0.6) / 0.4;
+                ct = u * u * (3 - 2 * u);
+              }
+              var eased = (ci + ct) / steps;
               // Travel until the LAST card's centre sits at the middle of
               // the screen (the old right-edge stop left it stranded at
               // the right).
-              var rowKids = workRow.children;
               var lastCard = rowKids.length ? rowKids[rowKids.length - 1] : null;
               var maxX = 0;
               if (lastCard) {
@@ -907,16 +880,29 @@
         window.addEventListener("scroll", onScroll, { passive: true });
         window.addEventListener("resize", onScroll, { passive: true });
         onScroll();
-        /* Anchor-jump freeze: clicking a nav/hero anchor (Work, About,
-           Contact, "See my work", the scroll cue) starts a smooth
-           scroll; freeze the carousel until it lands so the card row
-           doesn't whip across while the page glides past it. */
+        /* Anchor jumps are INSTANT (round 18, Alp 2026-11-12): clicking a
+           nav/hero anchor (Portfolio, About, Contact, "See my work",
+           the scroll cue) used to smooth-scroll, and the sweep across
+           the tall work track stalled and snapped the carousel on
+           landing. Now the jump is instant — the page's smooth
+           scroll-behavior is overridden for this one jump, the target
+           is reached in the same frame, and the carousel + nav are
+           re-synced immediately. No sweep, no stall, no snap. */
         Array.prototype.forEach.call(document.querySelectorAll('a[href^="#"]'), function (a) {
-          a.addEventListener("click", function () {
-            anchorJumping = true;
-            if (anchorJumpTimer) clearTimeout(anchorJumpTimer);
-            anchorJumpTimer = setTimeout(endAnchorJump, 1200);
-            window.addEventListener("scrollend", endAnchorJump);
+          a.addEventListener("click", function (ev) {
+            var href = a.getAttribute("href") || "";
+            var target = href.length > 1 ? document.querySelector(href) : null;
+            if (!target) return;
+            ev.preventDefault();
+            var root = document.documentElement;
+            var prev = root.style.scrollBehavior;
+            root.style.scrollBehavior = "auto";
+            target.scrollIntoView();
+            root.style.scrollBehavior = prev;
+            anchorJumping = false;
+            if (anchorJumpTimer) { clearTimeout(anchorJumpTimer); anchorJumpTimer = null; }
+            window.removeEventListener("scrollend", endAnchorJump);
+            onScrollFrame();
           });
         });
       } catch (e) { /* scroll polish is optional; never break the page */ }
