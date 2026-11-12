@@ -28,77 +28,94 @@
    affect vertical scrolling or the sticky carousel. */
 html { scroll-behavior: smooth; overflow-x: hidden; }
 
-/* ---------- Horizontal work carousel: vertical scroll drives a
-   horizontal swipe (Apple-style). The section is a tall scroll track;
-   the sticky viewport pins while the card row slides left. (2026-11-06:
-   track shortened 250vh -> 200vh so the page starts scrolling down
-   sooner, and the row now travels far enough for the last card to reach
-   the middle; the card in the middle grows + brightens, the rest dim.) */
-.work-scroll {
+/* ---------- Fade works carousel (Round 19, Alp 2026-11-12): no forced
+   scrolling. One featured project (large, scene left + text right) and
+   the next two in smaller cards on the side. It fades through all five
+   every 5s; clicking a side card jumps it to featured. Only the featured
+   scene animates — the side scenes are frozen stills. */
+.work-carousel {
   width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
-  /* (Round 17, Alp 2026-11-12: 500vh runway, ~100vh per card step, so
-     each project gets a long dwell instead of whipping past.) */
-  height: 500vh;
-  padding: 0;
+  padding: 56px 0 8px;
 }
-.work-sticky {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  height: 100svh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-.work-sticky h2 {
+.work-carousel h2 {
   width: 100%;
-  max-width: 740px;
+  max-width: 1240px;
   margin: 0 auto 22px;
   padding: 0 28px 10px;
 }
-.work-track { overflow: visible; }
-.work-scroll .cards {
+.work-carousel-body {
   display: flex;
   gap: 22px;
-  width: max-content;
-  padding-left: max(28px, calc((100vw - 740px) / 2));
-  padding-right: 28px;
-  will-change: transform;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 28px;
+  align-items: stretch;
+  transition: opacity 0.45s ease;
 }
-.work-scroll .cards .card { flex: 0 0 520px; }
-/* In the carousel the JS drives each card's transform + opacity every
-   frame (centre focus), so the transform transition must NOT run here —
-   it would lag the scroll by 0.35s and feel floaty. The shadow
-   transition stays: the focus glow eases in smoothly. */
-.work-scroll .cards .card { transition: box-shadow 0.35s var(--ease-flow); }
-/* In the carousel every card is vertical (scene on top, text below),
-   including the Alp Browser featured card — the wide side-by-side layout
-   only applies in the grid (mobile fallback). */
-.work-scroll .cards .card-wide {
-  flex: 0 0 520px;
+.work-carousel-body.work-fading { opacity: 0; }
+.work-featured { flex: 1 1 auto; min-width: 0; display: flex; }
+.work-featured .card { flex: 1; }
+/* The featured card is not a link (only "Learn more" is), so it must not
+   lift or scale its scene on hover the way the old linked cards did. */
+.work-featured .card:hover { transform: none; box-shadow: none; }
+.work-featured .card:hover .card-scene .scn { transform: none; }
+/* Side column: two small cards, scene on top + title below, no blurb. */
+.work-side {
+  flex: 0 0 283px;
   display: flex;
   flex-direction: column;
+  gap: 18px;
 }
-.work-scroll .cards .card-wide .card-body { padding: 18px 20px 20px; }
-.work-scroll .cards .card-wide .card-body h3 { font-size: 24px; }
+.work-side-card {
+  flex: 1;
+  padding: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.work-side-card .card-scene {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px 0;
+  min-height: 0;
+}
+.work-side-card .card-scene .scn { width: 100%; height: 100%; }
+.work-side-card h3 { font-size: 18px; padding: 10px 16px 14px; }
+/* Only the featured scene animates; the side scenes are frozen. */
+.work-side .scn * { animation-play-state: paused !important; }
+.work-side .card-scene .scn { transform: none !important; }
+/* Back / Next, below the cards, left and right. */
+.work-nav {
+  display: flex;
+  justify-content: space-between;
+  max-width: 1240px;
+  margin: 18px auto 0;
+  padding: 0 28px;
+}
+.work-nav button {
+  background: none;
+  border: none;
+  padding: 6px 0;
+  cursor: pointer;
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.work-nav button:hover { color: var(--accent); }
 
-/* Mobile + reduced motion: the carousel becomes the plain vertical grid. */
+/* Mobile + reduced motion: stack — featured on top, next two below. */
 @media (max-width: 700px), (prefers-reduced-motion: reduce) {
-  .work-scroll { width: auto; margin: 0; height: auto; padding: 56px 0 8px; }
-  .work-sticky { position: static; height: auto; overflow: visible; display: block; }
-  .work-sticky h2 { max-width: none; margin: 0 0 22px; padding: 0 0 10px; }
-  .work-scroll .cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    width: auto;
-    padding: 0;
-    will-change: auto;
-  }
-  .work-scroll .cards .card,
-  .work-scroll .cards .card-wide { flex: none; }
+  .work-carousel-body { flex-direction: column; }
+  .work-carousel-body.work-fading { opacity: 1; transition: none; }
+  .work-side { flex: none; }
+  .work-side-card { flex: none; }
+  .work-side-card .card-scene { height: 150px; flex: none; }
 }
 
 body {
