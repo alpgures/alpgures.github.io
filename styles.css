@@ -256,16 +256,14 @@ section h2 {
   margin-bottom: 22px;
   padding-bottom: 4px;
 }
-/* Hand-drawn squiggle rule (Round 8): the straight border-bottom
-   is gone; the heading carries a wavy ink underline instead. */
+/* (Round 16, Alp 2026-11-12: no squiggles anywhere.) The heading
+   carries a straight 1px fine-line rule instead of the wavy underline. */
 section h2::after {
   content: "";
   display: block;
-  height: 6px;
-  margin-top: 8px;
-  background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2740%27%20height%3D%276%27%20viewBox%3D%270%200%2040%206%27%3E%3Cpath%20d%3D%27M0%203%20Q%205%200.5%2010%203%20T%2020%203%20T%2030%203%20T%2040%203%27%20fill%3D%27none%27%20stroke%3D%27%23e7e4db%27%20stroke-width%3D%271.5%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E") left bottom repeat-x;
-  background-size: auto 6px;
-  opacity: 0.45;
+  height: 1px;
+  margin-top: 10px;
+  background: var(--line);
 }
 
 /* Hero */
@@ -421,9 +419,7 @@ html.glass-ok .chips .chip {
   box-sizing: border-box;
   overflow: hidden;
   vertical-align: -0.12em;
-  padding: 0 0.06em 0.12em;
-  background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2740%27%20height%3D%276%27%20viewBox%3D%270%200%2040%206%27%3E%3Cpath%20d%3D%27M0%203%20Q%205%200.5%2010%203%20T%2020%203%20T%2030%203%20T%2040%203%27%20fill%3D%27none%27%20stroke%3D%27%2393a0b4%27%20stroke-width%3D%271.5%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E") left bottom repeat-x;
-  background-size: auto 6px;
+  padding: 0 0.06em;
   transition: width 0.55s cubic-bezier(0.22,1,0.36,1);
 }
 .greet-word { color: var(--accent); white-space: nowrap; flex-shrink: 0; }
@@ -443,13 +439,11 @@ html.glass-ok .chips .chip {
   display: inline-flex;
   align-items: center;
   box-sizing: border-box;
-  padding: 0.06em 0.08em 0.12em;
+  padding: 0.06em 0.08em;
   overflow: hidden;
   vertical-align: baseline;
   line-height: 1;
   transition: width 0.55s cubic-bezier(0.22,1,0.36,1);
-  background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2740%27%20height%3D%276%27%20viewBox%3D%270%200%2040%206%27%3E%3Cpath%20d%3D%27M0%203%20Q%205%200.5%2010%203%20T%2020%203%20T%2030%203%20T%2040%203%27%20fill%3D%27none%27%20stroke%3D%27%2393a0b4%27%20stroke-width%3D%271.5%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E") left bottom repeat-x;
-  background-size: auto 6px;
   color: var(--ink);
 }
 .love-dot { white-space: nowrap; }
@@ -488,9 +482,13 @@ html.glass-ok .chips .chip {
    pill treatment as the work-card chips) so it reads over ANY part
    of the scene — it used to sit bottom-right, transparent and muted,
    right on top of the village's glowing windows. The text stays
-   solid now; only the arrow bobs, gently, with no opacity fade.
+   (Round 16: the pill is gone; see the rule itself.)
    It still fades with the hero as you scroll (app.js). */
 .scroll-cue {
+  /* (Round 16, Alp 2026-11-12: the frosted pill looked like a generic
+     vibecoded widget. No container at all now — bare ink text + a
+     hand-drawn arrow, part of the line art. Legibility comes from a
+     soft shadow behind the text/arrow, not a box.) */
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -502,12 +500,6 @@ html.glass-ok .chips .chip {
   gap: 10px;
   color: var(--ink);
   text-decoration: none;
-  background: rgba(27, 29, 34, 0.72);
-  border: 1px solid rgba(231, 228, 219, 0.3);
-  border-radius: 999px;
-  padding: 10px 20px;
-  backdrop-filter: blur(10px) saturate(1.3);
-  -webkit-backdrop-filter: blur(10px) saturate(1.3);
   transition: opacity 0.3s ease;
 }
 .scroll-cue:hover { color: var(--ink); text-decoration: none; }
@@ -518,9 +510,11 @@ html.glass-ok .chips .chip {
   font-weight: 500;
   letter-spacing: 0.04em;
   white-space: nowrap;
+  text-shadow: 0 1px 10px rgba(20, 21, 24, 0.9), 0 0 3px rgba(20, 21, 24, 0.9);
 }
 .scroll-cue-arrow {
   display: block;
+  filter: drop-shadow(0 1px 4px rgba(20, 21, 24, 0.85));
   animation: cue-bob 2s ease-in-out infinite;
 }
 @keyframes cue-bob {
@@ -705,16 +699,20 @@ main:has(#contact) + footer { border-top: none; }
 }
 
 .card {
+  /* (Round 16, Alp 2026-11-12: the faint border + filled panel read as a
+     generic vibecoded card. Now a clear fine-line ink frame on the bare
+     page — a drawing's frame, not a UI panel. The wobbly radius stays;
+     it is a corner, not a squiggle.) */
   display: flex;
   flex-direction: column;
-  border: 1.5px solid rgba(231, 228, 219, 0.16);
+  border: 1.5px solid rgba(231, 228, 219, 0.55);
   border-radius: 16px 22px 14px 20px / 20px 14px 22px 16px;
   overflow: hidden;
-  background: var(--surface);
+  background: transparent;
   color: var(--ink);
   transition: transform 0.35s var(--ease-flow), box-shadow 0.35s var(--ease-flow);
 }
-.card:hover { text-decoration: none; transform: translateY(-4px); box-shadow: 0 14px 32px rgba(0, 0, 0, 0.5); }
+.card:hover { text-decoration: none; transform: translateY(-4px); box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35); }
 .card-scene .scn { transition: transform 0.6s var(--ease-flow); }
 .card:hover .card-scene .scn { transform: scale(1.04); }
 
