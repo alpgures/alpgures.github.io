@@ -136,10 +136,13 @@
 
 .sc-dct .scn-chat { animation: scn-float 7.5s ease-in-out infinite; animation-delay: -3s; }
 
-.sc-dct .scn-gear {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: scn-spin 12s linear infinite;
+/* igde spindle: one unified Figma vector with a wide planted base (resized
+   Nov 12), so it cannot spin or sway — a rotation would lift the base off
+   the ground. It gets only a gentle vertical bob, the whole shape together. */
+.sc-dct .scn-igde { animation: scn-igdebob 6s ease-in-out infinite; }
+@keyframes scn-igdebob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
 }
 
 .sc-dct .scn-eye {
