@@ -5,20 +5,36 @@
   --scene-bg: #1b1d22;
 }
 
+/* translate3d (not translateY) in the motion keyframes + will-change on the
+   animated groups (Alp Nov 12): plain translateY lets the browser rasterize
+   the text inside a floating panel on its own layer, so the text rounds to
+   whole pixels independently of its parent — it skips a pixel, then jumps
+   2px at once, and can't track the panel. translate3d forces the whole
+   group (panel + its text) onto one compositor layer, so the text moves as
+   part of that layer's bitmap and tracks the panel exactly, sub-pixel
+   smooth, no judder. */
 @keyframes scn-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -10px, 0); }
 }
 /* Floats move TOGETHER (Alp Nov 12): every scn-float runs 7s with no delay
    offset, so the panels, chips and dots in a scene rise and fall as one
    unit instead of drifting apart. Only the things with their own distinct
    motion (tab/row/pill cycles, ring spin, jet hover, btn pulse, blink,
    breeze, strobe) keep separate timing. */
+/* Promote every animated scene group to its own compositor layer, so the
+   text inside it is rasterized INTO the group's layer and moves with it as
+   one bitmap — no independent pixel-rounding, no judder, no lag. */
+.sc-plane .scn-eink, .sc-plane .scn-jet,
+.sc-koto .scn-phone, .sc-koto .scn-chip, .sc-koto .scn-dot,
+.sc-rui .scn-browser,
+.sc-dct .scn-phone, .sc-dct .scn-chat, .sc-dct .scn-dot,
+.sc-alp .scn-window, .sc-alp .scn-chip, .sc-alp .scn-dot { will-change: transform; }
 
 @keyframes scn-drift {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  33% { transform: translate(6px, -12px) rotate(2deg); }
-  66% { transform: translate(-6px, -6px) rotate(-2deg); }
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  33% { transform: translate3d(6px, -12px, 0) rotate(2deg); }
+  66% { transform: translate3d(-6px, -6px, 0) rotate(-2deg); }
 }
 
 /* ---------- Card + project scenes ---------- */
@@ -54,8 +70,8 @@
 
 .sc-plane .scn-jet { animation: scn-hover 6s ease-in-out infinite; }
 @keyframes scn-hover {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -4px, 0); }
 }
 
 .sc-plane .scn-strobe { animation: scn-strobe 1.6s ease-in-out infinite; }
