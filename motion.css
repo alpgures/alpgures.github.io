@@ -241,6 +241,39 @@
 .rv-d2 { transition-delay: 0.16s; }
 .rv-d3 { transition-delay: 0.24s; }
 
+/* ---------- Hero background: seamless 90-second loop (Alp, Nov 12:
+   "animated with a perfect loop, nothing too fast paced") ----------
+   Master loop 90s (1.5 min, inside the 1–2 min spec). EVERY duration below
+   divides 90 evenly (90/45/30/15) and EVERY keyframe has 0% == 100%, so at
+   t=90s every element is back to its exact t=0 state — a mathematically
+   perfect loop: no snap, no drift, no jump at the seam. Only the lights
+   and stars breathe; the mountains, temples, village and city line-work
+   never move. All motion is slow and subtle. Reduced-motion users get the
+   still frame (the existing block below already forces .tw/.lamp/
+   .lamp-glow to animation:none). */
+@keyframes hero-lamp-breathe {
+  0%, 100% { opacity: 0.78; }
+  50% { opacity: 1; }
+}
+@keyframes hero-glow-breathe {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 0.38; }
+}
+/* Stars: slow the 7s twinkle (styles.css) to 15s. 15 divides 90; 7 does
+   not, so the old 7s twinkle would drift out of phase and break the loop. */
+.scene .tw { animation-duration: 15s; }
+/* Canal lamps (the 152 city/village windows): three interleaved groups at
+   different rates, so the lights breathe organically instead of pulsing in
+   lockstep. nth-child partitions them because they are all direct children
+   of one <g> inside #lib-canal. */
+#lib-canal .lamp:nth-child(3n+1) { animation: hero-lamp-breathe 45s ease-in-out infinite; }
+#lib-canal .lamp:nth-child(3n+2) { animation: hero-lamp-breathe 30s ease-in-out infinite; animation-delay: -10s; }
+#lib-canal .lamp:nth-child(3n) { animation: hero-lamp-breathe 90s ease-in-out infinite; animation-delay: -30s; }
+/* Temple lamp (the one lit window on the left): its own slow 45s breathe. */
+#lib-temples .lamp { animation: hero-lamp-breathe 45s ease-in-out infinite; animation-delay: -15s; }
+/* Soft halos around the two main lights: slow 30s appear/fade. */
+.scene .lamp-glow { animation: hero-glow-breathe 30s ease-in-out infinite; }
+
 /* ---------- Reduced motion ---------- */
 
 @media (prefers-reduced-motion: reduce) {
