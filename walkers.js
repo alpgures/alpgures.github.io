@@ -38,6 +38,7 @@
   var ELBOW_VAR = 10;   // extra elbow bend as the arm swings forward
   var BOB = 1.5;        // scene units the body rises mid-step
   var LANTERN_SWING = 7;// degrees, pendulum lagging the arm
+  var ENVELOPE_SPEED = 4; // scene units/s at which the gait reaches full amplitude
   var CAT_STRIDE = 6;   // scene units per full gait cycle for the strolling cat
   var CAT_LEG = 9;      // degrees, the cat's leg swing
   var CAT_BOB = 0.6;    // scene units the cat's body bobs
@@ -204,6 +205,15 @@
     return d;
   }
 
+  /* Instantaneous speed (scene units/s) from the distance function. Used
+     for the gait envelope: the legs and arms only swing as wide as the body
+     is actually moving, so a figure eases into a walk from standing and
+     settles its feet together as it stops, instead of freezing mid-stride. */
+  function speedAt(segs, t) {
+    var dt = 0.05;
+    return (distanceAt(segs, t + dt) - distanceAt(segs, t - dt)) / (2 * dt);
+  }
+
   var walkers = [];
   document.querySelectorAll(".walker").forEach(function (el) {
     var idx = parseInt(el.getAttribute("data-walker"), 10);
@@ -244,12 +254,17 @@
       c = Math.cos(theta);
       bob = -BOB * s * s; // HIGH when a foot is in the air, LOW when planted
       w.el.style.translate = dist.toFixed(2) + "px " + bob.toFixed(2) + "px";
-      if (w.legNear) w.legNear.style.rotate = (LEG_SWING * c).toFixed(2) + "deg";
-      if (w.legFar) w.legFar.style.rotate = (-LEG_SWING * c).toFixed(2) + "deg";
-      if (w.shinNear) w.shinNear.style.rotate = (-KNEE_MAX * Math.max(0, -s) * Math.max(0, -s)).toFixed(2) + "deg";
-      if (w.shinFar) w.shinFar.style.rotate = (-KNEE_MAX * Math.max(0, s) * Math.max(0, s)).toFixed(2) + "deg";
-      if (w.armNear) w.armNear.style.rotate = (-ARM_SWING * c).toFixed(2) + "deg";
-      if (w.armFar) w.armFar.style.rotate = (ARM_SWING * c).toFixed(2) + "deg";
+      /* Gait envelope: 0 when standing (feet together, arms at rest), 1 at
+         full stride. Without it the figure froze mid-stride through every
+         pause and swung at full amplitude while the body was barely moving
+         at a walk's ends — that is the weird stop (and half the weird walk). */
+      var env = Math.min(1, Math.abs(speedAt(w.segs, t)) / ENVELOPE_SPEED);
+      if (w.legNear) w.legNear.style.rotate = (LEG_SWING * c * env).toFixed(2) + "deg";
+      if (w.legFar) w.legFar.style.rotate = (-LEG_SWING * c * env).toFixed(2) + "deg";
+      if (w.shinNear) w.shinNear.style.rotate = (-KNEE_MAX * Math.max(0, -s) * Math.max(0, -s) * env).toFixed(2) + "deg";
+      if (w.shinFar) w.shinFar.style.rotate = (-KNEE_MAX * Math.max(0, s) * Math.max(0, s) * env).toFixed(2) + "deg";
+      if (w.armNear) w.armNear.style.rotate = (-ARM_SWING * c * env).toFixed(2) + "deg";
+      if (w.armFar) w.armFar.style.rotate = (ARM_SWING * c * env).toFixed(2) + "deg";
       if (w.foreNear) w.foreNear.style.rotate = (ELBOW_BASE + ELBOW_VAR * Math.max(0, -c)).toFixed(2) + "deg";
       if (w.foreFar) w.foreFar.style.rotate = (ELBOW_BASE + ELBOW_VAR * Math.max(0, c)).toFixed(2) + "deg";
       if (w.lantern) w.lantern.style.rotate = (LANTERN_SWING * Math.cos(theta - 1.0)).toFixed(2) + "deg";
