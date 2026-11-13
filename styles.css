@@ -52,11 +52,64 @@ html { scroll-behavior: smooth; overflow-x: hidden; }
   margin: 0 auto;
   padding: 0 28px;
   align-items: stretch;
-  transition: opacity 0.45s ease;
 }
-.work-carousel-body.work-fading { opacity: 0; }
+/* Round 20 (Alp 2026-11-12, correction 1): the boxes NEVER fade. Only the
+   content inside the cards fades — the card borders and backgrounds stay
+   put while the scene + text crossfade. */
+.work-carousel .card-scene, .work-carousel .card-body,
+.work-side-card h3 { transition: opacity 0.45s ease; }
+.work-carousel-body.work-content-fading .card-scene,
+.work-carousel-body.work-content-fading .card-body,
+.work-carousel-body.work-content-fading .work-side-card h3 { opacity: 0; }
+/* Round 20, correction 2: transparent scene backgrounds — the scenes sit
+   directly on the card, no dark rectangle behind them. */
+.work-carousel .card-scene { background: transparent; }
 .work-featured { flex: 1 1 auto; min-width: 0; display: flex; }
-.work-featured .card { flex: 1; }
+/* Round 20, correction 3: featured card matches Figma 2:5 exactly (965x460).
+   Scene + text are absolutely positioned in container-query units so the
+   layout scales with the card. */
+.work-featured .card {
+  flex: 1;
+  position: relative;
+  container-type: inline-size;
+  aspect-ratio: 965 / 460;
+  display: block;
+}
+.work-featured .card-scene {
+  position: absolute;
+  left: 4.66%; top: 10%;
+  width: 47.46%; height: 81.52%;
+  aspect-ratio: auto;
+  padding: 0;
+}
+.work-featured .card-scene .scn { width: 100%; height: 100%; }
+/* Round 20: the featured scene is the animated GIF (transparent). */
+.work-featured .card-scene .scn-gif {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.work-featured .card-wide .card-body {
+  position: absolute;
+  left: 56.17%; top: 0;
+  width: 41.45%; height: 100%;
+  padding: 0;
+  display: block;
+}
+.work-featured .card-wide .card-body h3 {
+  position: absolute; left: 0; top: 33.7%;
+  width: 100%;
+  margin: 0; font-size: 5.6cqw; line-height: 1.15; font-weight: 600;
+}
+.work-featured .card-wide .card-body p {
+  position: absolute; left: 0; top: 50.43%;
+  width: 100%;
+  margin: 0; font-size: 2.49cqw; line-height: 1.55; color: var(--muted);
+}
+.work-featured .card-wide .card-body .card-cta {
+  position: absolute; left: 0; top: 83.7%;
+  font-size: 3cqw; font-weight: 600;
+}
 /* The featured card is not a link (only "Learn more" is), so it must not
    lift or scale its scene on hover the way the old linked cards did. */
 .work-featured .card:hover { transform: none; box-shadow: none; }
@@ -67,9 +120,13 @@ html { scroll-behavior: smooth; overflow-x: hidden; }
   display: flex;
   flex-direction: column;
   gap: 18px;
+  /* Round 20: let the column shrink to the featured card's 965/460 height
+     instead of forcing the row taller via the scenes' intrinsic heights. */
+  min-height: 0;
 }
 .work-side-card {
   flex: 1;
+  min-height: 0;
   padding: 0;
   background: transparent;
   font: inherit;
@@ -83,9 +140,23 @@ html { scroll-behavior: smooth; overflow-x: hidden; }
   justify-content: center;
   padding: 10px 12px 0;
   min-height: 0;
+  /* Round 20: no aspect-ratio here — the scene flexes to the column height
+     (set by the featured card's 965/460), instead of forcing the row taller. */
+  aspect-ratio: auto;
 }
-.work-side-card .card-scene .scn { width: 100%; height: 100%; }
-.work-side-card h3 { font-size: 18px; padding: 10px 16px 14px; }
+/* Round 20: the side SVG is out of flow so its intrinsic aspect-ratio height
+   can't force the row taller than the featured card's 965/460. It fills the
+   scene content box exactly (letterboxed by preserveAspectRatio) at any size. */
+.work-side-card .card-scene { position: relative; }
+.work-side-card .card-scene .scn {
+  position: absolute;
+  top: 10px; left: 12px;
+  width: calc(100% - 24px);
+  height: calc(100% - 10px);
+}
+/* Round 20, correction 3: side titles match Figma (32px, centered). */
+.work-side-card { container-type: inline-size; }
+.work-side-card h3 { font-size: 11.3cqw; padding: 10px 16px 14px; text-align: center; }
 /* Only the featured scene animates; the side scenes are frozen. */
 .work-side .scn * { animation-play-state: paused !important; }
 .work-side .card-scene .scn { transform: none !important; }
@@ -112,10 +183,22 @@ html { scroll-behavior: smooth; overflow-x: hidden; }
 /* Mobile + reduced motion: stack — featured on top, next two below. */
 @media (max-width: 700px), (prefers-reduced-motion: reduce) {
   .work-carousel-body { flex-direction: column; }
-  .work-carousel-body.work-fading { opacity: 1; transition: none; }
+  .work-carousel-body.work-content-fading .card-scene,
+  .work-carousel-body.work-content-fading .card-body,
+  .work-carousel-body.work-content-fading .work-side-card h3 { opacity: 1; transition: none; }
   .work-side { flex: none; }
   .work-side-card { flex: none; }
   .work-side-card .card-scene { height: 150px; flex: none; }
+  /* Mobile: featured card stacks scene over text (no absolute layout). */
+  .work-featured .card { aspect-ratio: auto; container-type: normal; }
+  .work-featured .card-scene { position: static; width: auto; height: auto; aspect-ratio: 16 / 10; }
+  .work-featured .card-wide .card-body { position: static; width: auto; height: auto; padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; }
+  .work-featured .card-wide .card-body h3,
+  .work-featured .card-wide .card-body p,
+  .work-featured .card-wide .card-body .card-cta { position: static; width: auto; }
+  .work-featured .card-wide .card-body h3 { font-size: 26px; }
+  .work-featured .card-wide .card-body p { font-size: 16px; }
+  .work-featured .card-wide .card-body .card-cta { font-size: 17px; }
 }
 
 body {

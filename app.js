@@ -66,13 +66,14 @@
           .join("");
       });
 
-      // (Round 19, Alp 2026-11-12: fade carousel — no forced scrolling.
+      // (Round 19/20, Alp 2026-11-12: fade carousel — no forced scrolling.
       // One featured project (large, scene left + text right) and the next
       // two in smaller cards on the side. It fades through all five every
       // 5s; clicking a side card jumps it to featured. Only the featured
-      // scene animates — the side scenes are frozen in CSS. Auto-advance
-      // pauses on hover and when the tab is hidden; reduced motion gets no
-      // auto-advance and no fade.)
+      // scene animates — the side scenes are frozen in CSS. Round 20:
+      // the BOXES never fade, only the content inside them does.
+      // Auto-advance pauses on hover and when the tab is hidden; reduced
+      // motion gets no auto-advance and no fade.)
       (function setupWorkCarousel(projects) {
         var body = document.getElementById("work-carousel-body");
         var feat = document.getElementById("work-featured");
@@ -88,13 +89,16 @@
         var FADE_MS = 450;
         var AUTO_MS = 5000;
         function cardHtml(p, featured, pi) {
-          var scene = sceneFor(p.slug, p.image, p.title);
           if (featured) {
-            return '<div class="card card-wide"><div class="card-scene">' + scene + "</div>" +
+            // Round 20: the focused scene is the animated GIF (transparent,
+            // 4s seamless loop, Figma-exact). Side cards use the static SVG.
+            var gif = '<img class="scn-gif" src="images/works/' + esc(p.slug) + '.gif" alt="" />';
+            return '<div class="card card-wide"><div class="card-scene">' + gif + "</div>" +
               '<div class="card-body"><h3>' + esc(p.title) + "</h3>" +
               "<p>" + esc(p.blurb) + "</p>" +
               '<a class="card-cta" href="projects/project.html?p=' + esc(p.slug) + '">Learn more &rarr;</a></div></div>';
           }
+          var scene = sceneFor(p.slug, p.image, p.title);
           return '<button type="button" class="card work-side-card" data-idx="' + pi + '">' +
             '<div class="card-scene">' + scene + "</div>" +
             "<h3>" + esc(p.title) + "</h3></button>";
@@ -109,10 +113,10 @@
           idx = ((i % n) + n) % n;
           if (instant || reduced) { render(); return; }
           if (fadeTimer) clearTimeout(fadeTimer);
-          body.classList.add("work-fading");
+          body.classList.add("work-content-fading");
           fadeTimer = setTimeout(function () {
             render();
-            body.classList.remove("work-fading");
+            body.classList.remove("work-content-fading");
             fadeTimer = null;
           }, FADE_MS);
         }
