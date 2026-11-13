@@ -60,11 +60,14 @@
     5: [["walk", 4, -30], ["pause", 18, 0], ["walk", 4, 30], ["pause", 16, 0],
         ["walk", 4, -30], ["pause", 18, 0], ["walk", 4, 30], ["pause", 22, 0]]
   };
-  /* The strolling cat (cat 1): slow, 2 scene units/s. Distances are
-     multiples of CAT_STRIDE (6) so its gait also loops cleanly. */
-  var CAT_PLAN = [["walk", 10, 20], ["pause", 12, 0], ["walk", 10, -20],
-                  ["pause", 13, 0], ["walk", 10, 20], ["pause", 12, 0],
-                  ["walk", 10, -20], ["pause", 13, 0]];
+  /* The strolling cat (cat 1): slow, 2 scene units/s. Distances MUST be
+     multiples of CAT_STRIDE (6) so its gait ends at a neutral stride stance
+     instead of freezing mid-stride through the pause — the first version
+     used +-20 (not a multiple of 6) and the cat sat paused with its body
+     raised and legs half-swung. */
+  var CAT_PLAN = [["walk", 9, 18], ["pause", 12, 0], ["walk", 9, -18],
+                  ["pause", 13, 0], ["walk", 9, 18], ["pause", 12, 0],
+                  ["walk", 9, -18], ["pause", 17, 0]];
 
   function smoothstep(u) { return u * u * (3 - 2 * u); }
 
