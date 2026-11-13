@@ -101,8 +101,12 @@
       w.el.style.translate = dist.toFixed(2) + "px " + bob.toFixed(2) + "px";
       if (w.legNear) w.legNear.style.rotate = (LEG_SWING * s).toFixed(2) + "deg";
       if (w.legFar) w.legFar.style.rotate = (-LEG_SWING * s).toFixed(2) + "deg";
-      if (w.armNear) w.armNear.style.rotate = (ARM_SWING * s).toFixed(2) + "deg";
-      if (w.armFar) w.armFar.style.rotate = (-ARM_SWING * s).toFixed(2) + "deg";
+      /* Arms swing CONTRALATERAL: the arm on the same side as the forward leg
+         swings BACK, the opposite-side arm swings FORWARD. (The first version
+         had this backwards — same-side arm and leg swinging together, which
+         reads as a gorilla, not a person.) */
+      if (w.armNear) w.armNear.style.rotate = (-ARM_SWING * s).toFixed(2) + "deg";
+      if (w.armFar) w.armFar.style.rotate = (ARM_SWING * s).toFixed(2) + "deg";
       if (w.lantern) w.lantern.style.rotate = (LANTERN_SWING * Math.sin(theta - 1.0)).toFixed(2) + "deg";
     }
     requestAnimationFrame(frame);
