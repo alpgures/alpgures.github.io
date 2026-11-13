@@ -5,15 +5,36 @@
   --scene-bg: #1b1d22;
 }
 
+/* translate3d (not translateY) in the motion keyframes + will-change on the
+   animated groups (Alp Nov 12): plain translateY lets the browser rasterize
+   the text inside a floating panel on its own layer, so the text rounds to
+   whole pixels independently of its parent — it skips a pixel, then jumps
+   2px at once, and can't track the panel. translate3d forces the whole
+   group (panel + its text) onto one compositor layer, so the text moves as
+   part of that layer's bitmap and tracks the panel exactly, sub-pixel
+   smooth, no judder. */
 @keyframes scn-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -10px, 0); }
 }
+/* Floats move TOGETHER (Alp Nov 12): every scn-float runs 7s with no delay
+   offset, so the panels, chips and dots in a scene rise and fall as one
+   unit instead of drifting apart. Only the things with their own distinct
+   motion (tab/row/pill cycles, ring spin, jet hover, btn pulse, blink,
+   breeze, strobe) keep separate timing. */
+/* Promote every animated scene group to its own compositor layer, so the
+   text inside it is rasterized INTO the group's layer and moves with it as
+   one bitmap — no independent pixel-rounding, no judder, no lag. */
+.sc-plane .scn-eink, .sc-plane .scn-jet,
+.sc-koto .scn-phone, .sc-koto .scn-chip, .sc-koto .scn-dot,
+.sc-rui .scn-browser,
+.sc-dct .scn-phone, .sc-dct .scn-chat, .sc-dct .scn-dot,
+.sc-alp .scn-window, .sc-alp .scn-chip, .sc-alp .scn-dot { will-change: transform; }
 
 @keyframes scn-drift {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  33% { transform: translate(6px, -12px) rotate(2deg); }
-  66% { transform: translate(-6px, -6px) rotate(-2deg); }
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  33% { transform: translate3d(6px, -12px, 0) rotate(2deg); }
+  66% { transform: translate3d(-6px, -6px, 0) rotate(-2deg); }
 }
 
 /* ---------- Card + project scenes ---------- */
@@ -45,12 +66,12 @@
   to { stroke-dashoffset: -28; }
 }
 
-.sc-plane .scn-eink { animation: scn-float 9s ease-in-out infinite; }
+.sc-plane .scn-eink { animation: scn-float 7s ease-in-out infinite; }
 
 .sc-plane .scn-jet { animation: scn-hover 6s ease-in-out infinite; }
 @keyframes scn-hover {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -4px, 0); }
 }
 
 .sc-plane .scn-strobe { animation: scn-strobe 1.6s ease-in-out infinite; }
@@ -61,7 +82,7 @@
 
 /* ---------- Kotoban: simplified app mockup ---------- */
 
-.sc-koto .scn-phone { animation: scn-float 6.5s ease-in-out infinite; }
+.sc-koto .scn-phone { animation: scn-float 7s ease-in-out infinite; }
 
 .sc-koto .scn-ringspin {
   transform-box: fill-box;
@@ -87,11 +108,9 @@
   24%, 100% { fill: #1b1815; }
 }
 
-.sc-koto .scn-chip { animation: scn-float 5s ease-in-out infinite; }
-.sc-koto .scn-chip.c2 { animation-delay: -2.5s; }
+.sc-koto .scn-chip { animation: scn-float 7s ease-in-out infinite; }
 
-.sc-koto .scn-dot { animation: scn-float 5.2s ease-in-out infinite; }
-.sc-koto .scn-dot.d2 { animation-delay: -1.7s; }
+.sc-koto .scn-dot { animation: scn-float 7s ease-in-out infinite; }
 
 /* ---------- Recipe: simplified site mockup ---------- */
 
@@ -134,13 +153,11 @@
 
 .sc-dct .scn-phone { animation: scn-float 7s ease-in-out infinite; }
 
-.sc-dct .scn-chat { animation: scn-float 7.5s ease-in-out infinite; animation-delay: -3s; }
+.sc-dct .scn-chat { animation: scn-float 7s ease-in-out infinite; }
 
-.sc-dct .scn-gear {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: scn-spin 12s linear infinite;
-}
+/* igde spindle: one unified Figma vector with a wide planted base. It does
+   NOT turn or animate — Alp Nov 12: the scaleX 3D turn read as terrible, so
+   the spindle stands still and the phone + chat carry the motion. */
 
 .sc-dct .scn-eye {
   transform-box: fill-box;
@@ -162,18 +179,15 @@
   50% { transform: scale(1.045); }
 }
 
-.sc-dct .scn-dot { animation: scn-float 5.2s ease-in-out infinite; }
-.sc-dct .scn-dot.d2 { animation-delay: -1.7s; }
+.sc-dct .scn-dot { animation: scn-float 7s ease-in-out infinite; }
 
 /* ---------- alpbrowser: Arc-style browser mockup, site palette ---------- */
 
 .sc-alp .scn-window { animation: scn-float 7s ease-in-out infinite; }
 
-.sc-alp .scn-chip { animation: scn-float 5s ease-in-out infinite; }
-.sc-alp .scn-chip.c2 { animation-delay: -2.5s; }
+.sc-alp .scn-chip { animation: scn-float 7s ease-in-out infinite; }
 
-.sc-alp .scn-dot { animation: scn-float 5.2s ease-in-out infinite; }
-.sc-alp .scn-dot.d2 { animation-delay: -1.7s; }
+.sc-alp .scn-dot { animation: scn-float 7s ease-in-out infinite; }
 
 .sc-alp .scn-ringspin {
   transform-box: fill-box;
@@ -196,6 +210,24 @@
   36%, 100% { fill: #1b1815; }
 }
 
+
+/* ---------- Round 9: hand-drawn hero scene ---------- */
+
+.scene .ink-moon { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ink-draw 1.4s var(--ease-flow) 0.9s forwards; }
+@keyframes ink-draw { to { stroke-dashoffset: 0; } }
+
+/* The scene windows light up once the drawing finishes. */
+.scene .lamp { opacity: 0; animation: lamp-in 1s ease 1.9s forwards; }
+.scene .lamp-glow { opacity: 0; animation: lamp-glow-in 1.4s ease 1.9s forwards; }
+@keyframes lamp-in { to { opacity: 0.9; } }
+@keyframes lamp-glow-in { to { opacity: 0.12; } }
+
+/* Birds drift almost imperceptibly. */
+.scene .bird { animation: bird-drift 26s ease-in-out infinite alternate; }
+.scene .bird.b2 { animation-delay: -13s; }
+@keyframes bird-drift { from { transform: translateX(-14px); } to { transform: translateX(14px); } }
+
+
 /* ---------- Scroll reveal ---------- */
 
 .rv {
@@ -213,10 +245,13 @@
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .scn *, .scn, .chip-x, .chip-w, .chip-x .chip, .chip-w .chip, .mesh .blob, .stars circle.tw, .scroll-cue, .scroll-cue-text, .scroll-cue-arrow {
+  .scn *, .scn, .chip-x, .chip-w, .chip-x .chip, .chip-w .chip, .scene .tw, .scroll-cue, .scroll-cue-text, .scroll-cue-arrow {
     animation: none !important;
   }
   .rv { opacity: 1; translate: none; scale: none; transition: none; }
+  .scene .bird { animation: none !important; }
+  .scene .lamp { opacity: 0.9 !important; animation: none !important; }
+  .scene .lamp-glow { opacity: 0.12 !important; animation: none !important; }
   .sc-plane .scn-display,
   .sc-plane .scn-dline { opacity: 1 !important; transform: none !important; }
   .sc-plane .scn-plane { opacity: 0 !important; }
@@ -224,5 +259,4 @@
 
 @media (max-width: 700px) {
   .hero { min-height: 96vh; padding-bottom: 34vh; }
-  .taurus { height: 48vh; }
 }

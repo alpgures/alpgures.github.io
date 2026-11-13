@@ -26,23 +26,6 @@
       .replace(/"/g, "&quot;");
   }
 
-  function renderProjectCards(items) {
-    return items
-      .map(function (p, i) {
-        var scene = sceneFor(p.slug, p.image, p.title);
-        var delay = i === 1 || i === 3 ? " rv-d1" : i === 2 || i === 4 ? " rv-d2" : "";
-        var wide = p.featured ? " card-wide" : "";
-        return (
-          '<a class="card' + wide + ' rv' + delay + '" href="projects/project.html?p=' + esc(p.slug) + '">' +
-          '<div class="card-scene">' + scene + "</div>" +
-          '<div class="card-body"><h3>' + esc(p.title) + "</h3>" +
-          "<p>" + esc(p.blurb) + "</p>" +
-          '<span class="card-cta">Learn more →</span></div></a>'
-        );
-      })
-      .join("");
-  }
-
   fetch("data/site.json", { cache: "no-store" })
     .then(function (r) {
       if (!r.ok) throw new Error("site.json " + r.status);
@@ -83,8 +66,88 @@
           .join("");
       });
 
-      var cards = document.getElementById("project-cards");
-      if (cards) cards.innerHTML = renderProjectCards(data.projects || []);
+      // (Round 19/20, Alp 2026-11-12: fade carousel — no forced scrolling.
+      // One featured project (large, scene left + text right) and the next
+      // two in smaller cards on the side. It fades through all five every
+      // 5s; clicking a side card jumps it to featured. Only the featured
+      // scene animates — the side scenes are frozen in CSS. Round 20:
+      // the BOXES never fade, only the content inside them does.
+      // Auto-advance pauses on hover and when the tab is hidden; reduced
+      // motion gets no auto-advance and no fade.)
+      (function setupWorkCarousel(projects) {
+        var body = document.getElementById("work-carousel-body");
+        var feat = document.getElementById("work-featured");
+        var side = document.getElementById("work-side");
+        var backBtn = document.getElementById("work-back");
+        var nextBtn = document.getElementById("work-next");
+        if (!body || !feat || !side || !projects.length) return;
+        var n = projects.length;
+        var idx = 0;
+        var timer = null;
+        var fadeTimer = null;
+        var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var FADE_MS = 450;
+        var AUTO_MS = 10000;
+        function cardHtml(p, featured, pi) {
+          if (featured) {
+            // Round 20 v5 (Alp Nov 12): the focused scene is the LIVE SVG,
+            // not a GIF. GIFs are 256-color raster at 10fps — low resolution,
+            // low quality, and the float glitched. The live vector is crisp
+            // at any size, full color, and smooth 60fps CSS motion.
+            var scene = sceneFor(p.slug, p.image, p.title);
+            return '<div class="card card-wide"><div class="card-scene">' + scene + "</div>" +
+              '<div class="card-body"><h3>' + esc(p.title) + "</h3>" +
+              "<p>" + esc(p.blurb) + "</p>" +
+              '<a class="card-cta" href="projects/project.html?p=' + esc(p.slug) + '">Learn more &rarr;</a></div></div>';
+          }
+          var scene = sceneFor(p.slug, p.image, p.title);
+          return '<button type="button" class="card work-side-card" data-idx="' + pi + '">' +
+            '<div class="card-scene">' + scene + "</div>" +
+            "<h3>" + esc(p.title) + "</h3></button>";
+        }
+        function render() {
+          feat.innerHTML = cardHtml(projects[idx % n], true, idx % n);
+          side.innerHTML =
+            cardHtml(projects[(idx + 1) % n], false, (idx + 1) % n) +
+            cardHtml(projects[(idx + 2) % n], false, (idx + 2) % n);
+        }
+        function show(i, instant) {
+          idx = ((i % n) + n) % n;
+          if (instant || reduced) { render(); return; }
+          if (fadeTimer) clearTimeout(fadeTimer);
+          body.classList.add("work-content-fading");
+          fadeTimer = setTimeout(function () {
+            render();
+            body.classList.remove("work-content-fading");
+            fadeTimer = null;
+          }, FADE_MS);
+        }
+        function restart() {
+          if (timer) { clearInterval(timer); timer = null; }
+          if (reduced || n < 2) return;
+          timer = setInterval(function () { show(idx + 1); }, AUTO_MS);
+        }
+        function stop() {
+          if (timer) { clearInterval(timer); timer = null; }
+        }
+        if (backBtn) backBtn.addEventListener("click", function () { show(idx - 1); restart(); });
+        if (nextBtn) nextBtn.addEventListener("click", function () { show(idx + 1); restart(); });
+        side.addEventListener("click", function (e) {
+          var b = e.target && e.target.closest ? e.target.closest(".work-side-card") : null;
+          if (!b) return;
+          var pi = parseInt(b.getAttribute("data-idx"), 10);
+          if (isNaN(pi)) return;
+          show(pi);
+          restart();
+        });
+        body.addEventListener("mouseenter", stop);
+        body.addEventListener("mouseleave", restart);
+        document.addEventListener("visibilitychange", function () {
+          if (document.hidden) stop(); else restart();
+        });
+        render();
+        restart();
+      })(data.projects || []);
 
       // (Round 17, Alp 2026-11-12: the one-fact subtitle above the CTA
       // is gone — he didn't like it. The facts still live in
@@ -775,7 +838,7 @@
                pinned until you're essentially at the very top (y <= 8),
                where fixed and absolute coincide, so the swap is seamless.
                In between, the state is held, never toggled.) */
-            var ws = document.querySelector(".work-scroll");
+            var ws = document.getElementById("work");
             if (ws) {
               var wsTop = ws.getBoundingClientRect().top;
               var showNav;
@@ -803,74 +866,6 @@
             cueEl.style.pointerEvents = p > 0.85 ? "none" : "";
           }
 
-          // Horizontal work carousel: vertical scroll through the tall
-          // .work-scroll track drives the card row left. Skipped while
-          // an anchor jump is running (see anchorJumping above).
-          // (2026-11-06: the row now travels far enough for the LAST card
-          // to reach the middle — maxX is the last card's centre, not the
-          // row's right edge. And the card nearest the middle of the
-          // screen grows + brightens while the rest dim, so the eye always
-          // knows which project is in focus.)
-          // (Round 17, Alp 2026-11-12: Apple-style dwell. The old
-          // easeOutCubic rushed the early cards past and crawled at the
-          // end. Now the row HOLDS on each project while you scroll and
-          // only glides to the next once you've scrolled enough: the
-          // progress is split into one segment per card-to-card step, the
-          // first ~60% of each segment holds still, the last ~40% eases
-          // to the next card. The 500vh runway gives each card ~100vh.)
-          if (!anchorJumping) {
-            var workSection = document.querySelector(".work-scroll");
-            var workRow = document.getElementById("project-cards");
-            if (workSection && workRow && !reducedMotion && window.innerWidth > 700) {
-              var rect = workSection.getBoundingClientRect();
-              var span = workSection.offsetHeight - window.innerHeight;
-              var prog = span > 0 ? Math.min(Math.max(-rect.top / span, 0), 1) : 0;
-              // Dwell mapping: hold on each card, then glide to the next.
-              var rowKids = workRow.children;
-              var steps = Math.max(rowKids.length - 1, 1);
-              var cc = prog * steps;
-              var ci = Math.min(Math.floor(cc), steps - 1);
-              var cf = cc - ci;
-              var ct = 0;
-              if (cf >= 0.6) {
-                var u = (cf - 0.6) / 0.4;
-                ct = u * u * (3 - 2 * u);
-              }
-              var eased = (ci + ct) / steps;
-              // Travel until the LAST card's centre sits at the middle of
-              // the screen (the old right-edge stop left it stranded at
-              // the right).
-              var lastCard = rowKids.length ? rowKids[rowKids.length - 1] : null;
-              var maxX = 0;
-              if (lastCard) {
-                maxX = Math.max(lastCard.offsetLeft + lastCard.offsetWidth / 2 - window.innerWidth / 2, 0);
-              }
-              var tx = -eased * maxX;
-              workRow.style.transform = "translateX(" + tx + "px)";
-              // Centre focus: each card's distance from the middle of the
-              // screen drives its scale, lift, brightness and glow. The
-              // card in the middle pops; the rest recede.
-              var viewCx = window.innerWidth / 2;
-              var falloff = window.innerWidth * 0.75;
-              for (var fci = 0; fci < rowKids.length; fci++) {
-                var focusCard = rowKids[fci];
-                var cardCx = focusCard.offsetLeft + focusCard.offsetWidth / 2 + tx;
-                var focus = Math.max(0, Math.min(1, 1 - Math.abs(cardCx - viewCx) / falloff));
-                var focusScale = 0.97 + 0.05 * focus;
-                focusCard.style.transform = "translateY(" + (-6 * focus).toFixed(1) + "px) scale(" + focusScale.toFixed(3) + ")";
-                focusCard.style.opacity = (0.55 + 0.45 * focus).toFixed(3);
-                focusCard.style.boxShadow = "0 " + (8 + 10 * focus).toFixed(0) + "px " + (24 + 20 * focus).toFixed(0) + "px rgba(0, 0, 0, " + (0.35 + 0.25 * focus).toFixed(2) + ")";
-              }
-            } else if (workRow) {
-              workRow.style.transform = "";
-              var rowKids2 = workRow.children;
-              for (var fcj = 0; fcj < rowKids2.length; fcj++) {
-                rowKids2[fcj].style.transform = "";
-                rowKids2[fcj].style.opacity = "";
-                rowKids2[fcj].style.boxShadow = "";
-              }
-            }
-          }
         }
         function onScroll() {
           if (scrollTicking) return;

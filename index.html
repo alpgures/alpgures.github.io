@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=86">
-<link rel="stylesheet" href="motion.css?v=56">
+<link rel="stylesheet" href="styles.css?v=90">
+<link rel="stylesheet" href="motion.css?v=60">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐦</text></svg>">
 </head>
 <body>
@@ -51,12 +51,15 @@
 
 <main>
 
-<section id="work" class="work-scroll">
-  <div class="work-sticky">
-    <h2>Selected work</h2>
-    <div class="work-track">
-      <div id="project-cards" class="cards"></div>
-    </div>
+<section id="work" class="work-carousel">
+  <h2>Selected works</h2>
+  <div class="work-carousel-body" id="work-carousel-body">
+    <div id="work-featured" class="work-featured" aria-live="polite"></div>
+    <div id="work-side" class="work-side"></div>
+  </div>
+  <div class="work-nav">
+    <button id="work-back" type="button">&larr; Back</button>
+    <button id="work-next" type="button">Next &rarr;</button>
   </div>
 </section>
 
@@ -89,7 +92,7 @@
   <p>© 2026 Alp D. Güreş – Providence, RI</p>
 </footer>
 
-<script src="scenes.js?v=54"></script>
-<script src="app.js?v=80"></script>
+<script src="scenes.js?v=58"></script>
+<script src="app.js?v=84"></script>
 </body>
 </html>

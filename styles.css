@@ -28,77 +28,180 @@
    affect vertical scrolling or the sticky carousel. */
 html { scroll-behavior: smooth; overflow-x: hidden; }
 
-/* ---------- Horizontal work carousel: vertical scroll drives a
-   horizontal swipe (Apple-style). The section is a tall scroll track;
-   the sticky viewport pins while the card row slides left. (2026-11-06:
-   track shortened 250vh -> 200vh so the page starts scrolling down
-   sooner, and the row now travels far enough for the last card to reach
-   the middle; the card in the middle grows + brightens, the rest dim.) */
-.work-scroll {
+/* ---------- Fade works carousel (Round 19, Alp 2026-11-12): no forced
+   scrolling. One featured project (large, scene left + text right) and
+   the next two in smaller cards on the side. It fades through all five
+   every 5s; clicking a side card jumps it to featured. Only the featured
+   scene animates — the side scenes are frozen stills. */
+.work-carousel {
   width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
-  /* (Round 17, Alp 2026-11-12: 500vh runway, ~100vh per card step, so
-     each project gets a long dwell instead of whipping past.) */
-  height: 500vh;
-  padding: 0;
+  padding: 56px 0 8px;
 }
-.work-sticky {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  height: 100svh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-.work-sticky h2 {
+.work-carousel h2 {
   width: 100%;
-  max-width: 740px;
+  max-width: 1240px;
   margin: 0 auto 22px;
   padding: 0 28px 10px;
 }
-.work-track { overflow: visible; }
-.work-scroll .cards {
+.work-carousel-body {
   display: flex;
   gap: 22px;
-  width: max-content;
-  padding-left: max(28px, calc((100vw - 740px) / 2));
-  padding-right: 28px;
-  will-change: transform;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 28px;
+  align-items: stretch;
 }
-.work-scroll .cards .card { flex: 0 0 520px; }
-/* In the carousel the JS drives each card's transform + opacity every
-   frame (centre focus), so the transform transition must NOT run here —
-   it would lag the scroll by 0.35s and feel floaty. The shadow
-   transition stays: the focus glow eases in smoothly. */
-.work-scroll .cards .card { transition: box-shadow 0.35s var(--ease-flow); }
-/* In the carousel every card is vertical (scene on top, text below),
-   including the Alp Browser featured card — the wide side-by-side layout
-   only applies in the grid (mobile fallback). */
-.work-scroll .cards .card-wide {
-  flex: 0 0 520px;
+/* Round 20 (Alp 2026-11-12, correction 1): the boxes NEVER fade. Only the
+   content inside the cards fades — the card borders and backgrounds stay
+   put while the scene + text crossfade. */
+.work-carousel .card-scene, .work-carousel .card-body,
+.work-side-card h3 { transition: opacity 0.45s ease; }
+.work-carousel-body.work-content-fading .card-scene,
+.work-carousel-body.work-content-fading .card-body,
+.work-carousel-body.work-content-fading .work-side-card h3 { opacity: 0; }
+/* Round 20, correction 2: transparent scene backgrounds — the scenes sit
+   directly on the card, no dark rectangle behind them. */
+.work-carousel .card-scene { background: transparent; }
+.work-featured { flex: 1 1 auto; min-width: 0; display: flex; }
+/* Round 20, correction 3: featured card matches Figma 2:5 exactly (965x460).
+   Scene + text are absolutely positioned in container-query units so the
+   layout scales with the card. */
+.work-featured .card {
+  flex: 1;
+  position: relative;
+  container-type: inline-size;
+  aspect-ratio: 965 / 460;
+  display: block;
+}
+.work-featured .card-scene {
+  position: absolute;
+  left: 4.66%; top: 10%;
+  width: 47.46%; height: 81.52%;
+  aspect-ratio: auto;
+  padding: 0;
+}
+.work-featured .card-scene .scn { width: 100%; height: 100%; }
+/* Round 20 v5: the featured scene is the LIVE SVG (no GIF — GIFs are
+   256-color raster at 10fps, low res and glitchy; the live vector is crisp
+   and smooth). The scene must not clip its own overflow, or the floats get
+   cut off — the card's own overflow:hidden still bounds everything at the
+   card edge. The SVG element itself also needs overflow visible, or its
+   viewport clips the float (the viewBox has an 8px margin and the float is
+   10px, so content can move 2px past the viewBox edge). */
+.work-featured .card-scene { overflow: visible; }
+.work-featured .card-scene .scn { overflow: visible; }
+.work-featured .card-wide .card-body {
+  position: absolute;
+  left: 56.17%; top: 0;
+  width: 41.45%; height: 100%;
+  padding: 0;
+  display: block;
+}
+.work-featured .card-wide .card-body h3 {
+  position: absolute; left: 0; top: 33.7%;
+  width: 100%;
+  margin: 0; font-size: 5.6cqw; line-height: 1.15; font-weight: 600;
+}
+.work-featured .card-wide .card-body p {
+  position: absolute; left: 0; top: 50.43%;
+  width: 100%;
+  margin: 0; font-size: 2.49cqw; line-height: 1.55; color: var(--muted);
+}
+.work-featured .card-wide .card-body .card-cta {
+  position: absolute; left: 0; top: 83.7%;
+  font-size: 3cqw; font-weight: 600;
+}
+/* The featured card is not a link (only "Learn more" is), so it must not
+   lift or scale its scene on hover the way the old linked cards did. */
+.work-featured .card:hover { transform: none; box-shadow: none; }
+.work-featured .card:hover .card-scene .scn { transform: none; }
+/* Side column: two small cards, scene on top + title below, no blurb. */
+.work-side {
+  flex: 0 0 283px;
   display: flex;
   flex-direction: column;
+  gap: 18px;
+  /* Round 20: let the column shrink to the featured card's 965/460 height
+     instead of forcing the row taller via the scenes' intrinsic heights. */
+  min-height: 0;
 }
-.work-scroll .cards .card-wide .card-body { padding: 18px 20px 20px; }
-.work-scroll .cards .card-wide .card-body h3 { font-size: 24px; }
+.work-side-card {
+  flex: 1;
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.work-side-card .card-scene {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px 0;
+  min-height: 0;
+  /* Round 20: no aspect-ratio here — the scene flexes to the column height
+     (set by the featured card's 965/460), instead of forcing the row taller. */
+  aspect-ratio: auto;
+}
+/* Round 20: the side SVG is out of flow so its intrinsic aspect-ratio height
+   can't force the row taller than the featured card's 965/460. It fills the
+   scene content box exactly (letterboxed by preserveAspectRatio) at any size. */
+.work-side-card .card-scene { position: relative; }
+.work-side-card .card-scene .scn {
+  position: absolute;
+  top: 10px; left: 12px;
+  width: calc(100% - 24px);
+  height: calc(100% - 10px);
+}
+/* Round 20, correction 3: side titles match Figma (32px, centered). */
+.work-side-card { container-type: inline-size; }
+.work-side-card h3 { font-size: 11.3cqw; padding: 10px 16px 14px; text-align: center; }
+/* Only the featured scene animates; the side scenes are frozen. */
+.work-side .scn * { animation-play-state: paused !important; }
+.work-side .card-scene .scn { transform: none !important; }
+/* Back / Next, below the cards, left and right. */
+.work-nav {
+  display: flex;
+  justify-content: space-between;
+  max-width: 1240px;
+  margin: 18px auto 0;
+  padding: 0 28px;
+}
+.work-nav button {
+  background: none;
+  border: none;
+  padding: 6px 0;
+  cursor: pointer;
+  font-family: "Inter", -apple-system, "Helvetica Neue", sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.work-nav button:hover { color: var(--accent); }
 
-/* Mobile + reduced motion: the carousel becomes the plain vertical grid. */
+/* Mobile + reduced motion: stack — featured on top, next two below. */
 @media (max-width: 700px), (prefers-reduced-motion: reduce) {
-  .work-scroll { width: auto; margin: 0; height: auto; padding: 56px 0 8px; }
-  .work-sticky { position: static; height: auto; overflow: visible; display: block; }
-  .work-sticky h2 { max-width: none; margin: 0 0 22px; padding: 0 0 10px; }
-  .work-scroll .cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    width: auto;
-    padding: 0;
-    will-change: auto;
-  }
-  .work-scroll .cards .card,
-  .work-scroll .cards .card-wide { flex: none; }
+  .work-carousel-body { flex-direction: column; }
+  .work-carousel-body.work-content-fading .card-scene,
+  .work-carousel-body.work-content-fading .card-body,
+  .work-carousel-body.work-content-fading .work-side-card h3 { opacity: 1; transition: none; }
+  .work-side { flex: none; }
+  .work-side-card { flex: none; }
+  .work-side-card .card-scene { height: 150px; flex: none; }
+  /* Mobile: featured card stacks scene over text (no absolute layout). */
+  .work-featured .card { aspect-ratio: auto; container-type: normal; }
+  .work-featured .card-scene { position: static; width: auto; height: auto; aspect-ratio: 16 / 10; }
+  .work-featured .card-wide .card-body { position: static; width: auto; height: auto; padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; }
+  .work-featured .card-wide .card-body h3,
+  .work-featured .card-wide .card-body p,
+  .work-featured .card-wide .card-body .card-cta { position: static; width: auto; }
+  .work-featured .card-wide .card-body h3 { font-size: 26px; }
+  .work-featured .card-wide .card-body p { font-size: 16px; }
+  .work-featured .card-wide .card-body .card-cta { font-size: 17px; }
 }
 
 body {
