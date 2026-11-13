@@ -262,15 +262,16 @@
 /* Stars: slow the 7s twinkle (styles.css) to 15s. 15 divides 90; 7 does
    not, so the old 7s twinkle would drift out of phase and break the loop. */
 .scene .tw { animation-duration: 15s; }
-/* Canal lamps (the 152 city/village windows): three interleaved groups at
+/* Lamps (the 153 city/village/temple windows): three interleaved groups at
    different rates, so the lights breathe organically instead of pulsing in
-   lockstep. nth-child partitions them because they are all direct children
-   of one <g> inside #lib-canal. */
-#lib-canal .lamp:nth-child(3n+1) { animation: hero-lamp-breathe 45s ease-in-out infinite; }
-#lib-canal .lamp:nth-child(3n+2) { animation: hero-lamp-breathe 30s ease-in-out infinite; animation-delay: -10s; }
-#lib-canal .lamp:nth-child(3n) { animation: hero-lamp-breathe 90s ease-in-out infinite; animation-delay: -30s; }
-/* Temple lamp (the one lit window on the left): its own slow 45s breathe. */
-#lib-temples .lamp { animation: hero-lamp-breathe 45s ease-in-out infinite; animation-delay: -15s; }
+   lockstep. nth-child partitions them 51/51/51 (verified live in the
+   browser). NOTE: do NOT scope this to #lib-canal or #lib-temples — the
+   browser's DOM does not nest the lamps under those ids (verified:
+   #lib-canal .lamp matches 0), so those selectors are dead. .scene .lamp
+   is the selector that actually matches. */
+.scene .lamp:nth-child(3n+1) { animation: hero-lamp-breathe 45s ease-in-out infinite; }
+.scene .lamp:nth-child(3n+2) { animation: hero-lamp-breathe 30s ease-in-out infinite; animation-delay: -10s; }
+.scene .lamp:nth-child(3n) { animation: hero-lamp-breathe 90s ease-in-out infinite; animation-delay: -30s; }
 /* Soft halos around the two main lights: slow 30s appear/fade. */
 .scene .lamp-glow { animation: hero-glow-breathe 30s ease-in-out infinite; }
 
