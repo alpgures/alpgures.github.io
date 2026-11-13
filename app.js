@@ -87,7 +87,7 @@
         var fadeTimer = null;
         var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         var FADE_MS = 450;
-        var AUTO_MS = 5000;
+        var AUTO_MS = 10000;
         function cardHtml(p, featured, pi) {
           if (featured) {
             // Round 20 v5 (Alp Nov 12): the focused scene is the LIVE SVG,
