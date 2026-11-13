@@ -277,53 +277,12 @@
 .scene .lamp:nth-child(3n) { animation: hero-lamp-breathe 90s ease-in-out infinite; animation-delay: -30s; }
 /* Soft halos around the two main lights: slow 30s appear/fade. */
 .scene .lamp-glow { animation: hero-glow-breathe 30s ease-in-out infinite; }
-/* People (the 3 figures on the walkway, #lib-people > g): slow strolls with
-   human pacing — they accelerate out of a stop and decelerate into the next
-   one (ease-in-out per segment), pause to stand (flat keyframe ranges where
-   the translate holds), and wander a few steps before coming back. Each walk
-   is a full 90s cycle that starts and ends at translate 0 0, so the loop is
-   exact. The three walkers run the same 90s length at different phases
-   (delays 0s / -30s / -55s), so they are never in lockstep. NOTE: animate
-   the CSS `translate` property, NOT `transform` — these <g>s carry their
-   position/scale in a transform ATTRIBUTE, and a CSS `transform` would
-   override it and fling the figure to the origin (verified live:
-   transform: translateX(20px) moved a walker to x=18,y=81). `translate`
-   composes with the attribute instead. The -1px y at mid-stride is the step
-   bob (they rise a touch as they step). */
-@keyframes hero-walk-1 {
-  0% { translate: 0 0; }
-  10% { translate: 16px -1px; }
-  22% { translate: 32px 0; }
-  38% { translate: 32px 0; }
-  50% { translate: 16px -1px; }
-  62% { translate: 0 0; }
-  78% { translate: 0 0; }
-  88% { translate: -12px -1px; }
-  100% { translate: 0 0; }
-}
-@keyframes hero-walk-2 {
-  0% { translate: 0 0; }
-  12% { translate: -14px -1px; }
-  24% { translate: -28px 0; }
-  42% { translate: -28px 0; }
-  54% { translate: -12px -1px; }
-  66% { translate: 6px 0; }
-  80% { translate: 6px 0; }
-  90% { translate: 0 -1px; }
-  100% { translate: 0 0; }
-}
-@keyframes hero-walk-3 {
-  0% { translate: 0 0; }
-  14% { translate: -16px -1px; }
-  28% { translate: -32px 0; }
-  48% { translate: -32px 0; }
-  60% { translate: -16px -1px; }
-  74% { translate: 0 0; }
-  100% { translate: 0 0; }
-}
-#lib-people > g:nth-child(1) { animation: hero-walk-1 90s ease-in-out infinite; }
-#lib-people > g:nth-child(2) { animation: hero-walk-2 90s ease-in-out infinite; animation-delay: -30s; }
-#lib-people > g:nth-child(3) { animation: hero-walk-3 90s ease-in-out infinite; animation-delay: -55s; }
+/* People: the walkers are rebuilt from scratch as articulated figures
+   (separate legs/arms with a real gait cycle) and driven by walkers.js
+   (rAF, gait phase tied to distance walked). The old hero-walk translate
+   strolls are deleted (Alp, Nov 12: sliding a static figure is not
+   walking). Reduced motion: the JS does not run and the figures stand
+   still; the rule below is belt-and-braces. */
 
 /* ---------- Reduced motion ---------- */
 
