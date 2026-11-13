@@ -134,15 +134,26 @@
 
 .sc-dct .scn-phone { animation: scn-float 7s ease-in-out infinite; }
 
-.sc-dct .scn-chat { animation: scn-float 7.5s ease-in-out infinite; animation-delay: -3s; }
+.sc-dct .scn-chat { animation: scn-float 7s ease-in-out infinite; }
 
 /* igde spindle: one unified Figma vector with a wide planted base (resized
-   Nov 12), so it cannot spin or sway — a rotation would lift the base off
-   the ground. It gets only a gentle vertical bob, the whole shape together. */
-.sc-dct .scn-igde { animation: scn-igdebob 6s ease-in-out infinite; }
-@keyframes scn-igdebob {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
+   Nov 12). A 2D rotation would lift the base off the ground, so it turns
+   around its VERTICAL axis instead — a 3D turning effect done in 2D: the
+   shape squeezes horizontally to edge-on (scaleX 0), flips, and comes back,
+   like a coin spinning. Same flat 2D style, nothing about the look changes.
+   transform-box fill-box + origin center keeps it turning on its own axis
+   while the base stays planted on the ground. */
+.sc-dct .scn-igde {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: scn-igdetun 6s ease-in-out infinite;
+}
+@keyframes scn-igdetun {
+  0% { transform: scaleX(1); }
+  25% { transform: scaleX(0); }
+  50% { transform: scaleX(-1); }
+  75% { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
 }
 
 .sc-dct .scn-eye {
