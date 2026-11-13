@@ -83,23 +83,15 @@ html { scroll-behavior: smooth; overflow-x: hidden; }
   padding: 0;
 }
 .work-featured .card-scene .scn { width: 100%; height: 100%; }
-/* Round 20 v2: the featured scene is the animated GIF (transparent).
-   The GIF canvas is the scene plus 10% transparent padding on every side
-   (overscan, so floats never clip). The img is shown at 120% with
-   object-fit: contain, so the scene itself stays exactly the static size
-   and the padding just gives the motion room. The scene must not clip its
-   own overflow, or the padding is cut off and the float clips again — the
-   card's own overflow:hidden still bounds everything at the card edge. */
+/* Round 20 v5: the featured scene is the LIVE SVG (no GIF — GIFs are
+   256-color raster at 10fps, low res and glitchy; the live vector is crisp
+   and smooth). The scene must not clip its own overflow, or the floats get
+   cut off — the card's own overflow:hidden still bounds everything at the
+   card edge. The SVG element itself also needs overflow visible, or its
+   viewport clips the float (the viewBox has an 8px margin and the float is
+   10px, so content can move 2px past the viewBox edge). */
 .work-featured .card-scene { overflow: visible; }
-.work-featured .card-scene .scn-gif {
-  position: absolute;
-  left: 50%; top: 50%;
-  transform: translate(-50%, -50%);
-  width: 120%; height: 120%;
-  object-fit: contain;
-  display: block;
-  pointer-events: none;
-}
+.work-featured .card-scene .scn { overflow: visible; }
 .work-featured .card-wide .card-body {
   position: absolute;
   left: 56.17%; top: 0;

@@ -90,10 +90,12 @@
         var AUTO_MS = 5000;
         function cardHtml(p, featured, pi) {
           if (featured) {
-            // Round 20: the focused scene is the animated GIF (transparent,
-            // 4s seamless loop, Figma-exact). Side cards use the static SVG.
-            var gif = '<img class="scn-gif" src="images/works/' + esc(p.slug) + '.gif" alt="" />';
-            return '<div class="card card-wide"><div class="card-scene">' + gif + "</div>" +
+            // Round 20 v5 (Alp Nov 12): the focused scene is the LIVE SVG,
+            // not a GIF. GIFs are 256-color raster at 10fps — low resolution,
+            // low quality, and the float glitched. The live vector is crisp
+            // at any size, full color, and smooth 60fps CSS motion.
+            var scene = sceneFor(p.slug, p.image, p.title);
+            return '<div class="card card-wide"><div class="card-scene">' + scene + "</div>" +
               '<div class="card-body"><h3>' + esc(p.title) + "</h3>" +
               "<p>" + esc(p.blurb) + "</p>" +
               '<a class="card-cta" href="projects/project.html?p=' + esc(p.slug) + '">Learn more &rarr;</a></div></div>';

@@ -9,6 +9,11 @@
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
 }
+/* Floats move TOGETHER (Alp Nov 12): every scn-float runs 7s with no delay
+   offset, so the panels, chips and dots in a scene rise and fall as one
+   unit instead of drifting apart. Only the things with their own distinct
+   motion (tab/row/pill cycles, ring spin, jet hover, btn pulse, blink,
+   breeze, strobe) keep separate timing. */
 
 @keyframes scn-drift {
   0%, 100% { transform: translate(0, 0) rotate(0deg); }
@@ -45,7 +50,7 @@
   to { stroke-dashoffset: -28; }
 }
 
-.sc-plane .scn-eink { animation: scn-float 9s ease-in-out infinite; }
+.sc-plane .scn-eink { animation: scn-float 7s ease-in-out infinite; }
 
 .sc-plane .scn-jet { animation: scn-hover 6s ease-in-out infinite; }
 @keyframes scn-hover {
@@ -61,7 +66,7 @@
 
 /* ---------- Kotoban: simplified app mockup ---------- */
 
-.sc-koto .scn-phone { animation: scn-float 6.5s ease-in-out infinite; }
+.sc-koto .scn-phone { animation: scn-float 7s ease-in-out infinite; }
 
 .sc-koto .scn-ringspin {
   transform-box: fill-box;
@@ -87,11 +92,9 @@
   24%, 100% { fill: #1b1815; }
 }
 
-.sc-koto .scn-chip { animation: scn-float 5s ease-in-out infinite; }
-.sc-koto .scn-chip.c2 { animation-delay: -2.5s; }
+.sc-koto .scn-chip { animation: scn-float 7s ease-in-out infinite; }
 
-.sc-koto .scn-dot { animation: scn-float 5.2s ease-in-out infinite; }
-.sc-koto .scn-dot.d2 { animation-delay: -1.7s; }
+.sc-koto .scn-dot { animation: scn-float 7s ease-in-out infinite; }
 
 /* ---------- Recipe: simplified site mockup ---------- */
 
@@ -136,25 +139,9 @@
 
 .sc-dct .scn-chat { animation: scn-float 7s ease-in-out infinite; }
 
-/* igde spindle: one unified Figma vector with a wide planted base (resized
-   Nov 12). A 2D rotation would lift the base off the ground, so it turns
-   around its VERTICAL axis instead — a 3D turning effect done in 2D: the
-   shape squeezes horizontally to edge-on (scaleX 0), flips, and comes back,
-   like a coin spinning. Same flat 2D style, nothing about the look changes.
-   transform-box fill-box + origin center keeps it turning on its own axis
-   while the base stays planted on the ground. */
-.sc-dct .scn-igde {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: scn-igdetun 6s ease-in-out infinite;
-}
-@keyframes scn-igdetun {
-  0% { transform: scaleX(1); }
-  25% { transform: scaleX(0); }
-  50% { transform: scaleX(-1); }
-  75% { transform: scaleX(0); }
-  100% { transform: scaleX(1); }
-}
+/* igde spindle: one unified Figma vector with a wide planted base. It does
+   NOT turn or animate — Alp Nov 12: the scaleX 3D turn read as terrible, so
+   the spindle stands still and the phone + chat carry the motion. */
 
 .sc-dct .scn-eye {
   transform-box: fill-box;
@@ -176,18 +163,15 @@
   50% { transform: scale(1.045); }
 }
 
-.sc-dct .scn-dot { animation: scn-float 5.2s ease-in-out infinite; }
-.sc-dct .scn-dot.d2 { animation-delay: -1.7s; }
+.sc-dct .scn-dot { animation: scn-float 7s ease-in-out infinite; }
 
 /* ---------- alpbrowser: Arc-style browser mockup, site palette ---------- */
 
 .sc-alp .scn-window { animation: scn-float 7s ease-in-out infinite; }
 
-.sc-alp .scn-chip { animation: scn-float 5s ease-in-out infinite; }
-.sc-alp .scn-chip.c2 { animation-delay: -2.5s; }
+.sc-alp .scn-chip { animation: scn-float 7s ease-in-out infinite; }
 
-.sc-alp .scn-dot { animation: scn-float 5.2s ease-in-out infinite; }
-.sc-alp .scn-dot.d2 { animation-delay: -1.7s; }
+.sc-alp .scn-dot { animation: scn-float 7s ease-in-out infinite; }
 
 .sc-alp .scn-ringspin {
   transform-box: fill-box;
