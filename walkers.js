@@ -111,28 +111,34 @@
       var theta = (dist / STRIDE) * Math.PI * 2; // gait phase, from distance
       var s = Math.sin(theta);
       var c = Math.cos(theta);
-      /* Bob: HIGH when a foot is in the air (passing, theta 0/pi) and LOW
-         when both feet are planted (theta pi/2, 3pi/2). v1 used sin^2,
-         which had this backwards. */
-      var bob = -BOB * c * c;
+      /* Hips use COS (not sin): at theta = 0 the near leg is planted
+         forward and the far leg is back — a natural stride stance. That
+         matters because walks start/end at theta = multiples of 2pi: with
+         sin-based hips the figure froze mid-stride at a walk's end (knee
+         bent, body raised) and stayed that way through the pause. With cos
+         hips it ends in a planted stride, knees straight, body at rest
+         height, and holds that pose through the pause. (v2 bug, fixed.) */
+      /* Bob: HIGH when a foot is in the air (passing, theta pi/2, 3pi/2)
+         and LOW when both feet are planted (theta 0, pi). */
+      var bob = -BOB * s * s;
       w.el.style.translate = dist.toFixed(2) + "px " + bob.toFixed(2) + "px";
       /* Hips: legs alternate. */
-      if (w.legNear) w.legNear.style.rotate = (LEG_SWING * s).toFixed(2) + "deg";
-      if (w.legFar) w.legFar.style.rotate = (-LEG_SWING * s).toFixed(2) + "deg";
+      if (w.legNear) w.legNear.style.rotate = (LEG_SWING * c).toFixed(2) + "deg";
+      if (w.legFar) w.legFar.style.rotate = (-LEG_SWING * c).toFixed(2) + "deg";
       /* Knees: the shin bends BACK (negative) only while its leg is swinging
          through the air, peaking mid-swing, and is straight when the foot is
-         planted or pushing off. Near leg swings at theta ~0, far at ~pi. */
-      var kneeNear = -KNEE_MAX * Math.max(0, c) * Math.max(0, c);
-      var kneeFar = -KNEE_MAX * Math.max(0, -c) * Math.max(0, -c);
+         planted or pushing off. Near leg swings at theta ~3pi/2, far ~pi/2. */
+      var kneeNear = -KNEE_MAX * Math.max(0, -s) * Math.max(0, -s);
+      var kneeFar = -KNEE_MAX * Math.max(0, s) * Math.max(0, s);
       if (w.shinNear) w.shinNear.style.rotate = kneeNear.toFixed(2) + "deg";
       if (w.shinFar) w.shinFar.style.rotate = kneeFar.toFixed(2) + "deg";
       /* Arms: contralateral (same-side arm back, opposite-side arm forward). */
-      if (w.armNear) w.armNear.style.rotate = (-ARM_SWING * s).toFixed(2) + "deg";
-      if (w.armFar) w.armFar.style.rotate = (ARM_SWING * s).toFixed(2) + "deg";
+      if (w.armNear) w.armNear.style.rotate = (-ARM_SWING * c).toFixed(2) + "deg";
+      if (w.armFar) w.armFar.style.rotate = (ARM_SWING * c).toFixed(2) + "deg";
       /* Elbows: a resting bend that deepens as the arm swings forward. */
-      if (w.foreNear) w.foreNear.style.rotate = (ELBOW_BASE + ELBOW_VAR * Math.max(0, -s)).toFixed(2) + "deg";
-      if (w.foreFar) w.foreFar.style.rotate = (ELBOW_BASE + ELBOW_VAR * Math.max(0, s)).toFixed(2) + "deg";
-      if (w.lantern) w.lantern.style.rotate = (LANTERN_SWING * Math.sin(theta - 1.0)).toFixed(2) + "deg";
+      if (w.foreNear) w.foreNear.style.rotate = (ELBOW_BASE + ELBOW_VAR * Math.max(0, -c)).toFixed(2) + "deg";
+      if (w.foreFar) w.foreFar.style.rotate = (ELBOW_BASE + ELBOW_VAR * Math.max(0, c)).toFixed(2) + "deg";
+      if (w.lantern) w.lantern.style.rotate = (LANTERN_SWING * Math.cos(theta - 1.0)).toFixed(2) + "deg";
     }
     requestAnimationFrame(frame);
   }
