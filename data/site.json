@@ -23,6 +23,19 @@
       ]
     },
     {
+      "org": "77Health",
+      "place": "London, United Kingdom · remote",
+      "title": "AI Infrastructure Consultant",
+      "date": "Oct 2026 – Nov 2026",
+      "summary": "Built the AI infrastructure for a pre-seed menopause health-tech startup: a London-hosted server running local OCR and analysis, designed so patient data never leaves the company’s own systems.",
+      "link": "https://77health.co.uk/",
+      "link_label": "About 77Health",
+      "bullets": [
+        "Built a London-hosted OCI server running a local OCR and AI system to review menopause care research papers, replacing manual review.",
+        "Designed the system with GDPR measures keeping patient data on company infrastructure, so sensitive data never goes to a third-party AI company."
+      ]
+    },
+    {
       "org": "Brown University Biology Undergraduate Education",
       "place": "Providence, RI",
       "title": "Teaching Assistant, BIOL0530 Principles of Immunology",
