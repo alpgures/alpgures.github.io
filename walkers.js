@@ -1,290 +1,378 @@
-/* Hero walkers v3 — more people, cats, quicker (Nov 12, Alp: 'still not as
-   intricate', 'walking a little quicker', 'others in the city', 'a cat or
-   two'). The 3 main walkers gained accessories (scarf, satchel, hat, finer
-   seams, pocket); 3 new walkers joined in other parts of the city (temples,
-   mid-walkway, village); two cats moved in (one sits and swishes its tail,
-   one strolls the village). Everything still loops in 90s.
+/* Hero walkers v8 — six distinct people, two cats, a lived-in city
+   (Round 21; rebuild of the Opus Nov 13 pass). Alp: 'more intricate',
+   'more diverse instead of the same characters duplicated', 'they walk
+   weirdly', 'why are they stopping weirdly?'.
 
    The gait (rAF, 90s loop, per figure):
-   - Legs alternate at the hip (cos phase, so walks start/end in a planted
-     stride stance — knees straight, body at rest height — and hold that pose
-     through pauses). Each leg has a KNEE that bends only during the swing
-     phase; each arm has an ELBOW. Arms swing contralateral. Body bobs HIGH
-     when a foot is in the air, LOW when both feet are planted.
-   - The gait phase is tied to DISTANCE walked, not time, so the legs speed
-     up and slow down with the body: accelerate out of stops, decelerate in,
-     stand still in pauses.
-   - Quicker (v3): the main walkers now average 7.5 scene units/s (was 5) —
-     the same distances in 8/6/4s instead of 12/9/6s.
-   - Scarves flutter in the breeze (a slow sine, loops in 90s).
-   - The sitting cat swishes its tail (6s period, loops). The strolling cat
-     walks a slow diagonal gait tied to its own distance, and its tail
-     swishes too.
+   - Gait phase is tied to the PATH LENGTH walked (not time, not signed
+     position), so the legs speed up and slow down with the body (smoothstep
+     easing on each walk) and run forwards whichever way the figure goes.
+   - Planted feet do not slide: during stance the foot's offset from the hip
+     moves LINEARLY with distance (+FOOT_REACH to -FOOT_REACH over half a
+     stride, exactly the distance the body covers), and the hip angle is
+     asin(offset/LEG). The swing foot travels back to the front on a Hermite
+     (smoothstep) arc, with the KNEE bending only while it is in the air.
+   - Joints bend the right way: knees fold the shin BACK (positive rotate in
+     the figure's frame, which faces +x), elbows fold the forearm FORWARD
+     (negative rotate). Arms swing contralateral to the legs.
+   - The body bobs HIGH at mid-stance, LOW at foot contact; leans forward
+     LEAN degrees at full pace.
+   - Gait-amplitude ENVELOPE from the instantaneous speed: legs, knees and
+     arms ease to the neutral standing pose (feet together) as the body
+     decelerates and build back up as it accelerates — no freezing mid-stride.
+   - No moonwalking: a figure walking the other way first TURNS ROUND in the
+     pause before the walk (a TURN-second flip, eased).
+   - Lanterns and baskets hang from the hand (counter-rotated against the arm,
+     plus a lagging pendulum). The stick and the umbrella are held rigid: the
+     stick rides the forearm (that limb carries data-swing / data-elbow scales
+     so it barely moves); the umbrella (.w-held) is kept upright, no pendulum.
 
-   Figures' position/scale live in a transform ATTRIBUTE; this only ever
-   sets the CSS `translate` and `rotate` properties, which compose with it.
+   Every plan: 90s total, net distance 0, whole strides, pauses 3-5s, so the
+   loop seam is continuous (checked by _build/check_plans.js).
 
+   Placement: each figure's position/scale live in its transform ATTRIBUTE;
+   this only sets the CSS translate/rotate/scale properties, which compose
+   outside it (transform-origin 0 0), with the translate compensated so the
+   flip and lean pivot on the figure's feet.
+
+   ?wt=12.5 freezes the loop at that time (for frame captures).
    Reduced motion: nothing moves. */
 (function () {
   "use strict";
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-  var LOOP = 90;        // seconds — the master loop
-  var STRIDE = 15;      // scene units per full gait cycle (2 steps)
-  var LEG_SWING = 15;   // degrees, each leg at the hip
-  var KNEE_MAX = 35;    // degrees the shin bends back during the swing
-  var ARM_SWING = 12;   // degrees, each arm at the shoulder
-  var ELBOW_BASE = 8;   // degrees, the forearm's resting bend
-  var ELBOW_VAR = 10;   // extra elbow bend as the arm swings forward
-  var BOB = 1.5;        // scene units the body rises mid-step
-  var LANTERN_SWING = 7;// degrees, pendulum lagging the arm
+  var LOOP = 90;          // seconds — the master loop
+  var STRIDE = 15;        // scene units per full gait cycle (2 steps)
+  var LEG = 48;           // hip (y72) to sole (y120), figure units
+  var FOOT_REACH = STRIDE / (4 * 0.5); // 7.5 figure units (~9deg at the hip)
+  var KNEE_MAX = 30;      // degrees the shin folds back mid-swing
+  var ARM_SWING = 13;     // degrees at the shoulder
+  var ELBOW_BASE = 5;     // degrees, the forearm's resting bend
+  var ELBOW_VAR = 14;     // extra elbow bend as the arm swings forward
+  var BOB = 0.7;          // scene units the body rises at mid-stance
+  var LEAN = 2;           // degrees forward lean at full pace
+  var LANTERN_SWING = 6;  // degrees, pendulum lagging the step
   var ENVELOPE_SPEED = 4; // scene units/s at which the gait reaches full amplitude
-  var CAT_STRIDE = 6;   // scene units per full gait cycle for the strolling cat
-  var CAT_LEG = 9;      // degrees, the cat's leg swing
-  var CAT_BOB = 0.6;    // scene units the cat's body bobs
+  var TURN = 0.8;         // seconds to turn round
+  var TURN_LEAD = 0.25;   // the turn ends this long before the walk starts
+  var CAT_STRIDE = 4;     // scene units per full gait cycle for the strolling cat
+  var CAT_LEG = 13;       // degrees, the cat's leg swing
+  var CAT_BOB = 0.4;      // scene units
+  var DEG = 180 / Math.PI;
 
-  /* Walk plans: [kind, seconds, distanceInSceneUnits] (+ = right, - = left).
-     Distances are multiples of STRIDE (15) so each walk is whole strides;
-     net distance per plan is 0 — every figure returns home at 90s.
-     MORE ACTIVE (v4, Alp Nov 12 ~23:37: 'only one person or two at a time,
-     which looks boring'): the v3 plans had 12-30s pauses, so each figure
-     walked only ~18-31% of the loop and on average just 1.3 of 6 were
-     moving. Now every figure walks ~52-56s of the 90s (58-62%), with short
-     4s pauses, and the starts are staggered so ~3-4 are moving at once. */
+  /* Walk plans: [kind, seconds, distance] (+ = right, - = left, scene units).
+     Pace 7.5 u/s (walks of 4/6/8 s = 2/3/4 strides); the elder (3) walks
+     5 u/s. Each figure walks ~48-54 s of the 90 s with 3-5 s pauses, starts
+     staggered: ~3.4 of the 6 are moving at any moment. */
   var PLANS = {
-    0: [["walk", 8, 60],
-        ["pause", 4, 0],
-        ["walk", 8, -60],
+    0: [["walk", 8, -60],
         ["pause", 4, 0],
         ["walk", 6, 45],
         ["pause", 4, 0],
+        ["walk", 4, -30],
+        ["pause", 4, 0],
+        ["walk", 6, 45],
+        ["pause", 4, 0],
+        ["walk", 8, -60],
+        ["pause", 5, 0],
+        ["walk", 4, 30],
+        ["pause", 4, 0],
+        ["walk", 6, 45],
+        ["pause", 4, 0],
+        ["walk", 4, 30],
+        ["pause", 4, 0],
         ["walk", 6, -45],
+        ["pause", 5, 0]],
+    1: [["pause", 5, 0],
+        ["walk", 6, 45],
+        ["pause", 5, 0],
+        ["walk", 4, -30],
+        ["pause", 5, 0],
+        ["walk", 6, 45],
+        ["pause", 5, 0],
+        ["walk", 8, -60],
+        ["pause", 4, 0],
+        ["walk", 4, 30],
+        ["pause", 5, 0],
+        ["walk", 6, -45],
+        ["pause", 4, 0],
+        ["walk", 4, 30],
+        ["pause", 5, 0],
+        ["walk", 4, 30],
+        ["pause", 4, 0],
+        ["walk", 6, -45]],
+    2: [["walk", 6, 45],
+        ["pause", 4, 0],
+        ["walk", 6, -45],
+        ["pause", 4, 0],
+        ["walk", 4, 30],
+        ["pause", 4, 0],
+        ["walk", 8, -60],
+        ["pause", 5, 0],
+        ["walk", 6, 45],
+        ["pause", 4, 0],
+        ["walk", 4, 30],
+        ["pause", 4, 0],
+        ["walk", 6, -45],
+        ["pause", 4, 0],
+        ["walk", 6, -45],
+        ["pause", 5, 0],
+        ["walk", 6, 45],
+        ["pause", 4, 0]],
+    3: [["walk", 6, 30],
+        ["pause", 5, 0],
+        ["walk", 9, -45],
+        ["pause", 4, 0],
+        ["walk", 6, 30],
+        ["pause", 5, 0],
+        ["walk", 6, -30],
+        ["pause", 4, 0],
+        ["walk", 9, 45],
+        ["pause", 5, 0],
+        ["walk", 6, -30],
+        ["pause", 4, 0],
+        ["walk", 6, 30],
+        ["pause", 5, 0],
+        ["walk", 6, -30],
+        ["pause", 4, 0]],
+    4: [["pause", 4, 0],
+        ["walk", 4, -30],
+        ["pause", 4, 0],
+        ["walk", 6, 45],
+        ["pause", 5, 0],
+        ["walk", 6, -45],
+        ["pause", 4, 0],
+        ["walk", 4, -30],
         ["pause", 4, 0],
         ["walk", 8, 60],
         ["pause", 4, 0],
-        ["walk", 8, -60],
-        ["pause", 4, 0],
         ["walk", 6, 45],
         ["pause", 4, 0],
-        ["walk", 6, -45],
-        ["pause", 6, 0]],
-    1: [["pause", 3, 0],
-        ["walk", 6, -45],
-        ["pause", 3, 0],
-        ["walk", 6, 45],
-        ["pause", 3, 0],
-        ["walk", 4, 30],
-        ["pause", 3, 0],
         ["walk", 4, -30],
-        ["pause", 3, 0],
-        ["walk", 6, -45],
-        ["pause", 3, 0],
+        ["pause", 5, 0],
         ["walk", 6, 45],
-        ["pause", 3, 0],
-        ["walk", 4, 30],
-        ["pause", 3, 0],
-        ["walk", 4, -30],
-        ["pause", 3, 0],
-        ["walk", 6, -45],
-        ["pause", 3, 0],
-        ["walk", 6, 45],
-        ["pause", 8, 0]],
-    2: [["walk", 6, -45],
-        ["pause", 3, 0],
-        ["walk", 6, 45],
-        ["pause", 3, 0],
-        ["walk", 4, -30],
-        ["pause", 3, 0],
-        ["walk", 4, 30],
-        ["pause", 3, 0],
-        ["walk", 6, -45],
-        ["pause", 3, 0],
-        ["walk", 6, 45],
-        ["pause", 3, 0],
-        ["walk", 4, -30],
-        ["pause", 3, 0],
-        ["walk", 4, 30],
-        ["pause", 3, 0],
-        ["walk", 6, -45],
-        ["pause", 3, 0],
-        ["walk", 6, 45],
-        ["pause", 11, 0]],
-    3: [["walk", 6, 45],
-        ["pause", 3, 0],
-        ["walk", 6, -45],
-        ["pause", 3, 0],
-        ["walk", 4, 30],
-        ["pause", 3, 0],
-        ["walk", 4, -30],
-        ["pause", 3, 0],
-        ["walk", 6, 45],
-        ["pause", 3, 0],
-        ["walk", 6, -45],
-        ["pause", 3, 0],
-        ["walk", 4, 30],
-        ["pause", 3, 0],
-        ["walk", 4, -30],
-        ["pause", 3, 0],
-        ["walk", 6, 45],
-        ["pause", 3, 0],
-        ["walk", 6, -45],
-        ["pause", 11, 0]],
-    4: [["pause", 3, 0],
-        ["walk", 6, -45],
-        ["pause", 3, 0],
-        ["walk", 6, 45],
-        ["pause", 3, 0],
-        ["walk", 4, -30],
-        ["pause", 3, 0],
-        ["walk", 4, 30],
-        ["pause", 3, 0],
-        ["walk", 6, -45],
-        ["pause", 3, 0],
-        ["walk", 6, 45],
-        ["pause", 3, 0],
-        ["walk", 4, -30],
-        ["pause", 3, 0],
-        ["walk", 4, 30],
-        ["pause", 3, 0],
-        ["walk", 6, -45],
-        ["pause", 3, 0],
-        ["walk", 6, 45],
-        ["pause", 8, 0]],
+        ["pause", 4, 0],
+        ["walk", 8, -60]],
     5: [["walk", 6, -45],
-        ["pause", 3, 0],
+        ["pause", 4, 0],
         ["walk", 6, 45],
-        ["pause", 3, 0],
+        ["pause", 5, 0],
         ["walk", 4, -30],
-        ["pause", 3, 0],
-        ["walk", 4, 30],
-        ["pause", 3, 0],
-        ["walk", 6, -45],
-        ["pause", 3, 0],
+        ["pause", 4, 0],
         ["walk", 6, 45],
-        ["pause", 3, 0],
+        ["pause", 4, 0],
+        ["walk", 6, -45],
+        ["pause", 4, 0],
         ["walk", 4, -30],
-        ["pause", 3, 0],
-        ["walk", 4, 30],
-        ["pause", 3, 0],
-        ["walk", 6, -45],
-        ["pause", 3, 0],
+        ["pause", 4, 0],
         ["walk", 6, 45],
-        ["pause", 11, 0]]
+        ["pause", 5, 0],
+        ["walk", 6, -45],
+        ["pause", 4, 0],
+        ["walk", 8, 60],
+        ["pause", 4, 0]]
   };
-  /* The strolling cat (cat 1): slow, 2 scene units/s. Distances MUST be
-     multiples of CAT_STRIDE (6) so its gait ends at a neutral stride stance
-     instead of freezing mid-stride through the pause — the first version
-     used +-20 (not a multiple of 6) and the cat sat paused with its body
-     raised and legs half-swung. */
-  var CAT_PLAN = [["walk", 9, 18], ["pause", 12, 0], ["walk", 9, -18],
-                  ["pause", 13, 0], ["walk", 9, 18], ["pause", 12, 0],
-                  ["walk", 9, -18], ["pause", 17, 0]];
+  /* The strolling cat: 2 u/s, whole cat strides (multiples of 4), turns
+     round in its pauses. */
+  var CAT_PLAN = [["walk", 8, 16], ["pause", 14, 0], ["walk", 8, -16],
+                  ["pause", 15, 0], ["walk", 8, 16], ["pause", 14, 0],
+                  ["walk", 8, -16], ["pause", 15, 0]];
 
   function smoothstep(u) { return u * u * (3 - 2 * u); }
+  function frac(x) { return x - Math.floor(x); }
 
   function buildSegments(plan) {
-    var segs = [], t = 0, x = 0;
-    plan.forEach(function (s) {
-      segs.push({ t0: t, t1: t + s[1], x0: x, x1: x + s[2], kind: s[0] });
-      t += s[1]; x += s[2];
+    var segs = [], t = 0, x = 0, s = 0;
+    plan.forEach(function (p) {
+      segs.push({ t0: t, t1: t + p[1], x0: x, d: p[2], s0: s, kind: p[0],
+                  dir: p[2] > 0 ? 1 : p[2] < 0 ? -1 : 0 });
+      t += p[1]; x += p[2]; s += Math.abs(p[2]);
     });
-    return segs;
+    /* Facing through each pause: the previous walk's direction, turning to
+       the next walk's direction at the end of the pause (cyclic). */
+    var walks = segs.filter(function (g) { return g.kind === "walk"; });
+    segs.forEach(function (g, i) {
+      if (g.kind === "walk") return;
+      var prev = null, next = null, j;
+      for (j = 1; j <= segs.length && !prev; j++) {
+        var a = segs[(i - j + segs.length) % segs.length];
+        if (a.kind === "walk") prev = a;
+      }
+      for (j = 1; j <= segs.length && !next; j++) {
+        var b = segs[(i + j) % segs.length];
+        if (b.kind === "walk") next = b;
+      }
+      g.from = prev ? prev.dir : 1;
+      g.to = next ? next.dir : g.from;
+    });
+    return { segs: segs, path: s, walks: walks.length };
   }
 
-  /* Cumulative eased distance from the loop start at time t (seconds). */
-  function distanceAt(segs, t) {
-    var d = 0;
+  /* State at time t: position x, path length s, speed v, facing f (-1..1). */
+  function stateAt(plan, t) {
+    var segs = plan.segs;
     for (var i = 0; i < segs.length; i++) {
-      var s = segs[i];
-      if (t >= s.t1) { d += (s.x1 - s.x0); continue; }
-      if (t <= s.t0) break;
-      var u = (t - s.t0) / (s.t1 - s.t0);
-      if (s.kind === "walk") d += (s.x1 - s.x0) * smoothstep(u);
-      break;
+      var g = segs[i];
+      if (t >= g.t1 && i < segs.length - 1) continue;
+      var T = g.t1 - g.t0, u = Math.min(1, Math.max(0, (t - g.t0) / T));
+      if (g.kind === "walk") {
+        var e = smoothstep(u);
+        return { x: g.x0 + g.d * e, s: g.s0 + Math.abs(g.d) * e,
+                 v: Math.abs(g.d) / T * 6 * u * (1 - u), f: g.dir };
+      }
+      var f = g.from;
+      if (g.to !== g.from) {
+        var k = (t - (g.t1 - TURN_LEAD - TURN)) / TURN;
+        if (k > 0) f = k >= 1 ? g.to : g.from * Math.cos(Math.PI * smoothstep(k));
+      }
+      return { x: g.x0, s: g.s0, v: 0, f: f };
     }
-    return d;
   }
 
-  /* Instantaneous speed (scene units/s) from the distance function. Used
-     for the gait envelope: the legs and arms only swing as wide as the body
-     is actually moving, so a figure eases into a walk from standing and
-     settles its feet together as it stops, instead of freezing mid-stride. */
-  function speedAt(segs, t) {
-    var dt = 0.05;
-    return (distanceAt(segs, t + dt) - distanceAt(segs, t - dt)) / (2 * dt);
+  function parsePlace(el) {
+    var tf = el.getAttribute("transform") || "";
+    var m = /translate\(\s*([-\d.]+)[ ,]+([-\d.]+)\s*\)\s*scale\(\s*([-\d.]+)/.exec(tf);
+    return m ? { X: +m[1], Y: +m[2], sign: +m[3] < 0 ? -1 : 1 } : { X: 0, Y: 0, sign: 1 };
+  }
+
+  /* Place a figure: move its feet by (dx,dy), mirror by sx about the feet,
+     then lean by deg (scene frame) about the feet. CSS individual transforms
+     compose as translate . rotate . scale . [attribute], origin 0 0, so the
+     translate is compensated for where rotate.scale sends the feet. */
+  function place(el, P, dx, dy, sx, deg) {
+    var a = deg / DEG, c = Math.cos(a), s = Math.sin(a);
+    var fx = c * sx * P.X - s * P.Y, fy = s * sx * P.X + c * P.Y;
+    el.style.translate = (P.X + dx - fx).toFixed(3) + "px " + (P.Y + dy - fy).toFixed(3) + "px";
+    el.style.rotate = deg.toFixed(3) + "deg";
+    el.style.scale = sx.toFixed(4) + " 1";
+  }
+
+  function rot(el, deg) { if (el) el.style.rotate = deg.toFixed(2) + "deg"; }
+
+  /* One leg at gait phase ph (0..1 cycles; 0 = heel strike, foot forward). */
+  function legAngles(ph, env) {
+    var x, knee = 0, hip;
+    if (ph < 0.5) {
+      x = FOOT_REACH * (1 - 4 * ph);                  // stance: linear, planted
+    } else {
+      var u = (ph - 0.5) * 2;
+      x = -FOOT_REACH + 2 * FOOT_REACH * smoothstep(u); // swing: Hermite arc
+      knee = KNEE_MAX * Math.sin(Math.PI * u);
+    }
+    hip = -Math.asin(Math.max(-1, Math.min(1, x * env / LEG))) * DEG - 0.5 * knee * env;
+    return { hip: hip, knee: knee * env };
+  }
+
+  function num(el, name, dflt) {
+    var v = el && el.getAttribute(name);
+    return v === null || v === undefined || v === "" ? dflt : parseFloat(v);
   }
 
   var walkers = [];
   document.querySelectorAll(".walker").forEach(function (el) {
     var idx = parseInt(el.getAttribute("data-walker"), 10);
-    var plan = PLANS[idx];
-    if (!plan) return;
+    if (!PLANS[idx]) return;
+    var armNear = el.querySelector(".w-arm-near"), armFar = el.querySelector(".w-arm-far");
+    var lanterns = [];
+    el.querySelectorAll(".w-lantern").forEach(function (ln) {
+      var arm = ln.closest(".w-arm");
+      lanterns.push({ el: ln, near: arm === armNear, far: arm === armFar, inArm: !!arm });
+    });
     walkers.push({
-      el: el,
-      segs: buildSegments(plan),
-      legNear: el.querySelector(".w-leg-near"),
-      legFar: el.querySelector(".w-leg-far"),
-      shinNear: el.querySelector(".w-shin-near"),
-      shinFar: el.querySelector(".w-shin-far"),
-      armNear: el.querySelector(".w-arm-near"),
-      armFar: el.querySelector(".w-arm-far"),
-      foreNear: el.querySelector(".w-fore-near"),
-      foreFar: el.querySelector(".w-fore-far"),
-      lantern: el.querySelector(".w-lantern"),
+      el: el, place: parsePlace(el), plan: buildSegments(PLANS[idx]),
+      legNear: el.querySelector(".w-leg-near"), legFar: el.querySelector(".w-leg-far"),
+      shinNear: el.querySelector(".w-shin-near"), shinFar: el.querySelector(".w-shin-far"),
+      armNear: armNear, armFar: armFar,
+      foreNear: el.querySelector(".w-fore-near"), foreFar: el.querySelector(".w-fore-far"),
+      swingNear: num(armNear, "data-swing", 1), swingFar: num(armFar, "data-swing", 1),
+      elbowNear: num(armNear, "data-elbow", 1), elbowFar: num(armFar, "data-elbow", 1),
+      lanterns: lanterns,
+      held: el.querySelector(".w-held"),
       scarfTail: el.querySelector(".w-scarf-tail")
     });
   });
 
-  var catSit = document.querySelector('.cat-sit .w-cat-tail');
-  var catWalk = document.querySelector('.cat-walk');
-  var catWalkSegs = catWalk ? buildSegments(CAT_PLAN) : null;
-  var catLegA = catWalk ? catWalk.querySelector(".w-cat-leg-a") : null;
-  var catLegB = catWalk ? catWalk.querySelector(".w-cat-leg-b") : null;
-  var catTail = catWalk ? catWalk.querySelector(".w-cat-tail") : null;
+  var catSitTail = document.querySelector(".cat-sit .w-cat-tail");
+  var catWalk = document.querySelector(".cat-walk");
+  var cat = catWalk ? {
+    el: catWalk, place: parsePlace(catWalk), plan: buildSegments(CAT_PLAN),
+    legsA: catWalk.querySelectorAll(".w-cat-leg-a"),
+    legsB: catWalk.querySelectorAll(".w-cat-leg-b"),
+    tail: catWalk.querySelector(".w-cat-tail")
+  } : null;
 
-  var start = performance.now();
-  function frame(now) {
-    var t = ((now - start) / 1000) % LOOP;
-    var i, w, dist, theta, s, c, bob;
+  /* City details (lived-in-*): all periods divide 90 s. */
+  var dogBreath = document.querySelector(".lived-in-dog-breath");
+  var yataiLantern = document.querySelector(".lived-in-yatai-lantern");
+  var steam = document.querySelectorAll(".lived-in-steam");
+  var laundry = document.querySelectorAll(".lived-in-laundry-item");
+
+  function frame(t) {
+    var i, w, st, env, p, ln, lr, rn, rf, an, af, fn, ff, c2, dir, lean, bob;
     for (i = 0; i < walkers.length; i++) {
       w = walkers[i];
-      dist = distanceAt(w.segs, t);
-      theta = (dist / STRIDE) * Math.PI * 2; // gait phase, from distance
-      s = Math.sin(theta);
-      c = Math.cos(theta);
-      bob = -BOB * s * s; // HIGH when a foot is in the air, LOW when planted
-      w.el.style.translate = dist.toFixed(2) + "px " + bob.toFixed(2) + "px";
-      /* Gait envelope: 0 when standing (feet together, arms at rest), 1 at
-         full stride. Without it the figure froze mid-stride through every
-         pause and swung at full amplitude while the body was barely moving
-         at a walk's ends — that is the weird stop (and half the weird walk). */
-      var env = Math.min(1, Math.abs(speedAt(w.segs, t)) / ENVELOPE_SPEED);
-      if (w.legNear) w.legNear.style.rotate = (LEG_SWING * c * env).toFixed(2) + "deg";
-      if (w.legFar) w.legFar.style.rotate = (-LEG_SWING * c * env).toFixed(2) + "deg";
-      if (w.shinNear) w.shinNear.style.rotate = (-KNEE_MAX * Math.max(0, -s) * Math.max(0, -s) * env).toFixed(2) + "deg";
-      if (w.shinFar) w.shinFar.style.rotate = (-KNEE_MAX * Math.max(0, s) * Math.max(0, s) * env).toFixed(2) + "deg";
-      if (w.armNear) w.armNear.style.rotate = (-ARM_SWING * c * env).toFixed(2) + "deg";
-      if (w.armFar) w.armFar.style.rotate = (ARM_SWING * c * env).toFixed(2) + "deg";
-      if (w.foreNear) w.foreNear.style.rotate = (ELBOW_BASE + ELBOW_VAR * Math.max(0, -c)).toFixed(2) + "deg";
-      if (w.foreFar) w.foreFar.style.rotate = (ELBOW_BASE + ELBOW_VAR * Math.max(0, c)).toFixed(2) + "deg";
-      if (w.lantern) w.lantern.style.rotate = (LANTERN_SWING * Math.cos(theta - 1.0)).toFixed(2) + "deg";
-      if (w.scarfTail) w.scarfTail.style.rotate = (10 * Math.sin((t / 3) * Math.PI * 2 - 0.8)).toFixed(2) + "deg";
+      st = stateAt(w.plan, t);
+      env = Math.min(1, st.v / ENVELOPE_SPEED);
+      p = st.s / STRIDE;                       // gait phase in cycles
+      ln = legAngles(frac(p), env);            // near leg
+      lr = legAngles(frac(p + 0.5), env);      // far leg
+      bob = -BOB * env * Math.pow(Math.sin(2 * Math.PI * p), 2);
+      dir = st.f;                              // scene direction (-1..1)
+      lean = LEAN * env;                       // forward, in the figure's frame
+      place(w.el, w.place, st.x, bob, dir * w.place.sign, lean * (dir >= 0 ? 1 : -1));
+      rot(w.legNear, ln.hip); rot(w.shinNear, ln.knee);
+      rot(w.legFar, lr.hip); rot(w.shinFar, lr.knee);
+      c2 = Math.cos(2 * Math.PI * p);          // +1 when the near foot is forward
+      an = ARM_SWING * env * c2 * w.swingNear; // near arm back while near foot forward
+      af = -ARM_SWING * env * c2 * w.swingFar;
+      fn = -(ELBOW_BASE + ELBOW_VAR * env * Math.max(0, -c2)) * w.elbowNear;
+      ff = -(ELBOW_BASE + ELBOW_VAR * env * Math.max(0, c2)) * w.elbowFar;
+      rot(w.armNear, an); rot(w.armFar, af); rot(w.foreNear, fn); rot(w.foreFar, ff);
+      for (var j = 0; j < w.lanterns.length; j++) {
+        var L = w.lanterns[j], up = -lean;
+        if (L.near) up -= an + fn;
+        else if (L.far) up -= af + ff;
+        rot(L.el, up + LANTERN_SWING * env * Math.sin(4 * Math.PI * p - 1.0));
+      }
+      if (w.held) rot(w.held, -(lean + an + fn));   // umbrella held steady, upright
+      if (w.scarfTail) rot(w.scarfTail, 9 * Math.sin((t / 3) * Math.PI * 2 - 0.8) - 8 * env);
     }
-    /* Sitting cat: a slow lazy tail swish (6s period, divides 90). */
-    if (catSit) catSit.style.rotate = (14 * Math.sin((t / 6) * Math.PI * 2)).toFixed(2) + "deg";
-    /* Strolling cat: slow diagonal gait tied to its own distance. */
-    if (catWalk) {
-      var cdist = distanceAt(catWalkSegs, t);
-      var ctheta = (cdist / CAT_STRIDE) * Math.PI * 2;
-      var cs = Math.sin(ctheta);
-      var cc = Math.cos(ctheta);
-      var cbob = -CAT_BOB * cs * cs;
-      catWalk.style.translate = cdist.toFixed(2) + "px " + cbob.toFixed(2) + "px";
-      if (catLegA) catLegA.style.rotate = (CAT_LEG * cc).toFixed(2) + "deg";
-      if (catLegB) catLegB.style.rotate = (-CAT_LEG * cc).toFixed(2) + "deg";
-      if (catTail) catTail.style.rotate = (10 * Math.sin(ctheta - 0.9)).toFixed(2) + "deg";
+    /* Sitting cat: only the tail tip flicks, now and then (9 s and 15 s). */
+    if (catSitTail) rot(catSitTail,
+      -28 * Math.pow(Math.max(0, Math.sin(2 * Math.PI * t / 9)), 8) +
+      18 * Math.pow(Math.max(0, Math.sin(2 * Math.PI * t / 15 + 1.3)), 10));
+    /* Strolling cat: diagonal pairs, gait from its own path length. */
+    if (cat) {
+      st = stateAt(cat.plan, t);
+      env = Math.min(1, st.v / 1.5);
+      p = st.s / CAT_STRIDE;
+      c2 = Math.cos(2 * Math.PI * p);
+      place(cat.el, cat.place, st.x, -CAT_BOB * env * Math.pow(Math.sin(2 * Math.PI * p), 2),
+            st.f * cat.place.sign, 0);
+      for (i = 0; i < cat.legsA.length; i++) rot(cat.legsA[i], CAT_LEG * env * c2);
+      for (i = 0; i < cat.legsB.length; i++) rot(cat.legsB[i], -CAT_LEG * env * c2);
+      if (cat.tail) rot(cat.tail, 6 * env * Math.sin(2 * Math.PI * p - 0.9) + 4 * Math.sin(2 * Math.PI * t / 5));
     }
-    requestAnimationFrame(frame);
+    /* The temple dog breathes (4.5 s); the yatai lantern swings (5 s); steam
+       rises (3 s, three staggered wisps); laundry sways (6 s). */
+    if (dogBreath) dogBreath.style.scale = "1 " + (1 + 0.06 * Math.sin(2 * Math.PI * t / 4.5)).toFixed(4);
+    if (yataiLantern) rot(yataiLantern, 5 * Math.sin(2 * Math.PI * t / 5));
+    for (i = 0; i < steam.length; i++) {
+      var u = frac(t / 3 + i / steam.length);
+      steam[i].style.translate = (0.8 * Math.sin(2 * Math.PI * u)).toFixed(2) + "px " + (-9 * u).toFixed(2) + "px";
+      steam[i].style.opacity = (0.65 * Math.sin(Math.PI * u)).toFixed(3);
+    }
+    for (i = 0; i < laundry.length; i++)
+      rot(laundry[i], 4 * Math.sin(2 * Math.PI * t / 6 + i * 0.9));
   }
-  requestAnimationFrame(frame);
+
+  var wt = parseFloat(new URLSearchParams(window.location.search).get("wt"));
+  if (!isNaN(wt)) { frame(((wt % LOOP) + LOOP) % LOOP); return; }
+
+  var start = performance.now();
+  function tick(now) {
+    frame(((now - start) / 1000) % LOOP);
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
 })();

@@ -92,26 +92,36 @@ html { scroll-behavior: smooth; overflow-x: hidden; }
    10px, so content can move 2px past the viewBox edge). */
 .work-featured .card-scene { overflow: visible; }
 .work-featured .card-scene .scn { overflow: visible; }
+/* Featured card text flows instead of fixed absolute tops: the old fixed
+   tops (h3 33.7%, p 50.43%) assumed a one-line title, so a two-line title
+   ("Annemin Tarifleri") ran into the description. Flex column keeps the
+   Figma positions for one-line titles (title at 33.7% via padding-top,
+   CTA near 83.7% via margin-top:auto + padding-bottom) while letting the
+   description sit below a two-line title instead of overlapping it. */
 .work-featured .card-wide .card-body {
   position: absolute;
   left: 56.17%; top: 0;
   width: 41.45%; height: 100%;
-  padding: 0;
-  display: block;
+  padding: 16.06cqw 0 4.77cqw;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 .work-featured .card-wide .card-body h3 {
-  position: absolute; left: 0; top: 33.7%;
+  position: static;
   width: 100%;
   margin: 0; font-size: 5.6cqw; line-height: 1.15; font-weight: 600;
 }
 .work-featured .card-wide .card-body p {
-  position: absolute; left: 0; top: 50.43%;
+  position: static;
   width: 100%;
-  margin: 0; font-size: 2.49cqw; line-height: 1.55; color: var(--muted);
+  margin: 1.55cqw 0 0; font-size: 2.49cqw; line-height: 1.55; color: var(--muted);
 }
 .work-featured .card-wide .card-body .card-cta {
-  position: absolute; left: 0; top: 83.7%;
-  font-size: 3cqw; font-weight: 600;
+  position: static;
+  margin-top: auto;
+  font-size: 3cqw; line-height: 1.2; font-weight: 600;
 }
 /* The featured card is not a link (only "Learn more" is), so it must not
    lift or scale its scene on hover the way the old linked cards did. */
@@ -198,7 +208,7 @@ html { scroll-behavior: smooth; overflow-x: hidden; }
   .work-featured .card-wide .card-body { position: static; width: auto; height: auto; padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 8px; }
   .work-featured .card-wide .card-body h3,
   .work-featured .card-wide .card-body p,
-  .work-featured .card-wide .card-body .card-cta { position: static; width: auto; }
+  .work-featured .card-wide .card-body .card-cta { position: static; width: auto; margin: 0; }
   .work-featured .card-wide .card-body h3 { font-size: 26px; }
   .work-featured .card-wide .card-body p { font-size: 16px; }
   .work-featured .card-wide .card-body .card-cta { font-size: 17px; }
