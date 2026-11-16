@@ -294,6 +294,20 @@
   0%, 100% { translate: 0 0; }
   50% { translate: 0 -2px; }
 }
+/* The gondola sails the canal and loops by wrapping around (Alp, Nov 16:
+   "he can loop by appearing through the other side"). One full crossing
+   per 90s loop, bow-first to the right, at a steady 18 u/s. The wrapper
+   carries the sail so the bob (on .gondola) and the rowing (gondoleer/oar)
+   keep working untouched. The 0%/100% values deliberately differ — the
+   exception to the perfect-loop rule: at both ends the boat is fully
+   off-screen (left edge past scene 1440 at 550px, right edge past scene 0
+   at -540px), so the wrap jump is invisible. Linear timing keeps the
+   speed constant; easing would make it surge and stall. */
+.scene .gondola-sail { animation: gondola-sail 90s linear infinite; }
+@keyframes gondola-sail {
+  0% { translate: -540px 0; }
+  100% { translate: 550px 0; }
+}
 .scene .gondoleer {
   transform-box: fill-box;
   transform-origin: 50% 100%;
@@ -322,7 +336,7 @@
   }
   .rv { opacity: 1; translate: none; scale: none; transition: none; }
   .scene .bird { animation: none !important; }
-  .scene .gondola, .scene .gondoleer, .scene .gondola-oar { animation: none !important; translate: none !important; rotate: none !important; }
+  .scene .gondola, .scene .gondoleer, .scene .gondola-oar, .scene .gondola-sail { animation: none !important; translate: none !important; rotate: none !important; }
   #lib-people > g { animation: none !important; translate: none !important; }
   .scene .lamp { opacity: 0.9 !important; animation: none !important; }
   .scene .lamp-glow { opacity: 0.12 !important; animation: none !important; }
