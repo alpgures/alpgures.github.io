@@ -839,7 +839,10 @@ main:has(#contact) + footer { border-top: none; }
   .nav-hero.scrolled { padding: 14px 0; }
   .nav-row { padding: 0 20px; }
   .nav-hero .nav-links { display: none; }
-  .scroll-cue { right: 56px; bottom: 28px; }
+  /* (2026-11-16: the hero carries a 66px margin-top, so on a 844px phone
+     it ends 32px past the viewport and the cue's arrow was clipped by
+     the viewport edge. Lift the cue so it sits fully in view.) */
+  .scroll-cue { right: 56px; bottom: 48px; }
   .scroll-cue-text { font-size: 13px; }
   .hero { padding: 56px 0 28px; }
   .hero-inner { max-width: 400px; padding: 0 20px; }
