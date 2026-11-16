@@ -1,4 +1,4 @@
-/* Hero walkers v8 — six distinct people, two cats, a lived-in city
+/* Hero walkers v9 — six distinct people, two cats, a lived-in city
    (Round 21; rebuild of the Opus Nov 13 pass). Alp: 'more intricate',
    'more diverse instead of the same characters duplicated', 'they walk
    weirdly', 'why are they stopping weirdly?'.
@@ -46,14 +46,15 @@
   var LEG = 48;           // hip (y72) to sole (y120), figure units
   var FOOT_REACH = STRIDE / (4 * 0.5); // 7.5 figure units (~9deg at the hip)
   var KNEE_MAX = 30;      // degrees the shin folds back mid-swing
-  var ARM_SWING = 13;     // degrees at the shoulder
+  var ARM_SWING = 18;     // degrees at the shoulder
   var ELBOW_BASE = 5;     // degrees, the forearm's resting bend
   var ELBOW_VAR = 14;     // extra elbow bend as the arm swings forward
-  var BOB = 0.7;          // scene units the body rises at mid-stance
-  var LEAN = 2;           // degrees forward lean at full pace
+  var BOB = 1.5;          // scene units the body rises at mid-stance
+  var LEAN = 3.5;         // degrees forward lean at full pace
   var LANTERN_SWING = 6;  // degrees, pendulum lagging the step
   var ENVELOPE_SPEED = 4; // scene units/s at which the gait reaches full amplitude
-  var TURN = 0.8;         // seconds to turn round
+  var TURN = 0.35;        // seconds to turn round (was 0.8: a slow squash
+                          // left the figure a thin line for too long)
   var TURN_LEAD = 0.25;   // the turn ends this long before the walk starts
   var CAT_STRIDE = 4;     // scene units per full gait cycle for the strolling cat
   var CAT_LEG = 13;       // degrees, the cat's leg swing
@@ -222,8 +223,19 @@
       }
       var f = g.from;
       if (g.to !== g.from) {
+        /* Turn without vanishing: the facing is a 2D flip, so a cosine
+           through 0 would squash the figure to zero width (invisible
+           mid-turn). Instead the figure squashes to ~45% and the facing
+           flips at the bottom of the squash — it reads as a pivot and the
+           figure never disappears. */
         var k = (t - (g.t1 - TURN_LEAD - TURN)) / TURN;
-        if (k > 0) f = k >= 1 ? g.to : g.from * Math.cos(Math.PI * smoothstep(k));
+        if (k > 0) {
+          if (k >= 1) f = g.to;
+          else {
+            var mag = 1 - 0.4 * Math.sin(Math.PI * smoothstep(k));
+            f = (k < 0.5 ? g.from : g.to) * mag;
+          }
+        }
       }
       return { x: g.x0, s: g.s0, v: 0, f: f };
     }
@@ -259,7 +271,10 @@
       x = -FOOT_REACH + 2 * FOOT_REACH * smoothstep(u); // swing: Hermite arc
       knee = KNEE_MAX * Math.sin(Math.PI * u);
     }
-    hip = -Math.asin(Math.max(-1, Math.min(1, x * env / LEG))) * DEG - 0.5 * knee * env;
+    /* The knee folds the shin back, so the thigh must rotate forward by
+       half the knee bend to carry the foot forward — the old minus sign
+       dragged both thighs backward and the walk read as a zombie shuffle. */
+    hip = -Math.asin(Math.max(-1, Math.min(1, x * env / LEG))) * DEG + 0.5 * knee * env;
     return { hip: hip, knee: knee * env };
   }
 
