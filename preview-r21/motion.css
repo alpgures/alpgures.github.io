@@ -1,0 +1,306 @@
+/* Motion system — refined playful. One easing, one float language, everywhere. */
+
+:root {
+  --ease-flow: cubic-bezier(0.22, 1, 0.36, 1);
+  --scene-bg: #1b1d22;
+}
+
+/* translate3d (not translateY) in the motion keyframes + will-change on the
+   animated groups (Alp Nov 12): plain translateY lets the browser rasterize
+   the text inside a floating panel on its own layer, so the text rounds to
+   whole pixels independently of its parent — it skips a pixel, then jumps
+   2px at once, and can't track the panel. translate3d forces the whole
+   group (panel + its text) onto one compositor layer, so the text moves as
+   part of that layer's bitmap and tracks the panel exactly, sub-pixel
+   smooth, no judder. */
+@keyframes scn-float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -10px, 0); }
+}
+/* Floats move TOGETHER (Alp Nov 12): every scn-float runs 7s with no delay
+   offset, so the panels, chips and dots in a scene rise and fall as one
+   unit instead of drifting apart. Only the things with their own distinct
+   motion (tab/row/pill cycles, ring spin, jet hover, btn pulse, blink,
+   breeze, strobe) keep separate timing. */
+/* Promote every animated scene group to its own compositor layer, so the
+   text inside it is rasterized INTO the group's layer and moves with it as
+   one bitmap — no independent pixel-rounding, no judder, no lag. */
+.sc-plane .scn-eink, .sc-plane .scn-jet,
+.sc-koto .scn-phone, .sc-koto .scn-chip, .sc-koto .scn-dot,
+.sc-rui .scn-browser,
+.sc-dct .scn-phone, .sc-dct .scn-chat, .sc-dct .scn-dot,
+.sc-alp .scn-window, .sc-alp .scn-chip, .sc-alp .scn-dot { will-change: transform; }
+
+@keyframes scn-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  33% { transform: translate3d(6px, -12px, 0) rotate(2deg); }
+  66% { transform: translate3d(-6px, -6px, 0) rotate(-2deg); }
+}
+
+/* ---------- Card + project scenes ---------- */
+
+.card-scene {
+  aspect-ratio: 16 / 10;
+  background: var(--scene-bg);
+  overflow: hidden;
+}
+.card-scene .scn { width: 100%; height: 100%; display: block; }
+
+.proj-scene {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--scene-bg);
+  overflow: hidden;
+  margin: 10px 0 6px;
+}
+.proj-scene .scn { width: 100%; height: auto; max-height: 380px; display: block; }
+
+/* ---------- PlaneFrame: e-ink display mockup (mirrors the real Nook UI) ---------- */
+
+.sc-plane .scn-breeze path {
+  stroke-dasharray: 12 16;
+  animation: scn-breeze-flow 1.1s linear infinite;
+}
+@keyframes scn-breeze-flow {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -28; }
+}
+
+.sc-plane .scn-eink { animation: scn-float 7s ease-in-out infinite; }
+
+.sc-plane .scn-jet { animation: scn-hover 6s ease-in-out infinite; }
+@keyframes scn-hover {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -4px, 0); }
+}
+
+.sc-plane .scn-strobe { animation: scn-strobe 1.6s ease-in-out infinite; }
+@keyframes scn-strobe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.1; }
+}
+
+/* ---------- Kotoban: simplified app mockup ---------- */
+
+.sc-koto .scn-phone { animation: scn-float 7s ease-in-out infinite; }
+
+.sc-koto .scn-ringspin {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: scn-spin 14s linear infinite;
+}
+@keyframes scn-spin {
+  to { transform: rotate(360deg); }
+}
+
+.sc-koto .scn-wrow rect { animation: scn-row-cycle 9s var(--ease-flow) infinite; }
+.sc-koto .scn-wrow.wr2 rect { animation-delay: -3s; }
+.sc-koto .scn-wrow.wr3 rect { animation-delay: -6s; }
+@keyframes scn-row-cycle {
+  0%, 10% { fill: #5b6b84; }
+  24%, 100% { fill: #f6f1e8; }
+}
+.sc-koto .scn-wrow text { animation: scn-row-text 9s var(--ease-flow) infinite; }
+.sc-koto .scn-wrow.wr2 text { animation-delay: -3s; }
+.sc-koto .scn-wrow.wr3 text { animation-delay: -6s; }
+@keyframes scn-row-text {
+  0%, 10% { fill: #fffdf8; }
+  24%, 100% { fill: #1b1815; }
+}
+
+.sc-koto .scn-chip { animation: scn-float 7s ease-in-out infinite; }
+
+.sc-koto .scn-dot { animation: scn-float 7s ease-in-out infinite; }
+
+/* ---------- Recipe: simplified site mockup ---------- */
+
+.sc-rui .scn-browser { animation: scn-float 7s ease-in-out infinite; }
+
+.sc-rui .scn-pill rect { animation: scn-pill-cycle 10s var(--ease-flow) infinite; }
+.sc-rui .scn-pill.p1 rect { animation-delay: -2s; }
+.sc-rui .scn-pill.p2 rect { animation-delay: -4s; }
+.sc-rui .scn-pill.p3 rect { animation-delay: -6s; }
+.sc-rui .scn-pill.p4 rect { animation-delay: -8s; }
+@keyframes scn-pill-cycle {
+  0%, 10% { fill: #5b6b84; }
+  20%, 100% { fill: #f1ece2; }
+}
+.sc-rui .scn-pill text { animation: scn-pill-text 10s var(--ease-flow) infinite; }
+.sc-rui .scn-pill.p1 text { animation-delay: -2s; }
+.sc-rui .scn-pill.p2 text { animation-delay: -4s; }
+.sc-rui .scn-pill.p3 text { animation-delay: -6s; }
+.sc-rui .scn-pill.p4 text { animation-delay: -8s; }
+@keyframes scn-pill-text {
+  0%, 10% { fill: #fffdf8; }
+  20%, 100% { fill: #6f6a62; }
+}
+
+.sc-rui .scn-playbtn {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: scn-pulse 2.6s ease-in-out infinite;
+}
+@keyframes scn-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.14); }
+}
+
+/* ---------- Hero: drifting language chips (rendered by app.js) ---------- */
+
+.hero { position: relative; }
+
+/* ---------- DCT Asistan: spindle + app overview ---------- */
+
+.sc-dct .scn-phone { animation: scn-float 7s ease-in-out infinite; }
+
+.sc-dct .scn-chat { animation: scn-float 7s ease-in-out infinite; }
+
+/* igde spindle: one unified Figma vector with a wide planted base. It does
+   NOT turn or animate — Alp Nov 12: the scaleX 3D turn read as terrible, so
+   the spindle stands still and the phone + chat carry the motion. */
+
+.sc-dct .scn-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: scn-blink 4.2s ease-in-out infinite;
+}
+@keyframes scn-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.12); }
+}
+
+.sc-dct .scn-okbtn {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: scn-btn-pulse 2.8s ease-in-out infinite;
+}
+@keyframes scn-btn-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.045); }
+}
+
+.sc-dct .scn-dot { animation: scn-float 7s ease-in-out infinite; }
+
+/* ---------- alpbrowser: Arc-style browser mockup, site palette ---------- */
+
+.sc-alp .scn-window { animation: scn-float 7s ease-in-out infinite; }
+
+.sc-alp .scn-chip { animation: scn-float 7s ease-in-out infinite; }
+
+.sc-alp .scn-dot { animation: scn-float 7s ease-in-out infinite; }
+
+.sc-alp .scn-ringspin {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: scn-spin 1.2s linear infinite;
+}
+
+.sc-alp .scn-tab rect { animation: scn-tab-cycle 9s var(--ease-flow) infinite; }
+.sc-alp .scn-tab.t2 rect { animation-delay: -3s; }
+.sc-alp .scn-tab.t3 rect { animation-delay: -6s; }
+@keyframes scn-tab-cycle {
+  0%, 28% { fill: #5b6b84; }
+  36%, 100% { fill: #f6f1e8; }
+}
+.sc-alp .scn-tab text { animation: scn-tab-text 9s var(--ease-flow) infinite; }
+.sc-alp .scn-tab.t2 text { animation-delay: -3s; }
+.sc-alp .scn-tab.t3 text { animation-delay: -6s; }
+@keyframes scn-tab-text {
+  0%, 28% { fill: #fffdf8; }
+  36%, 100% { fill: #1b1815; }
+}
+
+
+/* ---------- Round 9: hand-drawn hero scene ---------- */
+
+.scene .ink-moon { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ink-draw 1.4s var(--ease-flow) 0.9s forwards; }
+@keyframes ink-draw { to { stroke-dashoffset: 0; } }
+
+/* The scene windows light up once the drawing finishes. */
+.scene .lamp { opacity: 0; animation: lamp-in 1s ease 1.9s forwards; }
+.scene .lamp-glow { opacity: 0; animation: lamp-glow-in 1.4s ease 1.9s forwards; }
+@keyframes lamp-in { to { opacity: 0.9; } }
+@keyframes lamp-glow-in { to { opacity: 0.12; } }
+
+/* Birds drift almost imperceptibly. 45s (not 26s): an `alternate` animation
+   needs 2x its duration to divide the 90s master loop, so 26s would drift
+   out of phase and break the perfect loop (26 does not divide 45). 45s =
+   one full out-and-back per 90s loop. b2 runs antiphase (-22.5s). */
+.scene .bird { animation: bird-drift 45s ease-in-out infinite alternate; }
+.scene .bird.b2 { animation-delay: -22.5s; }
+@keyframes bird-drift { from { transform: translate3d(-14px, 0, 0); } to { transform: translate3d(14px, 0, 0); } }
+
+
+/* ---------- Scroll reveal ---------- */
+
+.rv {
+  opacity: 0;
+  translate: 0 26px;
+  scale: 0.985;
+  transition: opacity 0.9s var(--ease-flow), translate 0.9s var(--ease-flow), scale 0.9s var(--ease-flow);
+}
+.rv.in { opacity: 1; translate: 0 0; scale: 1; }
+.rv-d1 { transition-delay: 0.08s; }
+.rv-d2 { transition-delay: 0.16s; }
+.rv-d3 { transition-delay: 0.24s; }
+
+/* ---------- Hero background: seamless 90-second loop (Alp, Nov 12:
+   "animated with a perfect loop, nothing too fast paced") ----------
+   Master loop 90s (1.5 min, inside the 1–2 min spec). EVERY duration below
+   divides 90 evenly (90/45/30/15) and EVERY keyframe has 0% == 100%, so at
+   t=90s every element is back to its exact t=0 state — a mathematically
+   perfect loop: no snap, no drift, no jump at the seam. Only the lights
+   and stars breathe; the mountains, temples, village and city line-work
+   never move. All motion is slow and subtle. Reduced-motion users get the
+   still frame (the existing block below already forces .tw/.lamp/
+   .lamp-glow to animation:none). */
+@keyframes hero-lamp-breathe {
+  0%, 100% { opacity: 0.78; }
+  50% { opacity: 1; }
+}
+@keyframes hero-glow-breathe {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 0.38; }
+}
+/* Stars: slow the 7s twinkle (styles.css) to 15s. 15 divides 90; 7 does
+   not, so the old 7s twinkle would drift out of phase and break the loop. */
+.scene .tw { animation-duration: 15s; }
+/* Lamps (the 153 city/village/temple windows): three interleaved groups at
+   different rates, so the lights breathe organically instead of pulsing in
+   lockstep. nth-child partitions them 51/51/51 (verified live in the
+   browser). NOTE: do NOT scope this to #lib-canal or #lib-temples — the
+   browser's DOM does not nest the lamps under those ids (verified:
+   #lib-canal .lamp matches 0), so those selectors are dead. .scene .lamp
+   is the selector that actually matches. */
+.scene .lamp:nth-child(3n+1) { animation: hero-lamp-breathe 45s ease-in-out infinite; }
+.scene .lamp:nth-child(3n+2) { animation: hero-lamp-breathe 30s ease-in-out infinite; animation-delay: -10s; }
+.scene .lamp:nth-child(3n) { animation: hero-lamp-breathe 90s ease-in-out infinite; animation-delay: -30s; }
+/* Soft halos around the two main lights: slow 30s appear/fade. */
+.scene .lamp-glow { animation: hero-glow-breathe 30s ease-in-out infinite; }
+/* People: the walkers are rebuilt from scratch as articulated figures
+   (separate legs/arms with a real gait cycle) and driven by walkers.js
+   (rAF, gait phase tied to distance walked). The old hero-walk translate
+   strolls are deleted (Alp, Nov 12: sliding a static figure is not
+   walking). Reduced motion: the JS does not run and the figures stand
+   still; the rule below is belt-and-braces. */
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .scn *, .scn, .chip-x, .chip-w, .chip-x .chip, .chip-w .chip, .scene .tw, .scroll-cue, .scroll-cue-text, .scroll-cue-arrow {
+    animation: none !important;
+  }
+  .rv { opacity: 1; translate: none; scale: none; transition: none; }
+  .scene .bird { animation: none !important; }
+  #lib-people > g { animation: none !important; translate: none !important; }
+  .scene .lamp { opacity: 0.9 !important; animation: none !important; }
+  .scene .lamp-glow { opacity: 0.12 !important; animation: none !important; }
+  .sc-plane .scn-display,
+  .sc-plane .scn-dline { opacity: 1 !important; transform: none !important; }
+  .sc-plane .scn-plane { opacity: 0 !important; }
+}
+
+@media (max-width: 700px) {
+  .hero { min-height: 96vh; padding-bottom: 34vh; }
+}
