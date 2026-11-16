@@ -283,6 +283,35 @@
    strolls are deleted (Alp, Nov 12: sliding a static figure is not
    walking). Reduced motion: the JS does not run and the figures stand
    still; the rule below is belt-and-braces. */
+/* Gondola (Alp, Nov 16: "animate the gondoleer as well"): the boat bobs
+   gently (15s), the gondoleer leans into a rowing stroke and the oar
+   sweeps around his hands (6s per stroke, 15 strokes per 90s loop).
+   All durations divide 90 and every keyframe has 0% == 100%, so the
+   loop stays seamless. CSS translate/rotate properties compose with the
+   gondola group's transform attribute (never use transform: here). */
+.scene .gondola { animation: gondola-bob 15s ease-in-out infinite; }
+@keyframes gondola-bob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -2px; }
+}
+.scene .gondoleer {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: gondolier-row 6s ease-in-out infinite;
+}
+@keyframes gondolier-row {
+  0%, 100% { rotate: -2deg; }
+  50% { rotate: 2.5deg; }
+}
+.scene .gondola-oar {
+  transform-box: fill-box;
+  transform-origin: 75% 23%;
+  animation: oar-row 6s ease-in-out infinite;
+}
+@keyframes oar-row {
+  0%, 100% { rotate: 6deg; }
+  50% { rotate: -6deg; }
+}
 
 /* ---------- Reduced motion ---------- */
 
@@ -293,6 +322,7 @@
   }
   .rv { opacity: 1; translate: none; scale: none; transition: none; }
   .scene .bird { animation: none !important; }
+  .scene .gondola, .scene .gondoleer, .scene .gondola-oar { animation: none !important; translate: none !important; rotate: none !important; }
   #lib-people > g { animation: none !important; translate: none !important; }
   .scene .lamp { opacity: 0.9 !important; animation: none !important; }
   .scene .lamp-glow { opacity: 0.12 !important; animation: none !important; }

@@ -563,7 +563,7 @@ html.glass-ok .chips .chip {
 .greet-word { color: var(--accent); white-space: nowrap; flex-shrink: 0; }
 .greet-bang { color: var(--accent); white-space: nowrap; flex-shrink: 0; }
 .greet-rest { white-space: nowrap; position: relative; top: 0.05em; }
-.love-box > span { flex-shrink: 0; line-height: 1; }
+.love-box > span { flex-shrink: 0; line-height: 1.15; }
 .hero-love {
   font-size: clamp(24px, 6vw, 52px) !important;
   font-weight: 300;
@@ -574,13 +574,17 @@ html.glass-ok .chips .chip {
   margin: 0 0 10px;
 }
 .love-box {
+  /* (2026-11-16, Alp: the rotating love word sat ~3px lower than "I love".
+     The box used line-height 1 + align-items center while the lead sits
+     in the h1's 1.15 line box, so the word centered in a shorter box.
+     Match the h1 line-height and align on the text baseline instead.) */
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   box-sizing: border-box;
-  padding: 0.06em 0.08em;
+  padding: 0 0.08em;
   overflow: hidden;
   vertical-align: baseline;
-  line-height: 1;
+  line-height: 1.15;
   transition: width 0.55s cubic-bezier(0.22,1,0.36,1);
   color: var(--ink);
 }
@@ -628,8 +632,9 @@ html.glass-ok .chips .chip {
      hand-drawn arrow, part of the line art. Legibility comes from a
      soft shadow behind the text/arrow, not a box.) */
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  left: auto;
+  right: 56px;
+  transform: none;
   bottom: 36px;
   z-index: 3;
   display: flex;
@@ -679,6 +684,14 @@ html.glass-ok .chips .chip {
   border-radius: var(--hand);
 }
 .btn:hover { text-decoration: none; background: #7d8ca3; color: #141518; }
+
+/* (2026-11-16, Alp: the hero Experience button should stay filled but
+   be a darker blue than "See my work" — same slate family, light text.) */
+.btn-dark {
+  background: #5a6b84;
+  color: var(--ink);
+}
+.btn-dark:hover { background: #4e5e75; color: var(--ink); }
 
 .btn-ghost {
   /* (2026-11-07, round 6, per Alp: the Experience button was not
@@ -776,6 +789,12 @@ html.glass-ok .chips .chip {
   padding: 0;
   border: none;
 }
+/* (2026-11-16, Alp: the Contact heading carried a redundant short rule
+   under it — the h2::after fine line stacked on the contact-head's own
+   full-width rule. Drop the h2 one; the full-width rule stays.) */
+#contact .contact-head h2::after {
+  display: none;
+}
 #contact .contact-links {
   justify-content: flex-end;
   margin-top: 0;
@@ -820,7 +839,10 @@ main:has(#contact) + footer { border-top: none; }
   .nav-hero.scrolled { padding: 14px 0; }
   .nav-row { padding: 0 20px; }
   .nav-hero .nav-links { display: none; }
-  .scroll-cue { right: 56px; bottom: 28px; }
+  /* (2026-11-16: the hero carries a 66px margin-top, so on a 844px phone
+     it ends 32px past the viewport and the cue's arrow was clipped by
+     the viewport edge. Lift the cue so it sits fully in view.) */
+  .scroll-cue { right: 56px; bottom: 48px; }
   .scroll-cue-text { font-size: 13px; }
   .hero { padding: 56px 0 28px; }
   .hero-inner { max-width: 400px; padding: 0 20px; }
