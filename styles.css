@@ -685,6 +685,14 @@ html.glass-ok .chips .chip {
 }
 .btn:hover { text-decoration: none; background: #7d8ca3; color: #141518; }
 
+/* (2026-11-16, Alp: the hero Experience button should stay filled but
+   be a darker blue than "See my work" — same slate family, light text.) */
+.btn-dark {
+  background: #5a6b84;
+  color: var(--ink);
+}
+.btn-dark:hover { background: #4e5e75; color: var(--ink); }
+
 .btn-ghost {
   /* (2026-11-07, round 6, per Alp: the Experience button was not
      legible enough — the transparent ghost let a word bubble show
